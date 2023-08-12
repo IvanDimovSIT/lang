@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <memory>
 #include "../token/Token.h"
 #include "RuntimeErrorType.h"
 #include "../scanner/Function.h"
@@ -11,7 +12,8 @@ public:
 
 class Interpreter{
 public:
-    static bool execute(std::vector<Token*> &tokens, IRuntimeErrorReporter* errorReporter, std::vector<double>& result);
+    static bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result, IRuntimeErrorReporter* errorReporter);
+
 private:
     static bool execute(
         std::vector<Token*> &tokens,
@@ -22,6 +24,30 @@ private:
         std::vector<double>& result,
         IRuntimeErrorReporter* errorReporter);
 
-    //return new position
-    static int extractUpToClosedParenthesis(std::vector<Token*> &tokens, int currentPosition, std::vector<Token*>& extracted);
+    //removes function declarations and function bodies
+    static bool extractFunctions(std::vector<Token*> &tokens, std::vector<Token*> &dest);
+
+    static int findLastNonEndlineTokenIndex(std::vector<Token*> &tokens);
+    
+    static std::unique_ptr<std::vector<double>> evaluate(
+        std::vector<Token*> &tokens,
+        std::map<std::string, Function>& functions,
+        std::map<std::string, std::vector<double>>& localVariables,
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* errorReporter);
+
+
+    // examples:
+    // extract next value:  3 + 1,2,3
+    //            we are here ^   --> extracted -> 1,2,3
+    //
+    // extract next value:  3 + ( 1,2,3 - VAR )
+    //            we are here ^   --> extracted -> ( 1,2,3 - VAR )
+    //
+    static bool getNextArgument(std::vector<Token*> &tokens, std::vector<Token*> &dest);
+
+    // returns false if not an operation
+    static bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam);
 };
