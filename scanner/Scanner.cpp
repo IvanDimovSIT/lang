@@ -34,7 +34,7 @@ bool Scanner::scan(
     std::set<std::string> functionNames;
     int lineCounter = 1;
     std::string curr = "";
-    bool hadError = validateParenthesis(source, sourceLen, errorReporter);
+    bool hadError = !validateParenthesis(source, sourceLen, errorReporter);
     if(!findFunctionNames(source, functionNames, errorReporter)){
         hadError = true;
     }
