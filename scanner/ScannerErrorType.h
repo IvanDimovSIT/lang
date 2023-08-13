@@ -4,5 +4,9 @@ enum ScannerErrorType{
     ScannerErrorTypeFunctionDefinitionError,
     ScannerErrorTypeFunctionRedefinition,
     ScannerErrorTypeFunctionNameDefinitionError,
-    ScannerErrorTypeUnrecognisedToken
+    ScannerErrorTypeUnrecognisedToken,
+    ScannerErrorTypeMoreClosingParenthesis,
+    ScannerErrorTypeMoreOpenParenthesis,
+    ScannerErrorTypeMoreClosingCurlyBrackets,
+    ScannerErrorTypeMoreOpenCurlyBrackets
 };

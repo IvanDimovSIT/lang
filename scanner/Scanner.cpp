@@ -34,7 +34,7 @@ bool Scanner::scan(
     std::set<std::string> functionNames;
     int lineCounter = 1;
     std::string curr = "";
-    bool hadError = false;
+    bool hadError = validateParenthesis(source, sourceLen, errorReporter);
     if(!findFunctionNames(source, functionNames, errorReporter)){
         hadError = true;
     }
@@ -246,4 +246,53 @@ bool Scanner::isSingleCharToken(char token)
     default:
         return false;
     }
+}
+
+bool Scanner::validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter)
+{
+    int openP = 0;
+    int openCurly = 0;
+    int lineCounter = 1;
+    bool hadError = false;
+
+    for(int i=0; i<sourceLen; i++){
+        if(source[i] == '\n')
+            lineCounter++;
+        
+        if(source[i] == '('){
+            openP++;
+        }else if(source[i] == ')'){
+            openP--;
+        }else if(source[i] == '{'){
+            openCurly++;
+        }else if(source[i] == '}'){
+            openCurly--;
+        }
+
+        if(openP < 0){
+            hadError = true;
+            if(errorReporter)
+                errorReporter->report(lineCounter, ScannerErrorTypeMoreClosingParenthesis);
+        }
+        if(openCurly < 0){
+            hadError = true;
+            if(errorReporter)
+                errorReporter->report(lineCounter, ScannerErrorTypeMoreClosingCurlyBrackets);
+        }
+
+    }
+
+    if(openP > 0){
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(lineCounter, ScannerErrorTypeMoreOpenParenthesis);
+    }
+
+    if(openCurly > 0){
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(lineCounter, ScannerErrorTypeMoreOpenCurlyBrackets);
+    }
+    
+    return !hadError;
 }

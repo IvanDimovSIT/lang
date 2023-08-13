@@ -27,4 +27,6 @@ private:
     static void determineFunctionPrameters(Function& function);
     
     static std::map<std::string, TokenId> tokenMap;
+
+    static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
 };
