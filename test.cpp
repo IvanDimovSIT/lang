@@ -4,7 +4,10 @@
 #include "util/LiteralParser.h"
 #include "util/StringUtil.h"
 #include "util/TokenSubArrayFinder.h"
+#include "debug/DebugPrinter.h"
+#include "debug/ErrorPrinter.h"
 
+ErrorPrinter errorPrinter;
 
 void testLiteralParser(){
     std::vector<double> lit;
@@ -34,7 +37,7 @@ void testScanner(){
     std::string source = "f FUNC { a + 1,2,3 } \n A = 2,1 FUNC";
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
-    assert(Scanner::scan(source, tokens, functions, nullptr));
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     assert(functions.size() == 1);
     assert(functions["FUNC"].body.size() == 3);
     assert(functions["FUNC"].left);
