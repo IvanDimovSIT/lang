@@ -27,7 +27,8 @@ private:
     //removes function declarations and function bodies
     static bool extractFunctions(std::vector<Token*> &tokens, std::vector<Token*> &dest);
 
-    static int findLastNonEndlineTokenIndex(std::vector<Token*> &tokens);
+    //returns the index of the last non endline or brackets token 
+    static int findLastNonOperationalTokenIndex(std::vector<Token*> &tokens);
     
     // uses execute
     static std::unique_ptr<std::vector<double>> evaluate(
