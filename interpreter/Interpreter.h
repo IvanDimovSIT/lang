@@ -29,6 +29,7 @@ private:
 
     static int findLastNonEndlineTokenIndex(std::vector<Token*> &tokens);
     
+    // uses execute
     static std::unique_ptr<std::vector<double>> evaluate(
         std::vector<Token*> &tokens,
         std::map<std::string, Function>& functions,
@@ -50,4 +51,14 @@ private:
 
     // returns false if not an operation
     static bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam);
+
+    static std::unique_ptr<std::vector<double>> executeOperationOrFunction(
+        Token& operation,
+        std::vector<double>& left,
+        std::vector<double>& right,
+        std::map<std::string, Function>& functions,
+        std::map<std::string, std::vector<double>>& localVariables,
+        bool& hadError,
+        IRuntimeErrorReporter* errorReporter);
+
 };

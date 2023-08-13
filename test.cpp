@@ -34,7 +34,7 @@ void testStringUtil(){
 
 
 void testScanner(){
-    std::string source = "f FUNC { a + 1,2,3 } \n A = 2,1 FUNC ";
+    std::string source = "f FUNC { a + 1,2,3 }\nA = 2,1 FUNC ";
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
