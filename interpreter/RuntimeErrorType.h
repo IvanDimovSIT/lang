@@ -6,5 +6,6 @@ enum RuntimeErrorType{
     RuntimeErrorTypeOperationAsParameter,
     RuntimeErrorTypeNoClosingParenthesis,
     RuntimeErrorTypeEvaluationError,
-    RuntimeErrorTypeParameterError
+    RuntimeErrorTypeParameterError,
+    RuntimeErrorTypeNotAnOperation
 };

@@ -1,5 +1,6 @@
 #include "Interpreter.h"
 #include "../util/TokenSubArrayFinder.h"
+#include "InterpreterCalculator.h"
 
 bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result, IRuntimeErrorReporter* errorReporter)
 {
@@ -87,8 +88,13 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
     if(tokens[position]->id == TokenIdLiteral){
         result = std::make_unique<std::vector<double>>(tokens[position]->val);
         return std::move(result);
-    }
-    else if(tokens[position]->id == TokenIdFunction){
+    }else if(tokens[position]->id == TokenIdLeftParam){
+        result = std::make_unique<std::vector<double>>(left);
+        return std::move(result);
+    }else if(tokens[position]->id == TokenIdRightParam){
+        result = std::make_unique<std::vector<double>>(right);
+        return std::move(result);
+    }else if(tokens[position]->id == TokenIdFunction){
         bool ArgLeft, ArgRight;
         getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, functions);
         if((!ArgLeft) && (!ArgRight)){
@@ -132,7 +138,17 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
         return true;
     }
 
-    /// TODO: Add checks for the rest of the tokens
+    switch (operation.id)
+    {
+    case TokenIdAdd:
+    case TokenIdSubtract:
+    case TokenIdMultiply:
+    case TokenIdDivide:
+        leftParam = true;
+        rightParam = true;
+        return true;
+    break;
+    }
 
     return false;
 }
@@ -140,13 +156,37 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
 
 
 std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
-    Token& operation,
-    std::vector<double>& left,
-    std::vector<double>& right,
-    std::map<std::string, Function>& functions,
-    std::map<std::string, std::vector<double>>& localVariables,
-    bool& hadError,
-    IRuntimeErrorReporter* errorReporter)
+    std::vector<double>& leftOfOperator,
+        std::vector<double>& rightOfOperator,
+        Token& operation,
+        std::vector<double>& left,
+        std::vector<double>& right,
+        std::map<std::string, Function>& functions,
+        std::map<std::string, std::vector<double>>& localVariables,
+        bool& hadError,
+        IRuntimeErrorReporter* errorReporter)
 {
-    /// TODO: Add a switch for the operations
+    switch (operation.id)
+    {
+    case TokenIdFunction:
+        {
+            auto result = std::make_unique<std::vector<double>>();
+            hadError = !execute(functions[operation.str].body, functions, localVariables, leftOfOperator, rightOfOperator, *result, errorReporter);
+            return result;
+        }
+    case TokenIdAdd:
+        return InterpreterCalculator::add(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdSubtract:
+        return InterpreterCalculator::subtract(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdMultiply:
+        return InterpreterCalculator::multiply(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdDivide:
+        return InterpreterCalculator::divide(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    }
+
+    hadError = true;
+    if(errorReporter)
+        errorReporter->report(RuntimeErrorTypeNotAnOperation);
+
+    return std::make_unique<std::vector<double>>();
 }
