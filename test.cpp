@@ -66,6 +66,10 @@ void testScanner(){
 
     std::vector<double> result;
     assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+    assert(result.size() == 3);
+    assert(result[0] == 3);
+    assert(result[1] == 3);
+    assert(result[2] == 5);
 
 }
 

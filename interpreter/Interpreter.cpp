@@ -70,6 +70,7 @@ bool Interpreter::execute(
 
 
     result = *lastResult;
+    return true;
 }
 
     
@@ -148,6 +149,7 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
         rightParam = true;
         return true;
     break;
+    default:break;
     }
 
     return false;
@@ -182,6 +184,7 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::multiply(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdDivide:
         return InterpreterCalculator::divide(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    default:break;
     }
 
     hadError = true;
