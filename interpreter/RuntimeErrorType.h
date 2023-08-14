@@ -2,5 +2,9 @@
 
 enum RuntimeErrorType{
     RuntimeErrorTypeEmptyData,
-    RuntimeErrorTypeDivisionByZero
+    RuntimeErrorTypeDivisionByZero,
+    RuntimeErrorTypeOperationAsParameter,
+    RuntimeErrorTypeNoClosingParenthesis,
+    RuntimeErrorTypeEvaluationError,
+    RuntimeErrorTypeParameterError
 };

@@ -18,4 +18,7 @@ public:
     //return new position(moves backwards) (currentPosition token is ignored)
     static int findOpenCurly(std::vector<Token*> &tokens, int currentPosition);
     static int findOpenCurly(std::vector<Token> &tokens, int currentPosition);
+
+
+    static int findClosingParenthesis(std::vector<Token*> &tokens, int currentPosition);
 };

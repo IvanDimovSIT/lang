@@ -32,6 +32,24 @@ int TokenSubArrayFinder::findClosingCurly(std::vector<Token*> &tokens, int curre
     return TOKEN_INDEX_NOT_FOUND;
 }
 
+int TokenSubArrayFinder::findClosingParenthesis(std::vector<Token*> &tokens, int currentPosition)
+{
+    const int size = tokens.size();
+    int p;
+    int open = 1;
+    for(p = currentPosition+1; p<size; p++){
+        if(tokens[p]->id == TokenIdOpenParenthesis){
+            open++;
+        }else if(tokens[p]->id == TokenIdCloseParenthesis){
+            open--;
+            if(open == 0)
+                return p;
+        }
+    }
+
+    return TOKEN_INDEX_NOT_FOUND;
+}
+
 
 int TokenSubArrayFinder::findClosingCurly(std::vector<Token> &tokens, int currentPosition)
 {
