@@ -6,6 +6,8 @@
 #include "util/TokenSubArrayFinder.h"
 #include "debug/DebugPrinter.h"
 #include "debug/ErrorPrinter.h"
+#include "interpreter/Interpreter.h"
+#include "interpreter/FunctionExtractor.h"
 
 ErrorPrinter errorPrinter;
 
@@ -57,6 +59,14 @@ void testScanner(){
     assert(tokens[10].id == TokenIdLiteral);
     assert(tokens[10].val.size() == 2);
     assert(tokens[11].id == TokenIdFunction);
+
+    std::vector<Token*> exec;
+    FunctionExtractor::extractFunctions(tokens, exec);
+    assert(exec.size() == 5);
+
+    std::vector<double> result;
+    assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+
 }
 
 int main(){

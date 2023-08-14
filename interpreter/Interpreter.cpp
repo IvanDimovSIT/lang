@@ -69,7 +69,7 @@ bool Interpreter::execute(
     }
 
 
-
+    result = *lastResult;
 }
 
     
