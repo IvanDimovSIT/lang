@@ -102,7 +102,7 @@ bool Interpreter::execute(
 
     
 std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
-    int position,
+    int& position,
     std::vector<Token*> &tokens,
     std::map<std::string, Function>& functions,
     std::map<std::string, std::vector<double>>& localVariables,
@@ -150,6 +150,7 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
         TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos+1);
         result = std::make_unique<std::vector<double>>();
         hadError = !execute(sub, functions, localVariables, left, right, *result, errorReporter);
+        position = endPos; // move position to the end
         return std::move(result);
     }
 

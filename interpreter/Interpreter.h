@@ -34,7 +34,7 @@ private:
     //            we are here ^   --> extracted -> ( 1,2,3 - VAR )
     //
     static std::unique_ptr<std::vector<double>> getNextArgument(
-        int position,
+        int& position,
         std::vector<Token*> &tokens,
         std::map<std::string, Function>& functions,
         std::map<std::string, std::vector<double>>& localVariables,
