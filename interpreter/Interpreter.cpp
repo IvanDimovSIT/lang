@@ -57,7 +57,7 @@ bool Interpreter::execute(
             continue;
         }
 
-        if(leftParameter->size() == 0){
+        if(leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr){
             leftParameter = getNextArgument(i, tokens, functions, localVariables, left, right, hadError, errorReporter);
         }else if(operation == nullptr){
             operation = tokens[i];
@@ -72,9 +72,15 @@ bool Interpreter::execute(
         //check for calculation
         if(operation != nullptr){
             bool leftArg, rightArg;
-            getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, functions);
+            hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, functions); 
+             if(hadError){
+                if(errorReporter)
+                    errorReporter->report(RuntimeErrorTypeNotAnOperation);
+                return false;
+            }
             if(rightArg && rightParameter->size() > 0){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError, errorReporter);
+                std::move(rightParameter);//delete right parameter
             }else if(leftArg && leftParameter->size() > 0){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError, errorReporter);
             }else{
