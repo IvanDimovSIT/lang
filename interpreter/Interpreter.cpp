@@ -81,12 +81,13 @@ bool Interpreter::execute(
             if(rightArg && rightParameter->size() > 0){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError, errorReporter);
                 std::move(rightParameter);//delete right parameter
-            }else if(leftArg && leftParameter->size() > 0){
+            }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError, errorReporter);
             }else{
-                if(errorReporter)
-                    errorReporter->report(RuntimeErrorTypeParameterError);
-                return false;
+                continue;
+                //if(errorReporter)
+                //    errorReporter->report(RuntimeErrorTypeParameterError);
+                //return false;
             }
         }
 
