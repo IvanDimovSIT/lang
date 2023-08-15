@@ -97,6 +97,8 @@ bool Interpreter::execute(
     }
 
 
+    if(leftParameter->size() != 0)
+        lastResult = std::move(leftParameter);
     result = *lastResult;
     return true;
 }
