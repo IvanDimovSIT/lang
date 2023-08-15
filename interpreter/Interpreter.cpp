@@ -36,6 +36,27 @@ bool Interpreter::execute(
             continue;
         }
 
+        if(tokens[i]->id == TokenIdEquals && i-1>=0 && tokens[i-1]->id == TokenIdVariable){
+            const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
+            std::vector<Token*> statement;
+            TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
+
+            localVariables[tokens[i-1]->str].clear();
+            hadError = !execute(
+                statement,
+                functions,
+                localVariables,
+                left,
+                right,
+                localVariables[tokens[i-1]->str],
+                errorReporter);
+            if(hadError)
+                return false;
+            
+            i = statementEnd;
+            continue;
+        }
+
         if(leftParameter->size() == 0){
             leftParameter = getNextArgument(i, tokens, functions, localVariables, left, right, hadError, errorReporter);
         }else if(operation == nullptr){
@@ -86,7 +107,10 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
 {
     std::unique_ptr<std::vector<double>> result;
 
-    if(tokens[position]->id == TokenIdLiteral){
+    if(tokens[position]->id == TokenIdVariable){
+        result = std::make_unique<std::vector<double>>(localVariables[tokens[position]->str]);
+        return std::move(result);
+    }else if(tokens[position]->id == TokenIdLiteral){
         result = std::make_unique<std::vector<double>>(tokens[position]->val);
         return std::move(result);
     }else if(tokens[position]->id == TokenIdLeftParam){

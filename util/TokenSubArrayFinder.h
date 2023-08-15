@@ -21,4 +21,5 @@ public:
 
 
     static int findClosingParenthesis(std::vector<Token*> &tokens, int currentPosition);
+    static int findStatementEnd(std::vector<Token*> &tokens, int currentPosition);
 };

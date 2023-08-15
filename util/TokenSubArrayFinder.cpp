@@ -103,3 +103,14 @@ int TokenSubArrayFinder::findOpenCurly(std::vector<Token> &tokens, int currentPo
 
     return TOKEN_INDEX_NOT_FOUND;
 }
+
+int TokenSubArrayFinder::findStatementEnd(std::vector<Token*> &tokens, int currentPosition)
+{
+    const int size = tokens.size();
+    for(; currentPosition < size; currentPosition++){
+        if(tokens[currentPosition]->id == TokenIdEndLine)
+            return currentPosition;
+    }
+
+    return size-1;
+}
