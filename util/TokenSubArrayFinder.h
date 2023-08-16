@@ -22,4 +22,7 @@ public:
 
     static int findClosingParenthesis(std::vector<Token*> &tokens, int currentPosition);
     static int findStatementEnd(std::vector<Token*> &tokens, int currentPosition);
+
+    //return the index of the first token that matches the id in the current line (empty lines following are currentPosition are ignored) (moves forwards)
+    static int findFirstTokenIdInLine(std::vector<Token*> &tokens, int currentPosition, TokenId id);
 };

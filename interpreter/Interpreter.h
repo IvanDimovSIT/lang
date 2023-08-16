@@ -10,6 +10,12 @@ public:
     virtual void report(RuntimeErrorType errorType) = 0;
 };
 
+struct LoopReturn{
+    std::vector<Token*> condition;
+    int loopStart;
+    int loopEnd;
+};
+
 class Interpreter{
 public:
     static bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result, IRuntimeErrorReporter* errorReporter);

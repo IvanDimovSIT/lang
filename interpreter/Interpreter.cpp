@@ -1,3 +1,4 @@
+#include <stack>
 #include "Interpreter.h"
 #include "../util/TokenSubArrayFinder.h"
 #include "InterpreterCalculator.h"
@@ -25,6 +26,7 @@ bool Interpreter::execute(
     std::unique_ptr<std::vector<double>> rightParameter = std::make_unique<std::vector<double>>();
     std::unique_ptr<std::vector<double>> lastResult = std::make_unique<std::vector<double>>();
     Token* operation = nullptr;
+    std::stack<LoopReturn> loopStack;
 
     for(int i=0; i<size; i++){
         if(tokens[i]->id == TokenIdEndLine || tokens[i]->id == TokenIdOpenCurly || tokens[i]->id == TokenIdCloseCurly){

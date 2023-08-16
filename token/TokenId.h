@@ -17,5 +17,7 @@ enum TokenId{
     TokenIdIterate,             // i
     TokenIdLeftParam,           // a
     TokenIdRightParam,          // b
-    TokenIdEndLine              // '\n'
+    TokenIdEndLine,             // '\n'
+    TokenIdIf,                  // '?'
+    TokenIdLoop,                // 'loop'
 };

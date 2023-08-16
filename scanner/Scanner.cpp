@@ -17,7 +17,9 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"}", TokenIdCloseCurly},
     {"(", TokenIdOpenParenthesis},
     {")", TokenIdCloseParenthesis},
-    {"\n", TokenIdEndLine}
+    {"\n", TokenIdEndLine},
+    {"?", TokenIdIf},
+    {"loop", TokenIdLoop}
 };
 
 

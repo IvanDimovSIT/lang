@@ -114,3 +114,20 @@ int TokenSubArrayFinder::findStatementEnd(std::vector<Token*> &tokens, int curre
 
     return size-1;
 }
+
+int TokenSubArrayFinder::findFirstTokenIdInLine(std::vector<Token*> &tokens, int currentPosition, TokenId id)
+{
+    const int size = tokens.size();
+    bool seenEndLine = false;
+    for(; currentPosition<size; currentPosition++){
+        if(tokens[currentPosition]->id == id)
+            return currentPosition;
+        else if(tokens[currentPosition]->id == TokenIdEndLine)
+            seenEndLine = true;
+        else if(seenEndLine)
+            return TOKEN_INDEX_NOT_FOUND;
+    }
+
+    return TOKEN_INDEX_NOT_FOUND;
+}
+
