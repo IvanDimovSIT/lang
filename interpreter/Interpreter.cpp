@@ -38,6 +38,34 @@ bool Interpreter::execute(
             continue;
         }
 
+        if(tokens[i]->id == TokenIdIf){
+            std::vector<Token*> condition;
+            std::vector<double> conditionResult;
+            int endCondition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
+            if(endCondition == TOKEN_INDEX_NOT_FOUND){
+                if(errorReporter)
+                    errorReporter->report(RuntimeErrorTypeMissingIfCondition);
+                return false;
+            }
+            TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
+            if(!execute(condition, functions, localVariables, left, right, conditionResult, errorReporter))
+                return false;
+            
+            if(conditionResult[0] != 0.0){
+                i = endCondition;
+                continue;
+            }else{
+                int afterIfBody = TokenSubArrayFinder::findClosingParenthesis(tokens, endCondition);
+                if(afterIfBody == TOKEN_INDEX_NOT_FOUND){
+                    if(errorReporter)
+                        errorReporter->report(RuntimeErrorTypeInvalidIfSyntax);
+                    return false;
+                }
+                i = afterIfBody;
+                continue;
+            }
+        }
+
         if(tokens[i]->id == TokenIdEquals && i-1>=0 && tokens[i-1]->id == TokenIdVariable){
             const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
             std::vector<Token*> statement;

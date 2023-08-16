@@ -7,5 +7,7 @@ enum RuntimeErrorType{
     RuntimeErrorTypeNoClosingParenthesis,
     RuntimeErrorTypeEvaluationError,
     RuntimeErrorTypeParameterError,
-    RuntimeErrorTypeNotAnOperation
+    RuntimeErrorTypeNotAnOperation,
+    RuntimeErrorTypeMissingIfCondition,
+    RuntimeErrorTypeInvalidIfSyntax
 };
