@@ -53,6 +53,8 @@ bool Interpreter::execute(
             if(hadError)
                 return false;
             
+            /// TODO: Could be optimised
+            *lastResult = localVariables[tokens[i-1]->str]; 
             i = statementEnd;
             continue;
         }
