@@ -61,7 +61,7 @@ void testScanner(){
     assert(tokens[11].id == TokenIdFunction);
 
     std::vector<Token*> exec;
-    FunctionExtractor::extractFunctions(tokens, exec);
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
     assert(exec.size() == 5);
 
     std::vector<double> result;

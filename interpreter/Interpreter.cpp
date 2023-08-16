@@ -29,7 +29,7 @@ bool Interpreter::execute(
     std::stack<LoopReturn> loopStack;
 
     for(int i=0; i<size; i++){
-        if(loopStack.size() !=0 && i == loopStack.top().loopEnd){
+        if(loopStack.size() != 0 && i == loopStack.top().loopEnd){
             std::vector<double> conditionResult;
             if(!execute(loopStack.top().condition, functions, localVariables, left, right, conditionResult, errorReporter))
                 return false;
