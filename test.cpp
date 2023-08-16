@@ -73,10 +73,33 @@ void testScanner(){
 
 }
 
+void testInterpreter()
+{
+    std::string source = 
+        "f FUNC { a + 1 }\n END = 10 FUNC\n"
+        "START = 1\n"
+        "? START {\n"
+        "END = END + 2\n"
+        "}\n"
+        "loop END {\n"
+        "END = END - 1\n"
+        "}\n";
+    
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+    std::vector<double> result;
+    assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+    assert(result[0] == 0.0);
+}
+
 int main(){
     testLiteralParser();
     testStringUtil();
     testScanner();
+    testInterpreter();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;
