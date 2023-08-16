@@ -29,6 +29,20 @@ bool Interpreter::execute(
     std::stack<LoopReturn> loopStack;
 
     for(int i=0; i<size; i++){
+        if(i == loopStack.top().loopEnd){
+            std::vector<double> conditionResult;
+            if(!execute(loopStack.top().condition, functions, localVariables, left, right, conditionResult, errorReporter))
+                return false;
+
+            if(conditionResult[0] != 0.0){
+                i = loopStack.top().loopStart;
+                continue;
+            }else{
+                loopStack.pop();
+                continue;
+            }
+        }
+
         if(tokens[i]->id == TokenIdEndLine || tokens[i]->id == TokenIdOpenCurly || tokens[i]->id == TokenIdCloseCurly){
             if(leftParameter->size() != 0){
                 lastResult = std::move(leftParameter);
@@ -62,6 +76,30 @@ bool Interpreter::execute(
                     return false;
                 }
                 i = afterIfBody;
+                continue;
+            }
+        }
+
+        if(tokens[i]->id == TokenIdLoop){
+            LoopReturn loopData;
+            std::vector<double> conditionResult;
+            loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
+            if(loopData.loopStart == TOKEN_INDEX_NOT_FOUND){
+                if(errorReporter)
+                    errorReporter->report(RuntimeErrorTypeMissingLoopCondition);
+                return false;
+            }
+            TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
+            loopData.loopEnd = TokenSubArrayFinder::findClosingCurly(tokens, loopData.loopStart);
+            if(!execute(loopData.condition, functions, localVariables, left, right, conditionResult, errorReporter))
+                return false;
+
+            if(conditionResult[0] != 0){
+                loopStack.push(loopData);
+                i = loopData.loopStart;
+                continue;
+            }else{
+                i = loopData.loopEnd;
                 continue;
             }
         }

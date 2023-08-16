@@ -9,5 +9,6 @@ enum RuntimeErrorType{
     RuntimeErrorTypeParameterError,
     RuntimeErrorTypeNotAnOperation,
     RuntimeErrorTypeMissingIfCondition,
-    RuntimeErrorTypeInvalidIfSyntax
+    RuntimeErrorTypeInvalidIfSyntax,
+    RuntimeErrorTypeMissingLoopCondition
 };
