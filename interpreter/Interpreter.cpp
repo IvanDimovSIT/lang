@@ -116,13 +116,15 @@ bool Interpreter::execute(
                 localVariables,
                 left,
                 right,
-                localVariables[tokens[i-1]->str],
+                *leftParameter,
                 errorReporter);
             if(hadError)
                 return false;
             
             /// TODO: Could be optimised
-            *lastResult = localVariables[tokens[i-1]->str]; 
+            lastResult = std::move(leftParameter);
+            leftParameter = std::make_unique<std::vector<double>>();
+            localVariables[tokens[i - 1]->str] = *lastResult;
             i = statementEnd;
             continue;
         }
