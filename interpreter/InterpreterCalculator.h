@@ -30,6 +30,11 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> iterate(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
 private:
     using DyadicFunctionLambda = std::function<double(double, double, bool&, IRuntimeErrorReporter*)>;
 

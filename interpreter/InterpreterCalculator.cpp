@@ -1,5 +1,5 @@
 #include "InterpreterCalculator.h"
-
+#include <cmath>
 
 std::unique_ptr<std::vector<double>> InterpreterCalculator::dyadicFunction(
         std::vector<double>& left,
@@ -92,5 +92,35 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::divide(
             return a / b;
         })
     );
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::iterate(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    const int size = left.size();
+    if(size == 0){
+        hadError = true;
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+
+        return result;
+    }
+
+    for(const auto& i: left){
+        int val = floor(i);
+        if(val <= 0)
+            continue;
+
+        for(int j = 1; j <= val; j++){
+            result->push_back((double)i);
+        }
+    }
+    if(result->size() == 0)
+        result->push_back(0.0);
+
+    return std::move(result);
 }
 

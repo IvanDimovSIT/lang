@@ -81,6 +81,8 @@ void testInterpreter()
         "? START {\n"
         "END = END + 2\n"
         "}\n"
+        "B = 10 i\n"
+        "C = 12,2.2 i \n"
         "loop END {\n"
         "END = END - 1\n"
         "}\n";
