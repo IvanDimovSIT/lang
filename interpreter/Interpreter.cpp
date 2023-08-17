@@ -109,7 +109,7 @@ bool Interpreter::execute(
             std::vector<Token*> statement;
             TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
 
-            localVariables[tokens[i-1]->str].clear();
+            //localVariables[tokens[i-1]->str].clear(); /// TODO: Remove this
             hadError = !execute(
                 statement,
                 functions,
