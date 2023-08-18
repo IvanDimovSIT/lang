@@ -149,7 +149,8 @@ bool Interpreter::execute(
             if(hadError)
                 return false;
             
-            interpreterIO->write(output);
+            if(output.size() >= 1)
+                interpreterIO->write(output);
             i = statementEnd;
             continue;
         }
