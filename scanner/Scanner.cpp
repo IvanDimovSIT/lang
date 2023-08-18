@@ -20,7 +20,9 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"\n", TokenIdEndLine},
     {"?", TokenIdIf},
     {"loop", TokenIdLoop},
-    {"i", TokenIdIterate}
+    {"i", TokenIdIterate},
+    {"r", TokenIdRead},
+    {"w", TokenIdWrite}
 };
 
 
@@ -240,6 +242,8 @@ bool Scanner::isSingleCharToken(char token)
     case 'f':
     case 'a':
     case 'b':
+    case 'r':
+    case 'w':
     case '{':
     case '}':
     case '(':

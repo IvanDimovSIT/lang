@@ -20,4 +20,6 @@ enum TokenId{
     TokenIdEndLine,             // '\n'
     TokenIdIf,                  // '?'
     TokenIdLoop,                // 'loop'
+    TokenIdRead,                // 'r'
+    TokenIdWrite                // 'w'
 };

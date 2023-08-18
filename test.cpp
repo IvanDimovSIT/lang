@@ -99,7 +99,7 @@ void testInterpreter1()
 
 void testInterpreter2()
 {
-    std::string source = "C = 4,2.2 i \n";
+    std::string source = "C = 4,2.2 i + (6 i * 0 + 1) \n";
     
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
@@ -109,12 +109,12 @@ void testInterpreter2()
     std::vector<double> result;
     assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
     assert(result.size() == 6);
-    assert(result[0] == 1.0);
-    assert(result[1] == 2.0);
-    assert(result[2] == 3.0);
-    assert(result[3] == 4.0);
-    assert(result[4] == 1.0);
-    assert(result[5] == 2.0);
+    assert(result[0] == 2.0);
+    assert(result[1] == 3.0);
+    assert(result[2] == 4.0);
+    assert(result[3] == 5.0);
+    assert(result[4] == 2.0);
+    assert(result[5] == 3.0);
 }
 
 int main(){

@@ -145,16 +145,18 @@ bool Interpreter::execute(
         if(operation != nullptr){
             bool leftArg, rightArg;
             hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, functions); 
-             if(hadError){
+            if(hadError){
                 if(errorReporter)
                     errorReporter->report(RuntimeErrorTypeNotAnOperation);
                 return false;
             }
             if(rightArg && rightParameter->size() > 0){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError, errorReporter);
-                std::move(rightParameter);//delete right parameter
+                rightParameter = std::make_unique<std::vector<double>>();
+                operation = nullptr;
             }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError, errorReporter);
+                operation = nullptr;
             }else{
                 continue;
             }
@@ -219,7 +221,7 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
             return std::make_unique<std::vector<double>>();
         }
         std::vector<Token*> sub;
-        TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos+1);
+        TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos-1);
         result = std::make_unique<std::vector<double>>();
         hadError = !execute(sub, functions, localVariables, left, right, *result, errorReporter);
         position = endPos; // move position to the end
