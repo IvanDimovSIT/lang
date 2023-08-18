@@ -36,15 +36,6 @@ private:
         std::vector<double>& right,
         std::vector<double>& result);
 
-    
-
-    // examples:
-    // extract next value:  3 + 1,2,3
-    //            we are here ^   --> extracted -> 1,2,3
-    //
-    // extract next value:  3 + ( 1,2,3 - VAR )
-    //            we are here ^   --> extracted -> ( 1,2,3 - VAR )
-    //
     std::unique_ptr<std::vector<double>> getNextArgument(
         int& position,
         std::vector<Token*> &tokens,

@@ -8,8 +8,10 @@
 #include "debug/ErrorPrinter.h"
 #include "interpreter/Interpreter.h"
 #include "interpreter/FunctionExtractor.h"
+#include "interpreter/InterpreterIO.h"
 
 ErrorPrinter errorPrinter;
+InterpreterIO io;
 
 void testLiteralParser(){
     std::vector<double> lit;
@@ -65,7 +67,7 @@ void testScanner(){
     assert(exec.size() == 5);
 
     std::vector<double> result;
-    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, nullptr);
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
     assert(result.size() == 3);
     assert(result[0] == 3);
@@ -94,7 +96,7 @@ void testInterpreter1()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     std::vector<double> result;
-    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, nullptr);
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
     assert(result[0] == 0.0);
 }
@@ -109,7 +111,7 @@ void testInterpreter2()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     std::vector<double> result;
-    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, nullptr);
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
     assert(result.size() == 6);
     assert(result[0] == 2.0);
@@ -120,12 +122,28 @@ void testInterpreter2()
     assert(result[5] == 3.0);
 }
 
+void testInterpreter3()
+{
+    std::string source = "w r + 1 \n";
+    
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+    std::vector<double> result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+}
+
+
 int main(){
     testLiteralParser();
     testStringUtil();
     testScanner();
     testInterpreter1();
     testInterpreter2();
+    testInterpreter3();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

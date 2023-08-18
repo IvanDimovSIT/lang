@@ -1,8 +1,8 @@
 all:
-	clang++ main.cpp scanner/Scanner.cpp interpreter/InterpreterCalculator.cpp util/LiteralParser.cpp util/StringUtil.cpp util/TokenSubArrayFinder.cpp debug/DebugPrinter.cpp debug/ErrorPrinter.cpp interpreter/FunctionExtractor.cpp interpreter/Interpreter.cpp -o lang.out
+	clang++ main.cpp scanner/Scanner.cpp interpreter/InterpreterCalculator.cpp util/LiteralParser.cpp util/StringUtil.cpp util/TokenSubArrayFinder.cpp debug/DebugPrinter.cpp debug/ErrorPrinter.cpp interpreter/FunctionExtractor.cpp interpreter/Interpreter.cpp interpreter/InterpreterIO.cpp -o lang.out
 
 buildtest:
-	clang++ test.cpp scanner/Scanner.cpp interpreter/InterpreterCalculator.cpp util/LiteralParser.cpp util/StringUtil.cpp util/TokenSubArrayFinder.cpp debug/DebugPrinter.cpp debug/ErrorPrinter.cpp interpreter/FunctionExtractor.cpp interpreter/Interpreter.cpp  -o test.out
+	clang++ test.cpp scanner/Scanner.cpp interpreter/InterpreterCalculator.cpp util/LiteralParser.cpp util/StringUtil.cpp util/TokenSubArrayFinder.cpp debug/DebugPrinter.cpp debug/ErrorPrinter.cpp interpreter/FunctionExtractor.cpp interpreter/Interpreter.cpp interpreter/InterpreterIO.cpp -o test.out
 
 run: all
 	./lang.out

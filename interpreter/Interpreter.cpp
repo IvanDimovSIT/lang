@@ -2,9 +2,11 @@
 #include "Interpreter.h"
 #include "../util/TokenSubArrayFinder.h"
 #include "InterpreterCalculator.h"
+#include <cassert>
 
 Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO)
 {
+    assert(interpreterIO != nullptr);
     this->errorReporter = errorReporter;
     this->interpreterIO = interpreterIO;
 }
@@ -114,7 +116,6 @@ bool Interpreter::execute(
             std::vector<Token*> statement;
             TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
 
-            //localVariables[tokens[i-1]->str].clear(); /// TODO: Remove this
             hadError = !execute(
                 statement,
                 functions,
@@ -129,6 +130,26 @@ bool Interpreter::execute(
             lastResult = std::move(leftParameter);
             leftParameter = std::make_unique<std::vector<double>>();
             localVariables[tokens[i - 1]->str] = *lastResult;
+            i = statementEnd;
+            continue;
+        }
+
+        if(tokens[i]->id == TokenIdWrite){
+            const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
+            std::vector<double> output;
+            std::vector<Token*> statement;
+            TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
+            hadError = !execute(
+                statement,
+                functions,
+                localVariables,
+                left,
+                right,
+                output);
+            if(hadError)
+                return false;
+            
+            interpreterIO->write(output);
             i = statementEnd;
             continue;
         }
@@ -229,6 +250,8 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
         hadError = !execute(sub, functions, localVariables, left, right, *result);
         position = endPos; // move position to the end
         return std::move(result);
+    }else if(tokens[position]->id == TokenIdRead){
+        return interpreterIO->read();
     }
 
     hadError = true;
