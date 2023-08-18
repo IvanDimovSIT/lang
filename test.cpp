@@ -73,7 +73,7 @@ void testScanner(){
 
 }
 
-void testInterpreter()
+void testInterpreter1()
 {
     std::string source = 
         "f FUNC { a + 1 }\n END = 10 FUNC\n"
@@ -97,11 +97,32 @@ void testInterpreter()
     assert(result[0] == 0.0);
 }
 
+void testInterpreter2()
+{
+    std::string source = "C = 4,2.2 i \n";
+    
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+    std::vector<double> result;
+    assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+    assert(result.size() == 6);
+    assert(result[0] == 1.0);
+    assert(result[1] == 2.0);
+    assert(result[2] == 3.0);
+    assert(result[3] == 4.0);
+    assert(result[4] == 1.0);
+    assert(result[5] == 2.0);
+}
+
 int main(){
     testLiteralParser();
     testStringUtil();
     testScanner();
-    testInterpreter();
+    testInterpreter1();
+    testInterpreter2();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

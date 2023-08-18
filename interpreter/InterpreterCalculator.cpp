@@ -115,7 +115,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::iterate(
             continue;
 
         for(int j = 1; j <= val; j++){
-            result->push_back((double)i);
+            result->push_back((double)j);
         }
     }
     if(result->size() == 0)
