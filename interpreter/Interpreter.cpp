@@ -189,7 +189,6 @@ bool Interpreter::execute(
 
         if(hadError)
             return false;
-
     }
 
 
@@ -211,19 +210,25 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
 {
     std::unique_ptr<std::vector<double>> result;
 
-    if(tokens[position]->id == TokenIdVariable){
+    switch(tokens[position]->id)
+    {
+    case TokenIdVariable:
         result = std::make_unique<std::vector<double>>(localVariables[tokens[position]->str]);
         return std::move(result);
-    }else if(tokens[position]->id == TokenIdLiteral){
+    break;
+    case TokenIdLiteral:
         result = std::make_unique<std::vector<double>>(tokens[position]->val);
         return std::move(result);
-    }else if(tokens[position]->id == TokenIdLeftParam){
+    break;
+    case TokenIdLeftParam:
         result = std::make_unique<std::vector<double>>(left);
         return std::move(result);
-    }else if(tokens[position]->id == TokenIdRightParam){
+    break;
+    case TokenIdRightParam:
         result = std::make_unique<std::vector<double>>(right);
         return std::move(result);
-    }else if(tokens[position]->id == TokenIdFunction){
+    break;
+    case TokenIdFunction:{
         bool ArgLeft, ArgRight;
         getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, functions);
         if((!ArgLeft) && (!ArgRight)){
@@ -236,7 +241,9 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
                 errorReporter->report(RuntimeErrorTypeOperationAsParameter);
             return std::make_unique<std::vector<double>>();
         }
-    }else if(tokens[position]->id == TokenIdOpenParenthesis){
+    }
+    break;
+    case TokenIdOpenParenthesis:{
         int endPos = TokenSubArrayFinder::findClosingParenthesis(tokens, position);
         if(endPos == TOKEN_INDEX_NOT_FOUND){
             hadError = true;
@@ -248,10 +255,16 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
         TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos-1);
         result = std::make_unique<std::vector<double>>();
         hadError = !execute(sub, functions, localVariables, left, right, *result);
-        position = endPos; // move position to the end
+        position = endPos;
         return std::move(result);
-    }else if(tokens[position]->id == TokenIdRead){
+    }
+    break;
+    case TokenIdRead:
         return interpreterIO->read();
+    break;
+    default:
+        // ...
+        break;
     }
 
     hadError = true;
