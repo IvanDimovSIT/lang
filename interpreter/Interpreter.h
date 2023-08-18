@@ -10,6 +10,12 @@ public:
     virtual void report(RuntimeErrorType errorType) = 0;
 };
 
+class IInterpreterIO{
+public:
+    virtual std::unique_ptr<std::vector<double>> read() = 0;
+    virtual void write(std::vector<double>& value) = 0;
+};
+
 struct LoopReturn{
     std::vector<Token*> condition;
     int loopStart;
@@ -18,17 +24,17 @@ struct LoopReturn{
 
 class Interpreter{
 public:
-    static bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result, IRuntimeErrorReporter* errorReporter);
+    Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
+    bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result);
 
 private:
-    static bool execute(
+    bool execute(
         std::vector<Token*> &tokens,
         std::map<std::string, Function>& functions,
         std::map<std::string, std::vector<double>>& localVariables,
         std::vector<double>& left,
         std::vector<double>& right,
-        std::vector<double>& result,
-        IRuntimeErrorReporter* errorReporter);
+        std::vector<double>& result);
 
     
 
@@ -39,20 +45,19 @@ private:
     // extract next value:  3 + ( 1,2,3 - VAR )
     //            we are here ^   --> extracted -> ( 1,2,3 - VAR )
     //
-    static std::unique_ptr<std::vector<double>> getNextArgument(
+    std::unique_ptr<std::vector<double>> getNextArgument(
         int& position,
         std::vector<Token*> &tokens,
         std::map<std::string, Function>& functions,
         std::map<std::string, std::vector<double>>& localVariables,
         std::vector<double>& left,
         std::vector<double>& right,
-        bool& hadError,
-        IRuntimeErrorReporter* errorReporter);
+        bool& hadError);
 
     // returns false if not an operation
-    static bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam, std::map<std::string, Function>& functions);
+    bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam, std::map<std::string, Function>& functions);
 
-    static std::unique_ptr<std::vector<double>> executeOperationOrFunction(
+    std::unique_ptr<std::vector<double>> executeOperationOrFunction(
         std::vector<double>& leftOfOperator,
         std::vector<double>& rightOfOperator,
         Token& operation,
@@ -60,7 +65,10 @@ private:
         std::vector<double>& right,
         std::map<std::string, Function>& functions,
         std::map<std::string, std::vector<double>>& localVariables,
-        bool& hadError,
-        IRuntimeErrorReporter* errorReporter);
+        bool& hadError);
+
+private:
+    IRuntimeErrorReporter* errorReporter;
+    IInterpreterIO* interpreterIO;
 
 };

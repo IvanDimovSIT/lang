@@ -65,7 +65,8 @@ void testScanner(){
     assert(exec.size() == 5);
 
     std::vector<double> result;
-    assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, nullptr);
+    assert(interpreter.execute(exec, functions, result));
     assert(result.size() == 3);
     assert(result[0] == 3);
     assert(result[1] == 3);
@@ -93,7 +94,8 @@ void testInterpreter1()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     std::vector<double> result;
-    assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, nullptr);
+    assert(interpreter.execute(exec, functions, result));
     assert(result[0] == 0.0);
 }
 
@@ -107,7 +109,8 @@ void testInterpreter2()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     std::vector<double> result;
-    assert(Interpreter::execute(exec, functions, result, (IRuntimeErrorReporter*)&errorPrinter));
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, nullptr);
+    assert(interpreter.execute(exec, functions, result));
     assert(result.size() == 6);
     assert(result[0] == 2.0);
     assert(result[1] == 3.0);
