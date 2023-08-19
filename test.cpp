@@ -9,6 +9,7 @@
 #include "interpreter/Interpreter.h"
 #include "interpreter/FunctionExtractor.h"
 #include "interpreter/InterpreterIO.h"
+#include "scanner/Preprocessor.h"
 
 ErrorPrinter errorPrinter;
 InterpreterIO io;
@@ -89,7 +90,8 @@ void testInterpreter1()
         "loop END {\n"
         "END = END - 1\n"
         "}\n";
-    
+    Preprocessor::process(source);
+
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
@@ -104,6 +106,7 @@ void testInterpreter1()
 void testInterpreter2()
 {
     std::string source = "C = 4,2.2 i + (6 i * 0 + 1) \n";
+    Preprocessor::process(source);
     
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
@@ -130,7 +133,8 @@ void testInterpreter3()
         "A = A + 2,1,0\n"
         "}\n"
         "A\n";
-    
+    Preprocessor::process(source);
+
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));

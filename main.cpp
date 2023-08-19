@@ -5,6 +5,7 @@
 #include "debug/ErrorPrinter.h"
 #include "interpreter/InterpreterIO.h"
 #include "interpreter/FunctionExtractor.h"
+#include "scanner/Preprocessor.h"
 
 bool readFile(const std::string& filepath, std::string& contents)
 {
@@ -46,6 +47,7 @@ int main(int argc, char** argv)
         std::cout << "Error reading file" << std::endl;
         return 0;
     }
+    Preprocessor::process(source);
 
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
