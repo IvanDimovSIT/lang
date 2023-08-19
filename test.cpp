@@ -124,7 +124,12 @@ void testInterpreter2()
 
 void testInterpreter3()
 {
-    std::string source = "w r + 1 \n";
+    std::string source = 
+        "A = 1,2,3\n"
+        "? 2 - 2 {\n"
+        "A = A + 2,1,0\n"
+        "}\n"
+        "A\n";
     
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
@@ -134,6 +139,11 @@ void testInterpreter3()
     std::vector<double> result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 3);
+    assert(result[0] == 1.0);
+    assert(result[1] == 2.0);
+    assert(result[2] == 3.0);
 }
 
 

@@ -76,7 +76,7 @@ bool Interpreter::execute(
                 i = endCondition;
                 continue;
             }else{
-                int afterIfBody = TokenSubArrayFinder::findClosingParenthesis(tokens, endCondition);
+                int afterIfBody = TokenSubArrayFinder::findClosingCurly(tokens, endCondition);
                 if(afterIfBody == TOKEN_INDEX_NOT_FOUND){
                     if(errorReporter)
                         errorReporter->report(RuntimeErrorTypeInvalidIfSyntax);

@@ -1,0 +1,6 @@
+I = r
+loop I {
+    w I i
+    I = I - 1
+}
+
