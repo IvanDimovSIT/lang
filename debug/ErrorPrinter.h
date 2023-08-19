@@ -6,4 +6,7 @@ class ErrorPrinter : public IScannerErrorReporter, IRuntimeErrorReporter{
 public:
     void report(RuntimeErrorType errorType) override;
     void report(int line, ScannerErrorType errorType) override;
+private:
+    static std::map<ScannerErrorType, std::string> scannerErrors;
+    static std::map<RuntimeErrorType, std::string> runtimeErrors;
 };

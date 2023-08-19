@@ -1,13 +1,20 @@
-M = r
-I = M
-loop I{
-    w (M - I + 1)i
-    I = I - 1
+f EXAMPLEFUNC {
+    (a - b + 1)i
 }
 
-? 2 * (3 - 3) {
-    w 999
+M = r
+I = M
+loop I
+{
+    w M EXAMPLEFUNC I
+
+    I = I - 1
+
 }
+
+? 2 * (3 - 3) 
+{
+    w 999}
 
 ? 1 {
     w 100
