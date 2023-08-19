@@ -4,7 +4,7 @@ f EXAMPLEFUNC {
 
 M = r
 I = M
-loop I
+do I
 {
     w M EXAMPLEFUNC I
 
@@ -12,11 +12,11 @@ loop I
 
 }
 
-? 2 * (3 - 3) 
+if 2 * (3 - 3) 
 {
     w 999}
 
-? 1 {
+if 1 {
     w 100
 }
 

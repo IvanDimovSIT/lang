@@ -10,7 +10,6 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"/", TokenIdDivide},
     {"=", TokenIdEquals},
     {"f", TokenIdFunctionDeclaration},
-    {"i", TokenIdIterate},
     {"a", TokenIdLeftParam},
     {"b", TokenIdRightParam},
     {"{", TokenIdOpenCurly},
@@ -18,8 +17,8 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"(", TokenIdOpenParenthesis},
     {")", TokenIdCloseParenthesis},
     {"\n", TokenIdEndLine},
-    {"?", TokenIdIf},
-    {"loop", TokenIdLoop},
+    {"if", TokenIdIf},
+    {"do", TokenIdLoop},
     {"i", TokenIdIterate},
     {"r", TokenIdRead},
     {"w", TokenIdWrite}
@@ -45,7 +44,10 @@ bool Scanner::scan(
     }
     
     for(int i=0; i<sourceLen; i++){
-        if(isSingleCharToken(source[i])){
+        // special if token case
+        if(curr == "" && source[i] == 'i' && (i+1<sourceLen) && source[i+1] == 'f' && matchToken("if", tokens, functionNames)){
+            i++;
+        }else if(isSingleCharToken(source[i])){
             if(!matchToken(curr, tokens, functionNames)){
                 hadError = true;
                 if(errorReporter)
@@ -102,7 +104,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::set<std::string>
         if(source[i] == '\n')
             lineCounter++;
 
-        if(source[i] == 'f'){
+        if((source[i] == 'f' && i ==0) || (source[i] == 'f' && (i-1>=0) && source[i-1] != 'i')){ // extra checks for "if"
             if(!scanningFunctionName){
                 scanningFunctionName = true;
                 continue;

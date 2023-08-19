@@ -20,8 +20,8 @@ std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
     {RuntimeErrorTypeEvaluationError, "Missing operation"},
     {RuntimeErrorTypeParameterError, "Invalid Parameter"},
     {RuntimeErrorTypeNotAnOperation, "No operation found"},
-    {RuntimeErrorTypeMissingIfCondition, "Missing If('?') condition"},
-    {RuntimeErrorTypeInvalidIfSyntax, "Invalid If('?') syntax"},
+    {RuntimeErrorTypeMissingIfCondition, "Missing if condition"},
+    {RuntimeErrorTypeInvalidIfSyntax, "Invalid if syntax"},
     {RuntimeErrorTypeMissingLoopCondition, "Missing loop condition"}
 };
 

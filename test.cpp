@@ -42,6 +42,7 @@ void testScanner(){
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+    //DebugPrinter::printTokens(tokens);
     assert(functions.size() == 1);
     assert(functions["FUNC"].body.size() == 3);
     assert(functions["FUNC"].left);
@@ -81,12 +82,12 @@ void testInterpreter1()
     std::string source = 
         "f FUNC { a + 1 }\n END = 10 FUNC\n"
         "START = 1\n"
-        "? START {\n"
+        "if START {\n"
         "END = END + 2\n"
         "}\n"
         "B = 10 i\n"
         "C = 12,2.2 i \n"
-        "loop END {\n"
+        "do END {\n"
         "END = END - 1\n"
         "}\n";
 
@@ -126,7 +127,7 @@ void testInterpreter3()
 {
     std::string source = 
         "A = 1,2,3\n"
-        "? 2 - 2 {\n"
+        "if 2 - 2 {\n"
         "A = A + 2,1,0\n"
         "}\n"
         "A\n";
