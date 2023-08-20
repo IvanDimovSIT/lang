@@ -18,8 +18,8 @@ enum TokenId{
     TokenIdLeftParam,           // a
     TokenIdRightParam,          // b
     TokenIdEndLine,             // '\n'
-    TokenIdIf,                  // '?'
-    TokenIdLoop,                // 'loop'
+    TokenIdIf,                  // 'if'
+    TokenIdLoop,                // 'do'
     TokenIdRead,                // 'r'
     TokenIdWrite                // 'w'
 };
