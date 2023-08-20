@@ -3,6 +3,8 @@
 enum RuntimeErrorType{
     RuntimeErrorTypeEmptyData,
     RuntimeErrorTypeDivisionByZero,
+    RuntimeErrorTypeZeroPowerZero,
+    RuntimeErrorTypeArithmetic,
     RuntimeErrorTypeOperationAsParameter,
     RuntimeErrorTypeNoClosingParenthesis,
     RuntimeErrorTypeEvaluationError,

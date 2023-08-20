@@ -35,6 +35,12 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> power(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
 private:
     using DyadicFunctionLambda = std::function<double(double, double, bool&, IRuntimeErrorReporter*)>;
 

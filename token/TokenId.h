@@ -8,6 +8,7 @@ enum TokenId{
     TokenIdSubtract,            // -
     TokenIdMultiply,            // *
     TokenIdDivide,              // /
+    TokenIdPower,               // ^
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }

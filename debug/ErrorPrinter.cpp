@@ -15,6 +15,8 @@ std::map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
 std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
     {RuntimeErrorTypeEmptyData, "Empty Data"},
     {RuntimeErrorTypeDivisionByZero, "Division By Zero"},
+    {RuntimeErrorTypeZeroPowerZero, "Zero power of zero"},
+    {RuntimeErrorTypeArithmetic, "Arithmetic error"},
     {RuntimeErrorTypeOperationAsParameter, "Invalid operation"},
     {RuntimeErrorTypeNoClosingParenthesis, "Missing ')'"},
     {RuntimeErrorTypeEvaluationError, "Missing operation"},

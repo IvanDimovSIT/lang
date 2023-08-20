@@ -94,6 +94,34 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::divide(
     );
 }
 
+std::unique_ptr<std::vector<double>> InterpreterCalculator::power(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            if(a == 0 && b == 0){
+                if(r)
+                    r->report(RuntimeErrorTypeZeroPowerZero);
+                err = true;
+                return 0.0;
+            }
+            double res = pow(a, b);
+            if(std::isnan(res)){
+                if(r)
+                    r->report(RuntimeErrorTypeArithmetic);
+                err = true;
+                return 0.0;
+            }
+            return res;
+        })
+    );
+}
+
 std::unique_ptr<std::vector<double>> InterpreterCalculator::iterate(
     std::vector<double>& left,
     bool& hadError,

@@ -8,6 +8,7 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"-", TokenIdSubtract},
     {"*", TokenIdMultiply},
     {"/", TokenIdDivide},
+    {"^", TokenIdPower},
     {"=", TokenIdEquals},
     {"f", TokenIdFunctionDeclaration},
     {"a", TokenIdLeftParam},

@@ -297,6 +297,7 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdSubtract:
     case TokenIdMultiply:
     case TokenIdDivide:
+    case TokenIdPower:
         leftParam = true;
         rightParam = true;
         return true;
@@ -335,6 +336,8 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::multiply(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdDivide:
         return InterpreterCalculator::divide(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdPower:
+        return InterpreterCalculator::power(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdIterate:
         return InterpreterCalculator::iterate(leftOfOperator, hadError, errorReporter);
     default:break;
