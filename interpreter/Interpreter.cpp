@@ -149,8 +149,10 @@ bool Interpreter::execute(
             if(hadError)
                 return false;
             
-            if(output.size() >= 1)
+            if(output.size() >= 1){
                 interpreterIO->write(output);
+                *lastResult = output; // slow operation
+            }
             i = statementEnd;
             continue;
         }
