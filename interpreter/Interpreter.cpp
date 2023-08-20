@@ -155,7 +155,7 @@ bool Interpreter::execute(
             continue;
         }
 
-        if(leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr){
+        if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) || isFunctionWithoutParameters(*tokens[i], functions)){
             leftParameter = getNextArgument(i, tokens, functions, localVariables, left, right, hadError);
         }else if(operation == nullptr){
             operation = tokens[i];
@@ -235,7 +235,7 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
         if((!ArgLeft) && (!ArgRight)){
             result = std::make_unique<std::vector<double>>();
             hadError = !execute(functions[tokens[position]->str].body, functions, localVariables, left, right, *result);
-            return result;
+            return std::move(result);
         }else{
             hadError = true;
             if(errorReporter)
@@ -343,4 +343,13 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         errorReporter->report(RuntimeErrorTypeNotAnOperation);
 
     return std::make_unique<std::vector<double>>();
+}
+
+bool Interpreter::isFunctionWithoutParameters(Token& function, std::map<std::string, Function>& functions)
+{
+    bool left, right;
+    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, left, right, functions))
+        return false;
+
+    return (!left) && (!right);
 }

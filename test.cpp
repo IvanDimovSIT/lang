@@ -147,6 +147,58 @@ void testInterpreter3()
     assert(result[2] == 3.0);
 }
 
+void testInterpreter4()
+{
+    std::string source = 
+        "f F {\n"
+        "a - 1}\n"
+        "f MAIN{\n"
+        "3 - 1\n"
+        "}\n"
+        "MAIN\n";
+
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    std::vector<double> result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    //std::cout << functions.size() << "\n" << functions["F"].body.size() << "\n" << functions["MAIN"].body.size() << "\n";
+    assert(result.size() == 1);
+    assert(result[0] == 2.0);
+}
+
+void testInterpreter5()
+{
+    std::string source = 
+        "f F {\n"
+        "a - 1}\n"
+        "f MAIN{\n"
+        "3 F\n"
+        "}\n"
+        "MAIN\n";
+
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    std::vector<double> result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 1);
+    assert(result[0] == 2.0);
+}
+
+
 
 int main(){
     testLiteralParser();
@@ -155,6 +207,8 @@ int main(){
     testInterpreter1();
     testInterpreter2();
     testInterpreter3();
+    testInterpreter4();
+    testInterpreter5();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

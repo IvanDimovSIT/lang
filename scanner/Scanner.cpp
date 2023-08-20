@@ -186,6 +186,7 @@ bool Scanner::extractFunctions(std::vector<Token>& tokens, std::map<std::string,
             if(upTo == TOKEN_INDEX_NOT_FOUND){
                 return false;
             }
+            f.body.clear();
             TokenSubArrayFinder::findSubArray(tokens, f.body, i+1, upTo-1);
             if(f.body.size() <= 0)
                 return false;
@@ -193,6 +194,7 @@ bool Scanner::extractFunctions(std::vector<Token>& tokens, std::map<std::string,
             functions[functionName] = f;
             functionName = "";
             findOpen = false;
+            i = upTo;
             continue;
         }
 

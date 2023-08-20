@@ -2,6 +2,9 @@ f EXAMPLEFUNC {
     (a - b + 1)i
 }
 
+f MAIN
+{
+
 M = r
 I = M
 do I
@@ -29,3 +32,7 @@ do I {
     }
     I = I - 1
 }
+
+}
+
+MAIN

@@ -58,6 +58,8 @@ private:
         std::map<std::string, std::vector<double>>& localVariables,
         bool& hadError);
 
+    bool isFunctionWithoutParameters(Token& function, std::map<std::string, Function>& functions);
+
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;
