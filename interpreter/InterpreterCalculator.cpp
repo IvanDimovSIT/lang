@@ -94,6 +94,120 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::divide(
     );
 }
 
+std::unique_ptr<std::vector<double>> InterpreterCalculator::mod(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            const long long llA = a;
+            const long long llB = b;
+            if(llB == 0){
+                if(r)
+                    r->report(RuntimeErrorTypeDivisionByZero);
+                err = true;
+                return 0.0;
+            }
+            return (double)(llA % llB);
+        })
+    );
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::lessThan(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            return a < b? 1.0 : 0.0;
+        })
+    );
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::greaterThan(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            return a > b? 1.0 : 0.0;
+        })
+    );
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::lessThanOrEquals(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            return a <= b? 1.0 : 0.0;
+        })
+    );
+}
+
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::greaterThanOrEquals(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            return a >= b? 1.0 : 0.0;
+        })
+    );
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::equals(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            return a == b? 1.0 : 0.0;
+        })
+    );
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::notEquals(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    return std::move(
+        dyadicFunction(left, right, hadError, reporter,
+            [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
+        {
+            return a != b? 1.0 : 0.0;
+        })
+    );
+}
+
 std::unique_ptr<std::vector<double>> InterpreterCalculator::power(
     std::vector<double>& left,
     std::vector<double>& right,

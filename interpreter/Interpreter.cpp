@@ -297,7 +297,14 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdSubtract:
     case TokenIdMultiply:
     case TokenIdDivide:
+    case TokenIdMod:
     case TokenIdPower:
+    case TokenIdLessThan:
+    case TokenIdGreaterThan:
+    case TokenIdLessThanOrEquals:
+    case TokenIdGreaterThanOrEquals:
+    case TokenIdIsEquals:
+    case TokenIdNotEquals:
         leftParam = true;
         rightParam = true;
         return true;
@@ -336,10 +343,24 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::multiply(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdDivide:
         return InterpreterCalculator::divide(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdMod:
+        return InterpreterCalculator::mod(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdPower:
         return InterpreterCalculator::power(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdIterate:
         return InterpreterCalculator::iterate(leftOfOperator, hadError, errorReporter);
+    case TokenIdLessThan:
+        return InterpreterCalculator::lessThan(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdGreaterThan:
+        return InterpreterCalculator::greaterThan(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdLessThanOrEquals:
+        return InterpreterCalculator::lessThanOrEquals(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdGreaterThanOrEquals:
+        return InterpreterCalculator::greaterThanOrEquals(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdIsEquals:
+        return InterpreterCalculator::equals(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdNotEquals:
+        return InterpreterCalculator::notEquals(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:break;
     }
 

@@ -8,7 +8,14 @@ enum TokenId{
     TokenIdSubtract,            // -
     TokenIdMultiply,            // *
     TokenIdDivide,              // /
+    TokenIdMod,                 // %
     TokenIdPower,               // ^
+    TokenIdLessThan,            // <
+    TokenIdGreaterThan,         // >
+    TokenIdLessThanOrEquals,    // <=
+    TokenIdGreaterThanOrEquals, // >=
+    TokenIdIsEquals,            // ==
+    TokenIdNotEquals,           // !=
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }

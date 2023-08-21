@@ -30,12 +30,55 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> mod(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
     static std::unique_ptr<std::vector<double>> iterate(
         std::vector<double>& left,
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
     static std::unique_ptr<std::vector<double>> power(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> lessThan(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> greaterThan(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> lessThanOrEquals(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+
+    static std::unique_ptr<std::vector<double>> greaterThanOrEquals(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> equals(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> notEquals(
         std::vector<double>& left,
         std::vector<double>& right,
         bool& hadError,
