@@ -51,6 +51,16 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> sumAll(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> multiplyAll(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
     static std::unique_ptr<std::vector<double>> power(
         std::vector<double>& left,
         std::vector<double>& right,

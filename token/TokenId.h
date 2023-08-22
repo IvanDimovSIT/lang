@@ -18,6 +18,8 @@ enum TokenId{
     TokenIdNotEquals,           // !=
     TokenIdLogicalNot,          // !
     TokenIdCount,               // #
+    TokenIdSumAll,              // #+
+    TokenIdMultiplyAll,         // #*
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }

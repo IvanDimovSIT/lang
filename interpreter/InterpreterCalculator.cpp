@@ -304,3 +304,49 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::count(
 
     return std::move(result);
 }
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::sumAll(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    const int size = left.size();
+    if(size == 0){
+        hadError = true;
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+
+        return result;
+    }
+    double sum = 0.0;
+    for(const auto& i: left)
+        sum += i;
+
+    result->push_back(sum);
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::multiplyAll(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    const int size = left.size();
+    if(size == 0){
+        hadError = true;
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+
+        return result;
+    }
+    double prod = 1.0;
+    for(const auto& i: left)
+        prod *= i;
+
+    result->push_back(prod);
+
+    return std::move(result);
+}

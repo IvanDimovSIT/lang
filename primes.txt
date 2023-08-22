@@ -1,0 +1,14 @@
+f ISPRIME {
+    ( a % (a - 2 i + 1) #* ) + (a == 2)
+}
+
+MAX = r
+I = 2
+if MAX > 1 {
+    do I <= MAX{
+        if I ISPRIME {
+            w I
+        }
+        I = I + 1
+    }
+}

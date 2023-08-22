@@ -291,6 +291,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdCount:
     case TokenIdLogicalNot:
     case TokenIdIterate:
+    case TokenIdSumAll:
+    case TokenIdMultiplyAll:
         leftParam = true;
         rightParam = false;
         return true;
@@ -355,6 +357,10 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::logicalNot(leftOfOperator, hadError, errorReporter);
     case TokenIdCount:
         return InterpreterCalculator::count(leftOfOperator, hadError, errorReporter);
+    case TokenIdSumAll:
+        return InterpreterCalculator::sumAll(leftOfOperator, hadError, errorReporter);
+    case TokenIdMultiplyAll:
+        return InterpreterCalculator::multiplyAll(leftOfOperator, hadError, errorReporter);
     case TokenIdLessThan:
         return InterpreterCalculator::lessThan(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdGreaterThan:
