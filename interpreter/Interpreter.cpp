@@ -288,6 +288,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
 
     switch (operation.id)
     {
+    case TokenIdCount:
+    case TokenIdLogicalNot:
     case TokenIdIterate:
         leftParam = true;
         rightParam = false;
@@ -349,6 +351,10 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::power(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdIterate:
         return InterpreterCalculator::iterate(leftOfOperator, hadError, errorReporter);
+    case TokenIdLogicalNot:
+        return InterpreterCalculator::logicalNot(leftOfOperator, hadError, errorReporter);
+    case TokenIdCount:
+        return InterpreterCalculator::count(leftOfOperator, hadError, errorReporter);
     case TokenIdLessThan:
         return InterpreterCalculator::lessThan(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdGreaterThan:

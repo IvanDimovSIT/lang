@@ -266,3 +266,41 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::iterate(
     return std::move(result);
 }
 
+std::unique_ptr<std::vector<double>> InterpreterCalculator::logicalNot(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    const int size = left.size();
+    if(size == 0){
+        hadError = true;
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+
+        return result;
+    }
+    for(const auto& i:left)
+        result->push_back(i == 0.0 ? 1.0 : 0.0);
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::count(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    const int size = left.size();
+    if(size == 0){
+        hadError = true;
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+
+        return result;
+    }
+    result->push_back((double)size);
+
+    return std::move(result);
+}

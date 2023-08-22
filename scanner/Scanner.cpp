@@ -17,6 +17,8 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"==",TokenIdIsEquals},
     {"!=",TokenIdNotEquals},
     {"=", TokenIdEquals},
+    {"!", TokenIdLogicalNot},
+    {"#", TokenIdCount},
     {"f", TokenIdFunctionDeclaration},
     {"a", TokenIdLeftParam},
     {"b", TokenIdRightParam},

@@ -41,6 +41,16 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> logicalNot(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> count(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
     static std::unique_ptr<std::vector<double>> power(
         std::vector<double>& left,
         std::vector<double>& right,

@@ -16,6 +16,8 @@ enum TokenId{
     TokenIdGreaterThanOrEquals, // >=
     TokenIdIsEquals,            // ==
     TokenIdNotEquals,           // !=
+    TokenIdLogicalNot,          // !
+    TokenIdCount,               // #
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }
