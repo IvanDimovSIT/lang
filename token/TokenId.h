@@ -23,6 +23,9 @@ enum TokenId{
     TokenIdUnion,               // |
     TokenIdSelect,              // :
     TokenIdRandom,              // ?
+    TokenIdCeil,                // ^
+    TokenIdFloor,               // _
+    TokenIdRound,               // ~
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }

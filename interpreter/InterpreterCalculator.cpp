@@ -399,3 +399,48 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::randomize(
 
     return std::move(result);
 }
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::findCeil(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter))
+        return std::move(result);
+
+    for(const auto& i: left)
+        result->push_back(ceil(i));
+
+    return std::move(result);
+}
+
+    std::unique_ptr<std::vector<double>> InterpreterCalculator::findFloor(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter))
+        return std::move(result);
+
+    for(const auto& i: left)
+        result->push_back(floor(i));
+
+    return std::move(result);
+}
+
+    std::unique_ptr<std::vector<double>> InterpreterCalculator::findRound(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter))
+        return std::move(result);
+
+    for(const auto& i: left)
+        result->push_back(round(i));
+
+    return std::move(result);
+}

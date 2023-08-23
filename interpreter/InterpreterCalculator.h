@@ -121,6 +121,21 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> findCeil(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> findFloor(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> findRound(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
 private:
     using DyadicFunctionLambda = std::function<double(double, double, bool&, IRuntimeErrorReporter*)>;
 

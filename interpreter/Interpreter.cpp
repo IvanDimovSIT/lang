@@ -294,6 +294,9 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdSumAll:
     case TokenIdMultiplyAll:
     case TokenIdRandom:
+    case TokenIdFloor:
+    case TokenIdCeil:
+    case TokenIdRound:
         leftParam = true;
         rightParam = false;
         return true;
@@ -382,6 +385,12 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::select(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdRandom:
         return InterpreterCalculator::randomize(leftOfOperator, hadError, errorReporter);
+    case TokenIdCeil:
+        return InterpreterCalculator::findCeil(leftOfOperator, hadError, errorReporter);
+    case TokenIdFloor:
+        return InterpreterCalculator::findFloor(leftOfOperator, hadError, errorReporter);
+    case TokenIdRound:
+        return InterpreterCalculator::findRound(leftOfOperator, hadError, errorReporter);
     default:break;
     }
 
