@@ -47,7 +47,7 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
 
 
 bool Scanner::scan(
-    const std::string& source,
+    const std::string& programSource,
     std::vector<Token>& tokens,
     std::map<std::string, Function>& functions,
     IScannerErrorReporter* errorReporter)
@@ -55,11 +55,13 @@ bool Scanner::scan(
     tokens.clear();
     functions.clear();
 
+    std::string source = removeComments(programSource);
     const int sourceLen = source.size();
     std::set<std::string> functionNames;
     int lineCounter = 1;
     std::string curr = "";
     bool hadError = !validateParenthesis(source, sourceLen, errorReporter);
+    bool inComment = false;
     if(!findFunctionNames(source, functionNames, errorReporter)){
         hadError = true;
     }
@@ -328,4 +330,24 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
     }
     
     return !hadError;
+}
+
+std::string Scanner::removeComments(const std::string& source)
+{
+    std::string program = "";
+    bool inComment = false;
+    const int sourceLen = source.size();
+    
+    for(int i=0; i<sourceLen; i++){
+        if(inComment && source[i]=='\n'){
+            inComment = false;
+            program += '\n';
+        }else if((!inComment) && source[i] == '/' && (i+1<sourceLen) && source[i+1] == '/'){
+            inComment = true;
+        }else if(!inComment){
+            program += source[i];
+        }
+    }
+
+    return program;
 }

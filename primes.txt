@@ -1,15 +1,17 @@
+// function that checks if a number is prime
 f ISPRIME {
     ( a % (a - 2 i + 1) #* ) + (a == 2)
 }
 
+// declare variables
 MAX = r; I = 2; RESULT = 0
 if MAX > 1 {
     do I <= MAX{
         if I ISPRIME {
             w I
-            RESULT = RESULT | I
+            RESULT = RESULT | I // add the prime number to the list
         }
-        I = I + 1
+        I = I + 1 // increment counter
     }
 }
-RESULT = RESULT : (RESULT # i + 1)
+RESULT = RESULT : (RESULT # i + 1) // remove the 0 from the result

@@ -13,11 +13,13 @@ public:
 class Scanner{
 public:
     static bool scan(
-        const std::string& source,
+        const std::string& programSource,
         std::vector<Token>& tokens,
         std::map<std::string, Function>& functions,
         IScannerErrorReporter* errorReporter);
 private:
+    static std::string removeComments(const std::string& source);
+
     static bool findFunctionNames(const std::string& source, std::set<std::string>& functionNames, IScannerErrorReporter* errorReporter);
     static bool extractFunctions(std::vector<Token>& tokens, std::map<std::string, Function>& functions);
     
