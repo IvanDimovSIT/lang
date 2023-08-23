@@ -104,6 +104,23 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> findUnion(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> select(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> randomize(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
 private:
     using DyadicFunctionLambda = std::function<double(double, double, bool&, IRuntimeErrorReporter*)>;
 
@@ -114,5 +131,7 @@ private:
         IRuntimeErrorReporter* reporter,
         DyadicFunctionLambda lambda
     );
+
+    static bool validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter);
 
 };

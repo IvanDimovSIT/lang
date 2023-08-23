@@ -1,5 +1,17 @@
 #include "InterpreterCalculator.h"
+#include "../util/RandomGenerator.h"
 #include <cmath>
+
+bool InterpreterCalculator::validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter)
+{
+    if(val.size() == 0){
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+        return false;
+    }
+
+    return true;
+}
 
 std::unique_ptr<std::vector<double>> InterpreterCalculator::dyadicFunction(
         std::vector<double>& left,
@@ -242,14 +254,8 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::iterate(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    const int size = left.size();
-    if(size == 0){
-        hadError = true;
-        if(reporter)
-            reporter->report(RuntimeErrorTypeEmptyData);
-
-        return result;
-    }
+    if(!validateInput(left, reporter))
+        return std::move(result);
 
     for(const auto& i: left){
         int val = floor(i);
@@ -272,14 +278,9 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::logicalNot(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    const int size = left.size();
-    if(size == 0){
-        hadError = true;
-        if(reporter)
-            reporter->report(RuntimeErrorTypeEmptyData);
-
-        return result;
-    }
+    if(!validateInput(left, reporter))
+        return std::move(result);
+    
     for(const auto& i:left)
         result->push_back(i == 0.0 ? 1.0 : 0.0);
 
@@ -311,14 +312,9 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::sumAll(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    const int size = left.size();
-    if(size == 0){
-        hadError = true;
-        if(reporter)
-            reporter->report(RuntimeErrorTypeEmptyData);
-
-        return result;
-    }
+    if(!validateInput(left, reporter))
+        return std::move(result);
+    
     double sum = 0.0;
     for(const auto& i: left)
         sum += i;
@@ -334,19 +330,72 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::multiplyAll(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    const int size = left.size();
-    if(size == 0){
-        hadError = true;
-        if(reporter)
-            reporter->report(RuntimeErrorTypeEmptyData);
-
-        return result;
-    }
+    if(!validateInput(left, reporter))
+        return std::move(result);
+    
     double prod = 1.0;
     for(const auto& i: left)
         prod *= i;
 
     result->push_back(prod);
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::findUnion(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if((!validateInput(left, reporter)) || (!validateInput(right, reporter)))
+        return std::move(result);
+
+    *result = left;
+    for(const auto& i: right)
+        result->push_back(i);
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::select(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    const int leftSize = left.size();
+    if(leftSize == 0 || right.size() == 0){
+        hadError = true;
+        if(reporter)
+            reporter->report(RuntimeErrorTypeEmptyData);
+        return std::move(result);
+    }
+
+    for(const auto& i: right){
+        int index = floor(i)-1;
+        if(index>=0 && index<leftSize)
+            result->push_back(left[index]);
+    }
+    if(result->size() == 0)
+        result->push_back(0.0);
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::randomize(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter))
+        return std::move(result);
+
+    for(const auto& i: left)
+        result->push_back(i*RandomGenerator::generateRandom());
 
     return std::move(result);
 }

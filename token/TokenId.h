@@ -20,6 +20,9 @@ enum TokenId{
     TokenIdCount,               // #
     TokenIdSumAll,              // #+
     TokenIdMultiplyAll,         // #*
+    TokenIdUnion,               // |
+    TokenIdSelect,              // :
+    TokenIdRandom,              // ?
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }
@@ -34,5 +37,5 @@ enum TokenId{
     TokenIdLoop,                // 'do'
     TokenIdRead,                // 'r'
     TokenIdWrite                // 'w'
-    
+
 };

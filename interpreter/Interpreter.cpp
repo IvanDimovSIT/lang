@@ -293,6 +293,7 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdIterate:
     case TokenIdSumAll:
     case TokenIdMultiplyAll:
+    case TokenIdRandom:
         leftParam = true;
         rightParam = false;
         return true;
@@ -309,6 +310,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdGreaterThanOrEquals:
     case TokenIdIsEquals:
     case TokenIdNotEquals:
+    case TokenIdUnion:
+    case TokenIdSelect:
         leftParam = true;
         rightParam = true;
         return true;
@@ -373,6 +376,12 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::equals(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdNotEquals:
         return InterpreterCalculator::notEquals(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdUnion:
+        return InterpreterCalculator::findUnion(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdSelect:
+        return InterpreterCalculator::select(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdRandom:
+        return InterpreterCalculator::randomize(leftOfOperator, hadError, errorReporter);
     default:break;
     }
 
