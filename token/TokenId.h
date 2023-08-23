@@ -9,7 +9,7 @@ enum TokenId{
     TokenIdMultiply,            // *
     TokenIdDivide,              // /
     TokenIdMod,                 // %
-    TokenIdPower,               // ^
+    TokenIdPower,               // **
     TokenIdLessThan,            // <
     TokenIdGreaterThan,         // >
     TokenIdLessThanOrEquals,    // <=
@@ -34,4 +34,5 @@ enum TokenId{
     TokenIdLoop,                // 'do'
     TokenIdRead,                // 'r'
     TokenIdWrite                // 'w'
+    
 };

@@ -9,7 +9,7 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"*", TokenIdMultiply},
     {"/", TokenIdDivide},
     {"%", TokenIdMod},
-    {"^", TokenIdPower},
+    {"**",TokenIdPower},
     {"<", TokenIdLessThan},
     {">", TokenIdGreaterThan},
     {"<=",TokenIdLessThanOrEquals},
