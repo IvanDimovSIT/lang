@@ -1,0 +1,29 @@
+SIZE = 50
+
+f GETCELL {
+    ((a == 1,0,0 #*) + (a == 1,1,1 #*) + (a == 0,0,0 #*)) !
+}
+
+f MASK {
+    a : (3 i + b - 1)
+}
+
+f RULE {
+    STATE = SIZE i == (SIZE - 1)
+    I = 1
+    w STATE
+    do I <= a {
+        J = 1
+        NEWSTATE = 0
+        do J < (SIZE - 1){
+            CURRENTMASK = STATE MASK J
+            NEWSTATE = NEWSTATE | (CURRENTMASK GETCELL)
+            J = J + 1
+        }
+        STATE = NEWSTATE | 0
+        w STATE
+        I = I + 1
+    }
+}
+
+r RULE
