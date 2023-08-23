@@ -37,6 +37,7 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"(", TokenIdOpenParenthesis},
     {")", TokenIdCloseParenthesis},
     {"\n",TokenIdEndLine},
+    {";",TokenIdEndLine},
     {"if",TokenIdIf},
     {"do",TokenIdLoop},
     {"i", TokenIdIterate},
@@ -138,7 +139,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::set<std::string>
             if(source[i] == ' ' && curr.size() <= 0)
                 continue;
             
-            if(source[i] == ' ' || source[i] == '{' || source[i] == '\n'){
+            if(source[i] == ' ' || source[i] == '{' || source[i] == '\n' || source[i] == ';'){
                 scanningFunctionName = false;
                 if(functionNames.count(curr) != 0){
                     foundError = true;
@@ -273,6 +274,7 @@ bool Scanner::isSingleCharToken(char token)
     case '(':
     case ')':
     case '\n':
+    case ';':
         return true;
     default:
         return false;
