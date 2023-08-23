@@ -136,6 +136,16 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> sortArray(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> reverseArray(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
 private:
     using DyadicFunctionLambda = std::function<double(double, double, bool&, IRuntimeErrorReporter*)>;
 

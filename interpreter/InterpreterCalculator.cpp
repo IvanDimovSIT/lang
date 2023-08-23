@@ -1,6 +1,7 @@
 #include "InterpreterCalculator.h"
 #include "../util/RandomGenerator.h"
 #include <cmath>
+#include <algorithm>
 
 bool InterpreterCalculator::validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter)
 {
@@ -441,6 +442,37 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::findCeil(
 
     for(const auto& i: left)
         result->push_back(round(i));
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::sortArray(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter))
+        return std::move(result);
+
+    *result = left;
+    std::sort(result->begin(), result->end());
+
+    return std::move(result);
+}
+
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::reverseArray(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter))
+        return std::move(result);
+
+    *result = left;
+    std::reverse(result->begin(), result->end());
 
     return std::move(result);
 }

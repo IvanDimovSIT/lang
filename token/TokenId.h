@@ -26,6 +26,8 @@ enum TokenId{
     TokenIdCeil,                // ^
     TokenIdFloor,               // _
     TokenIdRound,               // ~
+    TokenIdSort,                // $
+    TokenIdReverse,             // @
     TokenIdEquals,              // =
     TokenIdOpenCurly,           // {
     TokenIdCloseCurly,          // }

@@ -4,11 +4,14 @@ f ISPRIME {
 
 MAX = r
 I = 2
+RESULT = 0
 if MAX > 1 {
     do I <= MAX{
         if I ISPRIME {
             w I
+            RESULT = RESULT | I
         }
         I = I + 1
     }
 }
+RESULT = RESULT : (RESULT # i + 1)

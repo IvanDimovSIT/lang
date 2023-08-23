@@ -297,6 +297,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdFloor:
     case TokenIdCeil:
     case TokenIdRound:
+    case TokenIdSort:
+    case TokenIdReverse:
         leftParam = true;
         rightParam = false;
         return true;
@@ -391,6 +393,10 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::findFloor(leftOfOperator, hadError, errorReporter);
     case TokenIdRound:
         return InterpreterCalculator::findRound(leftOfOperator, hadError, errorReporter);
+    case TokenIdSort:
+        return InterpreterCalculator::sortArray(leftOfOperator, hadError, errorReporter);
+    case TokenIdReverse:
+        return InterpreterCalculator::reverseArray(leftOfOperator, hadError, errorReporter);
     default:break;
     }
 
