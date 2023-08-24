@@ -3,6 +3,8 @@ f ISPRIME {
     ( a % (a - 2 i + 1) #* ) + (a == 2)
 }
 
+t "Enter maximum number to check:"
+
 // declare variables
 MAX = r; I = 2; RESULT = 0
 if MAX > 1 {

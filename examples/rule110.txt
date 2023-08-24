@@ -30,4 +30,5 @@ f RULE {
     }
 }
 
+t "Enter simulation steps:"
 r RULE
