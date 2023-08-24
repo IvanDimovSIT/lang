@@ -25,6 +25,15 @@ void testLiteralParser(){
     assert(lit[0] == -0.12);
     assert(lit[1] == 3.1);
     assert(lit[2] == 0.0);
+
+    assert(LiteralParser::parseString("\"abc\\n\\t\\\"\"", lit));
+    assert(lit.size() == 6);
+    assert(lit[0] == 'a');
+    assert(lit[1] == 'b');
+    assert(lit[2] == 'c');
+    assert(lit[3] == '\n');
+    assert(lit[4] == '\t');
+    assert(lit[5] == '"');
 }
 
 void testStringUtil(){
@@ -33,6 +42,8 @@ void testStringUtil(){
     assert(!StringUtil::isValidIdentifierName("MYVaR"));
     assert(!StringUtil::isValidIdentifierName("0MYVR"));
     assert(!StringUtil::isValidIdentifierName("ABC.A"));
+
+    assert(StringUtil::findStringLiteralEndIndex("ab\"hel\\\"lo\"cd", 2) == 10);
 }
 
 
@@ -168,7 +179,6 @@ void testInterpreter4()
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
-    //std::cout << functions.size() << "\n" << functions["F"].body.size() << "\n" << functions["MAIN"].body.size() << "\n";
     assert(result.size() == 1);
     assert(result[0] == 2.0);
 }
@@ -198,6 +208,30 @@ void testInterpreter5()
     assert(result[0] == 2.0);
 }
 
+void testInterpreter6()
+{
+    std::string source = 
+        "A = \"abc\\\"\" + 1\n"
+        "A = A - 1"; 
+
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    std::vector<double> result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 4);
+    assert(result[0] == 'a');
+    assert(result[1] == 'b');
+    assert(result[2] == 'c');
+    assert(result[3] == '"');
+}
+
 
 
 int main(){
@@ -209,6 +243,7 @@ int main(){
     testInterpreter3();
     testInterpreter4();
     testInterpreter5();
+    testInterpreter6();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

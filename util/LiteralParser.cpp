@@ -49,3 +49,36 @@ bool LiteralParser::parse(const std::string& literal, std::vector<double>& value
 
     return true;
 }
+
+bool LiteralParser::parseString(const std::string& literal, std::vector<double>& value)
+{
+    value.clear();
+    const int size = literal.size()-1;
+    if(literal[size] != '"' || size < 3 || literal[0] != '"')
+        return false;
+
+    for(int i=1; i<size; i++){
+        if(literal[i]!='\\'){
+            value.push_back((double)literal[i]);
+        }else{
+            i++;
+            switch (literal[i])
+            {
+            case 'n':
+                value.push_back((double)'\n');
+                break;
+            case 't':
+                value.push_back((double)'\t');
+                break;
+            case '0':
+                value.push_back((double)'\0');
+                break;
+            default:
+                value.push_back((double)literal[i]);
+                break;
+            }
+        }
+    }
+
+    return true;
+}

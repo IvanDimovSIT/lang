@@ -1,7 +1,7 @@
 #pragma once
 
 enum TokenId{
-    TokenIdLiteral,             // 12,3213,0.123,-213,0
+    TokenIdLiteral,             // 12,3213,0.123,-213,0 "abc"
     TokenIdVariable,            // MYVAR
     TokenIdFunction,            // MYFUNC
     TokenIdAdd,                 // +

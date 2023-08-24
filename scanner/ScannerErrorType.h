@@ -8,5 +8,6 @@ enum ScannerErrorType{
     ScannerErrorTypeMoreClosingParenthesis,
     ScannerErrorTypeMoreOpenParenthesis,
     ScannerErrorTypeMoreClosingCurlyBrackets,
-    ScannerErrorTypeMoreOpenCurlyBrackets
+    ScannerErrorTypeMoreOpenCurlyBrackets,
+    ScannerErrorTypeStringLiteralError
 };

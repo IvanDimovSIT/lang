@@ -17,3 +17,16 @@ bool StringUtil::isValidIdentifierName(const std::string& name){
 
     return true;
 }
+
+int StringUtil::findStringLiteralEndIndex(const std::string& source, int start)
+{
+    const int size = source.size();
+    for(int i=start+1; i<size; i++){
+        if(source[i] == '"' && source[i-1] != '\\')
+            return i;
+        else if(source[i] == '\n')
+            return STRING_END_NOT_FOUND;
+    }
+
+    return STRING_END_NOT_FOUND;
+}

@@ -67,6 +67,26 @@ bool Scanner::scan(
     }
     
     for(int i=0; i<sourceLen; i++){
+        if(curr == "\""){
+            const int stringLiteralEnd = StringUtil::findStringLiteralEndIndex(source, i-1);
+            if(stringLiteralEnd == STRING_END_NOT_FOUND){
+                hadError = true;
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+            }
+            curr += source.substr(i, stringLiteralEnd-i+1);
+            if(!matchToken(curr, tokens, functionNames)){
+                hadError = true;
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+            }else{
+                i = stringLiteralEnd;
+            }
+
+            curr = "";
+            continue;
+        }
+
         // special if token case
         if(curr == "" && source[i] == 'i' && (i+1<sourceLen) && source[i+1] == 'f' && matchToken("if", tokens, functionNames)){
             i++;
@@ -84,7 +104,7 @@ bool Scanner::scan(
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
-        }else if(source[i] == ' ' || source[i] == '\t'){
+        }else if(source[i] == ' ' || source[i] == '\t' /*|| (i+1<sourceLen && source[i+1] == '"')*/){
             if(!matchToken(curr, tokens, functionNames)){
                 hadError = true;
                 if(errorReporter)
@@ -126,6 +146,18 @@ bool Scanner::findFunctionNames(const std::string& source, std::set<std::string>
     for(int i=0; i<stringLen; i++){
         if(source[i] == '\n')
             lineCounter++;
+
+        if(source[i] == '"'){
+            const int end = StringUtil::findStringLiteralEndIndex(source, i);
+            if(end == STRING_END_NOT_FOUND){
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+                foundError = true;
+            }else{
+                i = end;
+            }
+            continue;
+        }
 
         if((source[i] == 'f' && i ==0) || (source[i] == 'f' && (i-1>=0) && source[i-1] != 'i')){ // extra checks for "if"
             if(!scanningFunctionName){
@@ -244,7 +276,7 @@ bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, s
         t.id = tokenMap[token];
         tokens.push_back(t);
         return true;
-    }else if(LiteralParser::parse(token, t.val)){
+    }else if(LiteralParser::parse(token, t.val) || LiteralParser::parseString(token, t.val)){
         t.id = TokenIdLiteral;
         tokens.push_back(t);
         return true;
@@ -293,6 +325,18 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
     for(int i=0; i<sourceLen; i++){
         if(source[i] == '\n')
             lineCounter++;
+
+        if(source[i] == '"'){
+            const int end = StringUtil::findStringLiteralEndIndex(source, i);
+            if(end == STRING_END_NOT_FOUND){
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+                hadError = true;
+            }else{
+                i = end;
+            }
+            continue;
+        }
         
         if(source[i] == '('){
             openP++;

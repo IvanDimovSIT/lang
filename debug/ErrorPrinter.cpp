@@ -9,7 +9,8 @@ std::map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
     {ScannerErrorTypeMoreClosingParenthesis, "Extra ')'"},
     {ScannerErrorTypeMoreOpenParenthesis, "Missing ')'"},
     {ScannerErrorTypeMoreClosingCurlyBrackets, "Extra '{'"},
-    {ScannerErrorTypeMoreOpenCurlyBrackets, "Missing '}'"}
+    {ScannerErrorTypeMoreOpenCurlyBrackets, "Missing '}'"},
+    {ScannerErrorTypeStringLiteralError, "Invalid string literal"}
 };
 
 std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
