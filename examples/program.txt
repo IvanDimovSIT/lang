@@ -37,5 +37,6 @@ do I {
 
 MAIN
 
-w "Hello, World!"
-A = "abc\n13213\""| 199
+t "Hello, World!"
+A = g + 1
+t A

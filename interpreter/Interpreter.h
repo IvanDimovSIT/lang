@@ -14,6 +14,8 @@ class IInterpreterIO{
 public:
     virtual std::unique_ptr<std::vector<double>> read() = 0;
     virtual void write(std::vector<double>& value) = 0;
+    virtual std::unique_ptr<std::vector<double>> readText() = 0;
+    virtual void writeText(std::vector<double>& value) = 0;
 };
 
 struct LoopReturn{

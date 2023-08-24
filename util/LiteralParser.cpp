@@ -54,7 +54,7 @@ bool LiteralParser::parseString(const std::string& literal, std::vector<double>&
 {
     value.clear();
     const int size = literal.size()-1;
-    if(literal[size] != '"' || size < 3 || literal[0] != '"')
+    if(literal[size] != '"' || size < 2 || literal[0] != '"')
         return false;
 
     for(int i=1; i<size; i++){

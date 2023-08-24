@@ -34,6 +34,10 @@ void testLiteralParser(){
     assert(lit[3] == '\n');
     assert(lit[4] == '\t');
     assert(lit[5] == '"');
+
+    assert(LiteralParser::parseString("\" \"", lit));
+    assert(lit.size() == 1);
+    assert(lit[0] == ' ');
 }
 
 void testStringUtil(){

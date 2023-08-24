@@ -1,4 +1,4 @@
-SIZE = 50
+SIZE = 100
 
 f GETCELL {
     ((a == 1,0,0 #*) + (a == 1,1,1 #*) + (a == 0,0,0 #*)) !
@@ -8,10 +8,14 @@ f MASK {
     a : (3 i + b - 1)
 }
 
+f TOSTRING {
+    (a * "#" ) + (a ! * " ") 
+}
+
 f RULE {
     STATE = SIZE i == (SIZE - 1)
     I = 1
-    w STATE
+    t STATE TOSTRING
     do I <= a {
         J = 1
         NEWSTATE = 0
@@ -21,7 +25,7 @@ f RULE {
             J = J + 1
         }
         STATE = NEWSTATE | 0
-        w STATE
+        t STATE TOSTRING
         I = I + 1
     }
 }

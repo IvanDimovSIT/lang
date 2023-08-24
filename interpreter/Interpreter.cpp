@@ -134,7 +134,7 @@ bool Interpreter::execute(
             continue;
         }
 
-        if(tokens[i]->id == TokenIdWrite){
+        if(tokens[i]->id == TokenIdWrite || tokens[i]->id == TokenIdWriteText){
             const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
             std::vector<double> output;
             std::vector<Token*> statement;
@@ -150,7 +150,10 @@ bool Interpreter::execute(
                 return false;
             
             if(output.size() >= 1){
-                interpreterIO->write(output);
+                if(tokens[i]->id == TokenIdWrite)
+                    interpreterIO->write(output);
+                else
+                    interpreterIO->writeText(output);
                 *lastResult = output; // slow operation
             }
             i = statementEnd;
@@ -264,6 +267,9 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
     break;
     case TokenIdRead:
         return interpreterIO->read();
+    break;
+    case TokenIdReadText:
+        return interpreterIO->readText();
     break;
     default:
         // ...
