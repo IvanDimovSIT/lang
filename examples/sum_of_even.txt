@@ -1,0 +1,8 @@
+f SUMEVEN {
+   (a % 2 == 0) * a #+
+}
+
+t "Enter a list of numbers (eg. 1,2,8,5):"
+INPUT = r
+t "Sum of even numbers:"
+w INPUT SUMEVEN
