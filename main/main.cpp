@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     }
 
     if(!readFile(filepath, source)){
-        std::cout << "Error reading file" << std::endl;
+        std::cout << "Error reading file:\"" << filepath << "\"" << std::endl;
         return 1;
     }
 
