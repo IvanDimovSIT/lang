@@ -1,14 +1,14 @@
 #include <iostream>
 #include <cassert>
-#include "scanner/Scanner.h"
-#include "util/LiteralParser.h"
-#include "util/StringUtil.h"
-#include "util/TokenSubArrayFinder.h"
-#include "debug/DebugPrinter.h"
-#include "debug/ErrorPrinter.h"
-#include "interpreter/Interpreter.h"
-#include "interpreter/FunctionExtractor.h"
-#include "interpreter/InterpreterIO.h"
+#include "../scanner/Scanner.h"
+#include "../util/LiteralParser.h"
+#include "../util/StringUtil.h"
+#include "../util/TokenSubArrayFinder.h"
+#include "../debug/DebugPrinter.h"
+#include "../debug/ErrorPrinter.h"
+#include "../interpreter/Interpreter.h"
+#include "../interpreter/FunctionExtractor.h"
+#include "../interpreter/InterpreterIO.h"
 
 ErrorPrinter errorPrinter;
 InterpreterIO io;

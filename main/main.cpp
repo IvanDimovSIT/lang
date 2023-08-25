@@ -1,10 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include "interpreter/Interpreter.h"
-#include "scanner/Scanner.h"
-#include "debug/ErrorPrinter.h"
-#include "interpreter/InterpreterIO.h"
-#include "interpreter/FunctionExtractor.h"
+#include "../interpreter/Interpreter.h"
+#include "../scanner/Scanner.h"
+#include "../debug/ErrorPrinter.h"
+#include "../interpreter/InterpreterIO.h"
+#include "../interpreter/FunctionExtractor.h"
 
 bool readFile(const std::string& filepath, std::string& contents)
 {

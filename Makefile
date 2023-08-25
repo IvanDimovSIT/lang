@@ -1,8 +1,32 @@
 all:
-	clang++ main.cpp scanner/Scanner.cpp interpreter/InterpreterCalculator.cpp util/LiteralParser.cpp util/StringUtil.cpp util/TokenSubArrayFinder.cpp debug/DebugPrinter.cpp debug/ErrorPrinter.cpp interpreter/FunctionExtractor.cpp interpreter/Interpreter.cpp interpreter/InterpreterIO.cpp util/RandomGenerator.cpp -o lang.out
+	clang++ -flto -O3 -std=c++14 -o lang.out\
+	 main/main.cpp\
+	 scanner/Scanner.cpp\
+	 interpreter/InterpreterCalculator.cpp\
+	 util/LiteralParser.cpp\
+	 util/StringUtil.cpp\
+	 util/TokenSubArrayFinder.cpp\
+	 debug/DebugPrinter.cpp\
+	 debug/ErrorPrinter.cpp\
+	 interpreter/FunctionExtractor.cpp\
+	 interpreter/Interpreter.cpp\
+	 interpreter/InterpreterIO.cpp\
+	 util/RandomGenerator.cpp
 
 buildtest:
-	clang++ test.cpp scanner/Scanner.cpp interpreter/InterpreterCalculator.cpp util/LiteralParser.cpp util/StringUtil.cpp util/TokenSubArrayFinder.cpp debug/DebugPrinter.cpp debug/ErrorPrinter.cpp interpreter/FunctionExtractor.cpp interpreter/Interpreter.cpp interpreter/InterpreterIO.cpp util/RandomGenerator.cpp -g -o test.out
+	clang++ -g -std=c++14 -o test.out\
+	 main/test.cpp\
+	 scanner/Scanner.cpp\
+	 interpreter/InterpreterCalculator.cpp\
+	 util/LiteralParser.cpp\
+	 util/StringUtil.cpp\
+	 util/TokenSubArrayFinder.cpp\
+	 debug/DebugPrinter.cpp\
+	 debug/ErrorPrinter.cpp\
+	 interpreter/FunctionExtractor.cpp\
+	 interpreter/Interpreter.cpp\
+	 interpreter/InterpreterIO.cpp\
+	 util/RandomGenerator.cpp
 
 run: all
 	./lang.out program.txt
