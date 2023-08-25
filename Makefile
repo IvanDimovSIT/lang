@@ -29,7 +29,7 @@ buildtest:
 	 util/RandomGenerator.cpp
 
 run: all
-	./lang.out program.txt
+	./lang.out
 
 test: buildtest
 	./test.out
