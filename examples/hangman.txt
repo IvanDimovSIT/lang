@@ -1,0 +1,33 @@
+f MASKWORD {
+    (a * b) + ("*" * (b !))
+}
+
+f TOUPPER {
+    ISLOWER = ((a >= "a") * (a <= "z"))
+    (ISLOWER * ( a + ("A" - "a"))) + (ISLOWER ! * a)
+}
+
+WORDS = "BOOKTREECAT"
+WORDSLEN = 4,4,3
+RAND = WORDSLEN # ? ^ // Index of random word
+WORD = WORDS : (WORDSLEN : RAND i + (WORDSLEN : (RAND - 1 i) #+)) // select the word
+
+CURRENT = WORD * 0
+
+ATTEMPTS = 0
+do CURRENT #* ! {
+    t "To guess:" | (WORD MASKWORD CURRENT)
+    t "Enter letter:"
+    GUESS = g TOUPPER
+    if GUESS # == 1 {
+        CURRENT = CURRENT + (WORD == GUESS) ! !
+        ATTEMPTS = ATTEMPTS + 1
+    }
+    if GUESS # > 1 {
+       t "Enter a single letter!"
+    }
+}
+
+t "Correct! Word was:\"" | WORD | "\""
+t "Guesses:"
+w ATTEMPTS

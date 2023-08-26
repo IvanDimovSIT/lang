@@ -1,0 +1,9 @@
+f COUNT 
+{
+    (a == " ") #+ + 1
+}
+
+t "Enter text:"
+TEXT = g
+t "Words:"
+w TEXT COUNT
