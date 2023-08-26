@@ -1,0 +1,15 @@
+// function that checks if a number is prime
+f ISPRIME {
+    ( a % (a - 2 i + 1) #* ) + (a == 2) ! !
+}
+
+t "Enter numbers:"
+INPUT = r
+PRIMES = INPUT : ( INPUT\ISPRIME * (INPUT # i) ) // \ - apply function or operator to each number
+if PRIMES : 1 == 0 {
+    t "No primes found"
+}
+if PRIMES : 1 != 0 {
+    t "Found:"
+    w PRIMES
+}
