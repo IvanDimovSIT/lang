@@ -44,7 +44,8 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"r", TokenIdRead},
     {"w", TokenIdWrite},
     {"g", TokenIdReadText},
-    {"t", TokenIdWriteText}
+    {"t", TokenIdWriteText},
+    {"\\", TokenIdApplyToEach}
 };
 
 
@@ -99,6 +100,8 @@ bool Scanner::scan(
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
+            if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
+                hadError = true;
             curr += source[i];
             if(!matchToken(curr, tokens, functionNames)){
                 hadError = true;
@@ -106,6 +109,8 @@ bool Scanner::scan(
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
+            if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
+                hadError = true;
         }else if(source[i] == ' ' || source[i] == '\t' /*|| (i+1<sourceLen && source[i+1] == '"')*/){
             if(!matchToken(curr, tokens, functionNames)){
                 hadError = true;
@@ -113,6 +118,8 @@ bool Scanner::scan(
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
+            if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
+                hadError = true;
         }else{
             curr += source[i];
         }
@@ -126,6 +133,8 @@ bool Scanner::scan(
         if (errorReporter)
             errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
     }
+    if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
+        hadError = true;
 
     if(!extractFunctions(tokens, functions)){
         hadError = true;
@@ -313,6 +322,7 @@ bool Scanner::isSingleCharToken(char token)
     case ')':
     case '\n':
     case ';':
+    case '\\':
         return true;
     default:
         return false;
@@ -398,4 +408,33 @@ std::string Scanner::removeComments(const std::string& source)
     }
 
     return program;
+}
+
+bool Scanner::validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter)
+{
+    const int size = tokens.size();
+    if(size < 2)
+        return true;
+
+
+    bool isValid = (tokens[size-2].id != TokenIdApplyToEach) ||
+        (tokens[size-1].id != TokenIdLiteral &&
+        tokens[size-1].id != TokenIdVariable &&
+        tokens[size-1].id != TokenIdEquals &&
+        tokens[size-1].id != TokenIdWrite &&
+        tokens[size-1].id != TokenIdWriteText &&
+        tokens[size-1].id != TokenIdRead &&
+        tokens[size-1].id != TokenIdReadText &&
+        tokens[size-1].id != TokenIdOpenParenthesis &&
+        tokens[size-1].id != TokenIdOpenCurly &&
+        tokens[size-1].id != TokenIdCloseParenthesis &&
+        tokens[size-1].id != TokenIdCloseCurly);
+
+    if(isValid){
+        return true;
+    }else{
+        if(errorReporter)
+            errorReporter->report(line, ScannerErrorTypeNoOperatorToModify);
+        return false;
+    }
 }

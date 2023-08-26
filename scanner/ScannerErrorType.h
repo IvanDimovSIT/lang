@@ -9,5 +9,6 @@ enum ScannerErrorType{
     ScannerErrorTypeMoreOpenParenthesis,
     ScannerErrorTypeMoreClosingCurlyBrackets,
     ScannerErrorTypeMoreOpenCurlyBrackets,
-    ScannerErrorTypeStringLiteralError
+    ScannerErrorTypeStringLiteralError,
+    ScannerErrorTypeNoOperatorToModify
 };

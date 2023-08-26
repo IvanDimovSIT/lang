@@ -10,7 +10,8 @@ std::map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
     {ScannerErrorTypeMoreOpenParenthesis, "Missing ')'"},
     {ScannerErrorTypeMoreClosingCurlyBrackets, "Extra '{'"},
     {ScannerErrorTypeMoreOpenCurlyBrackets, "Missing '}'"},
-    {ScannerErrorTypeStringLiteralError, "Invalid string literal"}
+    {ScannerErrorTypeStringLiteralError, "Invalid string literal"},
+    {ScannerErrorTypeNoOperatorToModify, "No operator to modify"}
 };
 
 std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
@@ -25,7 +26,8 @@ std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
     {RuntimeErrorTypeNotAnOperation, "No operation found"},
     {RuntimeErrorTypeMissingIfCondition, "Missing if condition"},
     {RuntimeErrorTypeInvalidIfSyntax, "Invalid if syntax"},
-    {RuntimeErrorTypeMissingLoopCondition, "Missing loop condition"}
+    {RuntimeErrorTypeMissingLoopCondition, "Missing loop condition"},
+    {RuntimeErrorTypeNoOperatorToModify, "No operator to modify"}
 };
 
 void ErrorPrinter::report(RuntimeErrorType errorType){

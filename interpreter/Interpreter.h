@@ -62,6 +62,16 @@ private:
 
     bool isFunctionWithoutParameters(Token& function, std::map<std::string, Function>& functions);
 
+    std::unique_ptr<std::vector<double>> executeModifier(
+        std::vector<double>& leftParameter,
+        std::vector<Token*> &tokens,
+        std::map<std::string, Function>& functions,
+        std::map<std::string, std::vector<double>>& localVariables,
+        std::vector<double>& left,
+        std::vector<double>& right,
+        int position,
+        bool& hadError);
+
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;

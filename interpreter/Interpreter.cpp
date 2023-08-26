@@ -185,6 +185,10 @@ bool Interpreter::execute(
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
                 rightParameter = std::make_unique<std::vector<double>>();
                 operation = nullptr;
+            }else if(operation->id == TokenIdApplyToEach){
+                leftParameter = executeModifier(*leftParameter, tokens, functions, localVariables, left, right, i, hadError);
+                operation = nullptr;
+                i++;
             }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
                 operation = nullptr;
@@ -305,6 +309,7 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdRound:
     case TokenIdSort:
     case TokenIdReverse:
+    case TokenIdApplyToEach:
         leftParam = true;
         rightParam = false;
         return true;
@@ -420,4 +425,55 @@ bool Interpreter::isFunctionWithoutParameters(Token& function, std::map<std::str
         return false;
 
     return (!left) && (!right);
+}
+
+std::unique_ptr<std::vector<double>> Interpreter::executeModifier(
+    std::vector<double>& leftParameter,
+    std::vector<Token*> &tokens,
+    std::map<std::string, Function>& functions,
+    std::map<std::string, std::vector<double>>& localVariables,
+    std::vector<double>& left,
+    std::vector<double>& right,
+    int position,
+    bool& hadError)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(position == 0){
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+        return std::move(result);
+    }
+
+    const int size = leftParameter.size();
+    if(size == 0){
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+        return std::move(result);
+    }
+
+    if(position+1 >= tokens.size()){
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+        return std::move(result);
+    }
+
+    Token* operation = tokens[position+1];
+    for(int i=0; i<size; i++){
+        std::vector<double> first = {leftParameter[i]};
+        std::vector<double> second = {(i+1>=size? 0.0:leftParameter[i+1])};
+
+        auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, functions, localVariables, hadError);
+        for(const auto& j:*operationResult)
+            result->push_back(j);
+    }
+
+    if(result->size() == 0){
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+    }
+    return std::move(result);
 }

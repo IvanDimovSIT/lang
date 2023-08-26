@@ -236,6 +236,28 @@ void testInterpreter6()
     assert(result[3] == '"');
 }
 
+void testInterpreter7()
+{
+    std::string source = 
+        "A = 1,2,3 \\ +\n"; 
+
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    std::vector<double> result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 3);
+    assert(result[0] == 3);
+    assert(result[1] == 5);
+    assert(result[2] == 3);
+}
+
 
 
 int main(){
@@ -248,6 +270,7 @@ int main(){
     testInterpreter4();
     testInterpreter5();
     testInterpreter6();
+    testInterpreter7();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

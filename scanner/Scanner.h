@@ -31,4 +31,6 @@ private:
     static std::map<std::string, TokenId> tokenMap;
 
     static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
+
+    static bool validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter);
 };

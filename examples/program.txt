@@ -37,6 +37,5 @@ do I {
 
 MAIN
 
-t "Hello, World!"
-A = g + 1
-t A
+A = 1,2,3,4 \ +
+w A
