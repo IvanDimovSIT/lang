@@ -116,6 +116,11 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> makeSet(
+        std::vector<double>& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
     static std::unique_ptr<std::vector<double>> randomize(
         std::vector<double>& left,
         bool& hadError,
@@ -157,6 +162,6 @@ private:
         DyadicFunctionLambda lambda
     );
 
-    static bool validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter);
+    static bool validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter, bool& hadError);
 
 };

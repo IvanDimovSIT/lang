@@ -1,11 +1,13 @@
 #include "InterpreterCalculator.h"
 #include "../util/RandomGenerator.h"
 #include <cmath>
+#include <unordered_set>
 #include <algorithm>
 
-bool InterpreterCalculator::validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter)
+bool InterpreterCalculator::validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter, bool& hadError)
 {
     if(val.size() == 0){
+        hadError = true;
         if(reporter)
             reporter->report(RuntimeErrorTypeEmptyData);
         return false;
@@ -255,7 +257,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::iterate(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     for(const auto& i: left){
@@ -279,7 +281,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::logicalNot(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
     
     for(const auto& i:left)
@@ -313,7 +315,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::sumAll(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
     
     double sum = 0.0;
@@ -331,7 +333,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::multiplyAll(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
     
     double prod = 1.0;
@@ -350,7 +352,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::findUnion(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if((!validateInput(left, reporter)) || (!validateInput(right, reporter)))
+    if((!validateInput(left, reporter, hadError)) || (!validateInput(right, reporter, hadError)))
         return std::move(result);
 
     *result = left;
@@ -392,7 +394,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::randomize(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     for(const auto& i: left)
@@ -407,7 +409,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::findCeil(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     for(const auto& i: left)
@@ -422,7 +424,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::findCeil(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     for(const auto& i: left)
@@ -437,7 +439,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::findCeil(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     for(const auto& i: left)
@@ -452,7 +454,7 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::sortArray(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     *result = left;
@@ -468,11 +470,31 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::reverseArray(
     IRuntimeErrorReporter* reporter)
 {
     auto result = std::make_unique<std::vector<double>>();
-    if(!validateInput(left, reporter))
+    if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
     *result = left;
     std::reverse(result->begin(), result->end());
+
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::makeSet(
+    std::vector<double>& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter, hadError))
+        return std::move(result);
+
+    std::unordered_set<double> seen;
+    for(const auto& i: left){
+        if(seen.find(i) == seen.end()){
+            seen.insert(i);
+            result->push_back(i);
+        }
+    }
 
     return std::move(result);
 }

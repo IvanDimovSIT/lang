@@ -26,6 +26,7 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"~", TokenIdRound},
     {"$", TokenIdSort},
     {"@", TokenIdReverse},
+    {"&", TokenIdMakeSet},
     {"#", TokenIdCount},
     {"#+",TokenIdSumAll},
     {"#*",TokenIdMultiplyAll},

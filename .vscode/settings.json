@@ -56,6 +56,7 @@
         "shared_mutex": "cpp",
         "thread": "cpp",
         "iostream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "unordered_set": "cpp"
     }
 }

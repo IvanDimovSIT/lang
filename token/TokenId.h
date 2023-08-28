@@ -20,6 +20,7 @@ enum TokenId{
     TokenIdCount,               // #
     TokenIdSumAll,              // #+
     TokenIdMultiplyAll,         // #*
+    TokenIdMakeSet,             // &
     TokenIdUnion,               // |
     TokenIdSelect,              // :
     TokenIdRandom,              // ?

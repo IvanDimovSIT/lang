@@ -258,6 +258,31 @@ void testInterpreter7()
     assert(result[2] == 3);
 }
 
+void testInterpreter8()
+{
+    std::string source = 
+        "A = 1,2,2,-2.5,2,5,1,8,7,8,7,7,0 &\n"; 
+
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    std::vector<double> result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 7);
+    assert(result[0] == 1);
+    assert(result[1] == 2);
+    assert(result[2] == -2.5);
+    assert(result[3] == 5);
+    assert(result[4] == 8);
+    assert(result[5] == 7);
+    assert(result[6] == 0);
+}
 
 
 int main(){
@@ -271,6 +296,7 @@ int main(){
     testInterpreter5();
     testInterpreter6();
     testInterpreter7();
+    testInterpreter8();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;
