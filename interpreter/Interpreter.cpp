@@ -329,6 +329,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdNotEquals:
     case TokenIdUnion:
     case TokenIdSelect:
+    case TokenIdLeftRotate:
+    case TokenIdRightRotate:
         leftParam = true;
         rightParam = true;
         return true;
@@ -411,6 +413,10 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::sortArray(leftOfOperator, hadError, errorReporter);
     case TokenIdReverse:
         return InterpreterCalculator::reverseArray(leftOfOperator, hadError, errorReporter);
+    case TokenIdLeftRotate:
+        return InterpreterCalculator::leftRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdRightRotate:
+        return InterpreterCalculator::rightRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:break;
     }
 

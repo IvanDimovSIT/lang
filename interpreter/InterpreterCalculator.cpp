@@ -498,3 +498,51 @@ std::unique_ptr<std::vector<double>> InterpreterCalculator::makeSet(
 
     return std::move(result);
 }
+
+void InterpreterCalculator::rotateToLeft(const std::vector<double>& src, std::vector<double>& dest, long long positions)
+{
+    const int size = src.size();
+    if(positions < 0){
+        positions = -positions;
+        positions %= size;
+        positions = size - positions;
+    }
+    else{
+        positions %= size;
+    }
+
+    for(int i=0; i<size; i++){
+        dest.push_back(src[(i+positions)%size]);
+    }
+
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::leftRotate(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
+        return std::move(result);
+
+    rotateToLeft(left, *result, (long long)right[0]);
+    
+    return std::move(result);
+}
+
+std::unique_ptr<std::vector<double>> InterpreterCalculator::rightRotate(
+    std::vector<double>& left,
+    std::vector<double>& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<std::vector<double>>();
+    if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
+        return std::move(result);
+
+    rotateToLeft(left, *result, -((long long)right[0]));
+    
+    return std::move(result);
+}

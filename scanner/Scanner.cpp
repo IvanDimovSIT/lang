@@ -46,7 +46,9 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"w", TokenIdWrite},
     {"g", TokenIdReadText},
     {"t", TokenIdWriteText},
-    {"\\", TokenIdApplyToEach}
+    {"\\", TokenIdApplyToEach},
+    {"<<", TokenIdLeftRotate},
+    {">>", TokenIdRightRotate}
 };
 
 

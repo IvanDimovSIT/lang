@@ -151,6 +151,18 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<std::vector<double>> leftRotate(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
+    static std::unique_ptr<std::vector<double>> rightRotate(
+        std::vector<double>& left,
+        std::vector<double>& right,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
 private:
     using DyadicFunctionLambda = std::function<double(double, double, bool&, IRuntimeErrorReporter*)>;
 
@@ -163,5 +175,6 @@ private:
     );
 
     static bool validateInput(std::vector<double>& val, IRuntimeErrorReporter* reporter, bool& hadError);
+    static void rotateToLeft(const std::vector<double>& src, std::vector<double>& dest, long long positions);
 
 };
