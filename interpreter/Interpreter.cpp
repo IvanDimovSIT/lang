@@ -41,13 +41,12 @@ bool Interpreter::execute(
             if(!execute(loopStack.top().condition, functions, localVariables, left, right, conditionResult))
                 return false;
 
-            if(conditionResult[0] != 0.0){
+            if(conditionResult[0] != 0.0)
                 i = loopStack.top().loopStart;
-                continue;
-            }else{
+            else
                 loopStack.pop();
-                continue;
-            }
+            
+            continue;
         }
 
         if(tokens[i]->id == TokenIdEndLine || tokens[i]->id == TokenIdOpenCurly || tokens[i]->id == TokenIdCloseCurly){
@@ -74,7 +73,6 @@ bool Interpreter::execute(
             
             if(conditionResult[0] != 0.0){
                 i = endCondition;
-                continue;
             }else{
                 int afterIfBody = TokenSubArrayFinder::findClosingCurly(tokens, endCondition);
                 if(afterIfBody == TOKEN_INDEX_NOT_FOUND){
@@ -83,8 +81,8 @@ bool Interpreter::execute(
                     return false;
                 }
                 i = afterIfBody;
-                continue;
             }
+            continue;
         }
 
         if(tokens[i]->id == TokenIdLoop){
@@ -104,11 +102,10 @@ bool Interpreter::execute(
             if(conditionResult[0] != 0){
                 loopStack.push(loopData);
                 i = loopData.loopStart;
-                continue;
             }else{
                 i = loopData.loopEnd;
-                continue;
             }
+            continue;
         }
 
         if(tokens[i]->id == TokenIdEquals && i-1>=0 && tokens[i-1]->id == TokenIdVariable){
@@ -126,7 +123,6 @@ bool Interpreter::execute(
             if(hadError)
                 return false;
             
-            /// TODO: Could be optimised
             lastResult = std::move(leftParameter);
             leftParameter = std::make_unique<std::vector<double>>();
             localVariables[tokens[i - 1]->str] = *lastResult;
@@ -184,17 +180,17 @@ bool Interpreter::execute(
             if(rightArg && rightParameter->size() > 0){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
                 rightParameter = std::make_unique<std::vector<double>>();
-                operation = nullptr;
+                
             }else if(operation->id == TokenIdApplyToEach){
                 leftParameter = executeModifier(*leftParameter, tokens, functions, localVariables, left, right, i, hadError);
-                operation = nullptr;
                 i++;
             }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
                 leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
-                operation = nullptr;
             }else{
                 continue;
             }
+
+            operation = nullptr;
         }
 
         if(hadError)
