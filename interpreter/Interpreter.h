@@ -38,6 +38,17 @@ private:
         std::vector<double>& right,
         std::vector<double>& result);
 
+    inline bool checkForCalculation(
+        std::vector<Token*> &tokens,
+        int& position,
+        std::map<std::string, Function>& functions,
+        std::map<std::string, std::vector<double>>& localVariables,
+        std::vector<double>& left,
+        std::vector<double>& right,
+        Token*& operation,
+        std::unique_ptr<std::vector<double>>& leftParameter,
+        std::unique_ptr<std::vector<double>>& rightParameter);
+
     std::unique_ptr<std::vector<double>> getNextArgument(
         int& position,
         std::vector<Token*> &tokens,
@@ -62,7 +73,7 @@ private:
 
     bool isFunctionWithoutParameters(Token& function, std::map<std::string, Function>& functions);
 
-    std::unique_ptr<std::vector<double>> executeModifier(
+    inline std::unique_ptr<std::vector<double>> executeModifier(
         std::vector<double>& leftParameter,
         std::vector<Token*> &tokens,
         std::map<std::string, Function>& functions,

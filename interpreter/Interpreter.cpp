@@ -167,33 +167,7 @@ bool Interpreter::execute(
         if(hadError)
             return false;
 
-
-        //check for calculation
-        if(operation != nullptr){
-            bool leftArg, rightArg;
-            hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, functions); 
-            if(hadError){
-                if(errorReporter)
-                    errorReporter->report(RuntimeErrorTypeNotAnOperation);
-                return false;
-            }
-            if(rightArg && rightParameter->size() > 0){
-                leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
-                rightParameter = std::make_unique<std::vector<double>>();
-                
-            }else if(operation->id == TokenIdApplyToEach){
-                leftParameter = executeModifier(*leftParameter, tokens, functions, localVariables, left, right, i, hadError);
-                i++;
-            }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
-                leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
-            }else{
-                continue;
-            }
-
-            operation = nullptr;
-        }
-
-        if(hadError)
+        if(!checkForCalculation(tokens, i, functions, localVariables, left, right, operation, std::ref(leftParameter), std::ref(rightParameter)))
             return false;
     }
 
@@ -201,6 +175,44 @@ bool Interpreter::execute(
     if(leftParameter->size() != 0)
         lastResult = std::move(leftParameter);
     result = *lastResult;
+    return true;
+}
+
+bool Interpreter::checkForCalculation(
+    std::vector<Token*> &tokens,
+    int& position,
+    std::map<std::string, Function>& functions,
+    std::map<std::string, std::vector<double>>& localVariables,
+    std::vector<double>& left,
+    std::vector<double>& right,
+    Token*& operation,
+    std::unique_ptr<std::vector<double>>& leftParameter,
+    std::unique_ptr<std::vector<double>>& rightParameter)
+{
+    if(operation == nullptr)
+        return true;
+    
+    bool leftArg, rightArg, hadError;
+    hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, functions); 
+    if(hadError){
+        if(errorReporter)
+                errorReporter->report(RuntimeErrorTypeNotAnOperation);
+        return false;
+    }
+    if(rightArg && rightParameter->size() > 0){
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
+        rightParameter = std::make_unique<std::vector<double>>();
+                
+    }else if(operation->id == TokenIdApplyToEach){
+        leftParameter = executeModifier(*leftParameter, tokens, functions, localVariables, left, right, position, hadError);
+        position++;
+    }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
+    }else{
+        return true;
+    }
+
+    operation = nullptr;
     return true;
 }
 
