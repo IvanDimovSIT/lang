@@ -3,8 +3,8 @@
 
 class InterpreterIO : public IInterpreterIO{
 public:
-    std::unique_ptr<std::vector<double>> read() override;
-    void write(std::vector<double>& value) override;
-    std::unique_ptr<std::vector<double>> readText() override;
-    void writeText(std::vector<double>& value) override;
+    std::unique_ptr<Value> read() override;
+    void write(Value& value) override;
+    std::unique_ptr<Value> readText() override;
+    void writeText(Value& value) override;
 };

@@ -23,7 +23,7 @@ bool LiteralParser::parseSingleValue(const std::string literal, double& value){
     return true;
 }
 
-bool LiteralParser::parse(const std::string& literal, std::vector<double>& value){
+bool LiteralParser::parse(const std::string& literal, Value& value){
     value.clear();
     std::string curr = "";
     double val;
@@ -50,7 +50,7 @@ bool LiteralParser::parse(const std::string& literal, std::vector<double>& value
     return true;
 }
 
-bool LiteralParser::parseString(const std::string& literal, std::vector<double>& value)
+bool LiteralParser::parseString(const std::string& literal, Value& value)
 {
     value.clear();
     const int size = literal.size()-1;

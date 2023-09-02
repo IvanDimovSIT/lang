@@ -21,7 +21,7 @@ bool readFile(const std::string& filepath, std::string& contents)
     return true;
 }
 
-void printResult(const std::vector<double>& result)
+void printResult(const Value& result)
 {
     std::cout << "Result: [";
     const int size = result.size();
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
         std::cout << "Error finding functions" << std::endl;
         return 1;
     }
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     
     if(!interpreter.execute(exec, functions, result)){

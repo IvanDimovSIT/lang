@@ -4,11 +4,11 @@
 #define CHARS_START '\t'
 #define CHARS_END '~'
 
-std::unique_ptr<std::vector<double>> InterpreterIO::read()
+std::unique_ptr<Value> InterpreterIO::read()
 {
     std::string input, cur="";
     double converted;
-    auto result = std::make_unique<std::vector<double>>();
+    auto result = std::make_unique<Value>();
     std::cout << "numbers>";
     getline(std::cin, input);
     const int size = input.size();
@@ -36,7 +36,7 @@ std::unique_ptr<std::vector<double>> InterpreterIO::read()
     return std::move(result);
 }
     
-void InterpreterIO::write(std::vector<double>& value)
+void InterpreterIO::write(Value& value)
 {
     const int size = value.size();
     for(int i=0; i<size-1; i++){
@@ -45,10 +45,10 @@ void InterpreterIO::write(std::vector<double>& value)
     std::cout << value[size-1] << std::endl;
 }
 
-std::unique_ptr<std::vector<double>> InterpreterIO::readText()
+std::unique_ptr<Value> InterpreterIO::readText()
 {
     std::string input;
-    auto result = std::make_unique<std::vector<double>>();
+    auto result = std::make_unique<Value>();
     std::cout << "text>";
     getline(std::cin, input);
     
@@ -66,7 +66,7 @@ std::unique_ptr<std::vector<double>> InterpreterIO::readText()
     return std::move(result);
 }
     
-void InterpreterIO::writeText(std::vector<double>& value)
+void InterpreterIO::writeText(Value& value)
 {
     for(const auto& i: value){
         if(i<CHARS_START || i>CHARS_END)

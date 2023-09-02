@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 
+typedef std::vector<double> Value;
+
 struct Token{
     std::string str;
-    std::vector<double> val;
+    Value val;
     TokenId id;
 };

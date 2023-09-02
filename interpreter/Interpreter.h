@@ -1,8 +1,10 @@
 #pragma once
 #include <map>
 #include <memory>
+#include <stack>
 #include "../token/Token.h"
 #include "RuntimeErrorType.h"
+#include "ProgramSymbols.h"
 #include "../scanner/Function.h"
 
 class IRuntimeErrorReporter{
@@ -12,10 +14,10 @@ public:
 
 class IInterpreterIO{
 public:
-    virtual std::unique_ptr<std::vector<double>> read() = 0;
-    virtual void write(std::vector<double>& value) = 0;
-    virtual std::unique_ptr<std::vector<double>> readText() = 0;
-    virtual void writeText(std::vector<double>& value) = 0;
+    virtual std::unique_ptr<Value> read() = 0;
+    virtual void write(Value& value) = 0;
+    virtual std::unique_ptr<Value> readText() = 0;
+    virtual void writeText(Value& value) = 0;
 };
 
 struct LoopReturn{
@@ -23,63 +25,59 @@ struct LoopReturn{
     int loopStart;
     int loopEnd;
 };
+typedef std::stack<LoopReturn> LoopStack;
 
 class Interpreter{
 public:
     Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
-    bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result);
+    bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result);
 
 private:
     bool execute(
         std::vector<Token*> &tokens,
-        std::map<std::string, Function>& functions,
-        std::map<std::string, std::vector<double>>& localVariables,
-        std::vector<double>& left,
-        std::vector<double>& right,
-        std::vector<double>& result);
+        ProgramSymbols& programSymbols,
+        Value& left,
+        Value& right,
+        Value& result);
 
     inline bool checkForCalculation(
         std::vector<Token*> &tokens,
         int& position,
-        std::map<std::string, Function>& functions,
-        std::map<std::string, std::vector<double>>& localVariables,
-        std::vector<double>& left,
-        std::vector<double>& right,
+        ProgramSymbols& programSymbols,
+        Value& left,
+        Value& right,
         Token*& operation,
-        std::unique_ptr<std::vector<double>>& leftParameter,
-        std::unique_ptr<std::vector<double>>& rightParameter);
+        std::unique_ptr<Value>& leftParameter,
+        std::unique_ptr<Value>& rightParameter);
 
-    std::unique_ptr<std::vector<double>> getNextArgument(
+    std::unique_ptr<Value> getNextArgument(
         int& position,
         std::vector<Token*> &tokens,
-        std::map<std::string, Function>& functions,
-        std::map<std::string, std::vector<double>>& localVariables,
-        std::vector<double>& left,
-        std::vector<double>& right,
+        ProgramSymbols& programSymbols,
+        Value& left,
+        Value& right,
         bool& hadError);
 
     // returns false if not an operation
-    bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam, std::map<std::string, Function>& functions);
+    bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam, ProgramSymbols& programSymbols);
 
-    std::unique_ptr<std::vector<double>> executeOperationOrFunction(
-        std::vector<double>& leftOfOperator,
-        std::vector<double>& rightOfOperator,
+    std::unique_ptr<Value> executeOperationOrFunction(
+        Value& leftOfOperator,
+        Value& rightOfOperator,
         Token& operation,
-        std::vector<double>& left,
-        std::vector<double>& right,
-        std::map<std::string, Function>& functions,
-        std::map<std::string, std::vector<double>>& localVariables,
+        Value& left,
+        Value& right,
+        ProgramSymbols& programSymbols,
         bool& hadError);
 
-    bool isFunctionWithoutParameters(Token& function, std::map<std::string, Function>& functions);
+    bool isFunctionWithoutParameters(Token& function, ProgramSymbols& programSymbols);
 
-    inline std::unique_ptr<std::vector<double>> executeModifier(
-        std::vector<double>& leftParameter,
+    inline std::unique_ptr<Value> executeModifier(
+        Value& leftParameter,
         std::vector<Token*> &tokens,
-        std::map<std::string, Function>& functions,
-        std::map<std::string, std::vector<double>>& localVariables,
-        std::vector<double>& left,
-        std::vector<double>& right,
+        ProgramSymbols& programSymbols,
+        Value& left,
+        Value& right,
         int position,
         bool& hadError);
 

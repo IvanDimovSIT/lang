@@ -14,7 +14,7 @@ ErrorPrinter errorPrinter;
 InterpreterIO io;
 
 void testLiteralParser(){
-    std::vector<double> lit;
+    Value lit;
     assert(!LiteralParser::parse("sssa",lit));
     assert(LiteralParser::parse("123",lit));
     assert(lit.size() == 1);
@@ -82,7 +82,7 @@ void testScanner(){
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     assert(exec.size() == 5);
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
     assert(result.size() == 3);
@@ -111,7 +111,7 @@ void testInterpreter1()
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
     assert(result[0] == 0.0);
@@ -126,7 +126,7 @@ void testInterpreter2()
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
     assert(result.size() == 6);
@@ -152,7 +152,7 @@ void testInterpreter3()
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
@@ -179,7 +179,7 @@ void testInterpreter4()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
@@ -204,7 +204,7 @@ void testInterpreter5()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
@@ -225,7 +225,7 @@ void testInterpreter6()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
@@ -248,7 +248,7 @@ void testInterpreter7()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
@@ -270,7 +270,7 @@ void testInterpreter8()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 
@@ -296,7 +296,7 @@ void testInterpreter9()
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
-    std::vector<double> result;
+    Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     assert(interpreter.execute(exec, functions, result));
 

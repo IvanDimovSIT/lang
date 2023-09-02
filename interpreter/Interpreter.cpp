@@ -1,4 +1,3 @@
-#include <stack>
 #include "Interpreter.h"
 #include "../util/TokenSubArrayFinder.h"
 #include "InterpreterCalculator.h"
@@ -11,34 +10,33 @@ Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* i
     this->interpreterIO = interpreterIO;
 }
 
-bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, std::vector<double>& result)
+bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result)
 {
-    std::map<std::string, std::vector<double>> localVariables;
-    std::vector<double> empty;
-    return execute(tokens, functions, localVariables,  empty, empty, result);
+    ProgramSymbols programSymbols = {functions,{}};
+    Value empty;
+    return execute(tokens, programSymbols,  empty, empty, result);
 }
 
 
 bool Interpreter::execute(
     std::vector<Token*> &tokens,
-    std::map<std::string, Function>& functions,
-    std::map<std::string, std::vector<double>>& localVariables,
-    std::vector<double>& left,
-    std::vector<double>& right,
-    std::vector<double>& result)
+    ProgramSymbols& programSymbols,
+    Value& left,
+    Value& right,
+    Value& result)
 {
     const int size = tokens.size();
     bool hadError = false;
-    std::unique_ptr<std::vector<double>> leftParameter = std::make_unique<std::vector<double>>();
-    std::unique_ptr<std::vector<double>> rightParameter = std::make_unique<std::vector<double>>();
-    std::unique_ptr<std::vector<double>> lastResult = std::make_unique<std::vector<double>>();
+    std::unique_ptr<Value> leftParameter = std::make_unique<Value>();
+    std::unique_ptr<Value> rightParameter = std::make_unique<Value>();
+    std::unique_ptr<Value> lastResult = std::make_unique<Value>();
     Token* operation = nullptr;
-    std::stack<LoopReturn> loopStack;
+    LoopStack loopStack;
 
     for(int i=0; i<size; i++){
         if(loopStack.size() != 0 && i == loopStack.top().loopEnd){
-            std::vector<double> conditionResult;
-            if(!execute(loopStack.top().condition, functions, localVariables, left, right, conditionResult))
+            Value conditionResult;
+            if(!execute(loopStack.top().condition, programSymbols, left, right, conditionResult))
                 return false;
 
             if(conditionResult[0] != 0.0)
@@ -52,15 +50,15 @@ bool Interpreter::execute(
         if(tokens[i]->id == TokenIdEndLine || tokens[i]->id == TokenIdOpenCurly || tokens[i]->id == TokenIdCloseCurly){
             if(leftParameter->size() != 0){
                 lastResult = std::move(leftParameter);
-                leftParameter = std::make_unique<std::vector<double>>();
-                rightParameter = std::make_unique<std::vector<double>>();
+                leftParameter = std::make_unique<Value>();
+                rightParameter = std::make_unique<Value>();
             }
             continue;
         }
 
         if(tokens[i]->id == TokenIdIf){
             std::vector<Token*> condition;
-            std::vector<double> conditionResult;
+            Value conditionResult;
             int endCondition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
             if(endCondition == TOKEN_INDEX_NOT_FOUND){
                 if(errorReporter)
@@ -68,7 +66,7 @@ bool Interpreter::execute(
                 return false;
             }
             TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
-            if(!execute(condition, functions, localVariables, left, right, conditionResult))
+            if(!execute(condition, programSymbols, left, right, conditionResult))
                 return false;
             
             if(conditionResult[0] != 0.0){
@@ -87,7 +85,7 @@ bool Interpreter::execute(
 
         if(tokens[i]->id == TokenIdLoop){
             LoopReturn loopData;
-            std::vector<double> conditionResult;
+            Value conditionResult;
             loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
             if(loopData.loopStart == TOKEN_INDEX_NOT_FOUND){
                 if(errorReporter)
@@ -96,7 +94,7 @@ bool Interpreter::execute(
             }
             TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
             loopData.loopEnd = TokenSubArrayFinder::findClosingCurly(tokens, loopData.loopStart);
-            if(!execute(loopData.condition, functions, localVariables, left, right, conditionResult))
+            if(!execute(loopData.condition, programSymbols, left, right, conditionResult))
                 return false;
 
             if(conditionResult[0] != 0){
@@ -115,8 +113,7 @@ bool Interpreter::execute(
 
             hadError = !execute(
                 statement,
-                functions,
-                localVariables,
+                programSymbols,
                 left,
                 right,
                 *leftParameter);
@@ -124,21 +121,20 @@ bool Interpreter::execute(
                 return false;
             
             lastResult = std::move(leftParameter);
-            leftParameter = std::make_unique<std::vector<double>>();
-            localVariables[tokens[i - 1]->str] = *lastResult;
+            leftParameter = std::make_unique<Value>();
+            programSymbols.variables[tokens[i - 1]->str] = *lastResult;
             i = statementEnd;
             continue;
         }
 
         if(tokens[i]->id == TokenIdWrite || tokens[i]->id == TokenIdWriteText){
             const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
-            std::vector<double> output;
+            Value output;
             std::vector<Token*> statement;
             TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
             hadError = !execute(
                 statement,
-                functions,
-                localVariables,
+                programSymbols,
                 left,
                 right,
                 output);
@@ -150,24 +146,26 @@ bool Interpreter::execute(
                     interpreterIO->write(output);
                 else
                     interpreterIO->writeText(output);
-                *lastResult = output; // slow operation
+                *lastResult = output;
             }
             i = statementEnd;
             continue;
         }
 
-        if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) || isFunctionWithoutParameters(*tokens[i], functions)){
-            leftParameter = getNextArgument(i, tokens, functions, localVariables, left, right, hadError);
+        if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) ||
+            isFunctionWithoutParameters(*tokens[i], programSymbols))
+        {
+            leftParameter = getNextArgument(i, tokens, programSymbols, left, right, hadError);
         }else if(operation == nullptr){
             operation = tokens[i];
         }else{
-            rightParameter = getNextArgument(i, tokens, functions, localVariables, left, right, hadError);
+            rightParameter = getNextArgument(i, tokens, programSymbols, left, right, hadError);
         }
 
         if(hadError)
             return false;
 
-        if(!checkForCalculation(tokens, i, functions, localVariables, left, right, operation, std::ref(leftParameter), std::ref(rightParameter)))
+        if(!checkForCalculation(tokens, i, programSymbols, left, right, operation, std::ref(leftParameter), std::ref(rightParameter)))
             return false;
     }
 
@@ -181,33 +179,32 @@ bool Interpreter::execute(
 bool Interpreter::checkForCalculation(
     std::vector<Token*> &tokens,
     int& position,
-    std::map<std::string, Function>& functions,
-    std::map<std::string, std::vector<double>>& localVariables,
-    std::vector<double>& left,
-    std::vector<double>& right,
+    ProgramSymbols& programSymbols,
+    Value& left,
+    Value& right,
     Token*& operation,
-    std::unique_ptr<std::vector<double>>& leftParameter,
-    std::unique_ptr<std::vector<double>>& rightParameter)
+    std::unique_ptr<Value>& leftParameter,
+    std::unique_ptr<Value>& rightParameter)
 {
     if(operation == nullptr)
         return true;
     
     bool leftArg, rightArg, hadError;
-    hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, functions); 
+    hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, programSymbols); 
     if(hadError){
         if(errorReporter)
                 errorReporter->report(RuntimeErrorTypeNotAnOperation);
         return false;
     }
     if(rightArg && rightParameter->size() > 0){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
-        rightParameter = std::make_unique<std::vector<double>>();
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, programSymbols, hadError);
+        rightParameter = std::make_unique<Value>();
                 
     }else if(operation->id == TokenIdApplyToEach){
-        leftParameter = executeModifier(*leftParameter, tokens, functions, localVariables, left, right, position, hadError);
+        leftParameter = executeModifier(*leftParameter, tokens, programSymbols, left, right, position, hadError);
         position++;
     }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, functions, localVariables, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, programSymbols, hadError);
     }else{
         return true;
     }
@@ -217,47 +214,46 @@ bool Interpreter::checkForCalculation(
 }
 
     
-std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
+std::unique_ptr<Value> Interpreter::getNextArgument(
     int& position,
     std::vector<Token*> &tokens,
-    std::map<std::string, Function>& functions,
-    std::map<std::string, std::vector<double>>& localVariables,
-    std::vector<double>& left,
-    std::vector<double>& right,
+    ProgramSymbols& programSymbols,
+    Value& left,
+    Value& right,
     bool& hadError)
 {
-    std::unique_ptr<std::vector<double>> result;
+    std::unique_ptr<Value> result;
 
     switch(tokens[position]->id)
     {
     case TokenIdVariable:
-        result = std::make_unique<std::vector<double>>(localVariables[tokens[position]->str]);
+        result = std::make_unique<Value>(programSymbols.variables[tokens[position]->str]);
         return std::move(result);
     break;
     case TokenIdLiteral:
-        result = std::make_unique<std::vector<double>>(tokens[position]->val);
+        result = std::make_unique<Value>(tokens[position]->val);
         return std::move(result);
     break;
     case TokenIdLeftParam:
-        result = std::make_unique<std::vector<double>>(left);
+        result = std::make_unique<Value>(left);
         return std::move(result);
     break;
     case TokenIdRightParam:
-        result = std::make_unique<std::vector<double>>(right);
+        result = std::make_unique<Value>(right);
         return std::move(result);
     break;
     case TokenIdFunction:{
         bool ArgLeft, ArgRight;
-        getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, functions);
+        getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, programSymbols);
         if((!ArgLeft) && (!ArgRight)){
-            result = std::make_unique<std::vector<double>>();
-            hadError = !execute(functions[tokens[position]->str].body, functions, localVariables, left, right, *result);
+            result = std::make_unique<Value>();
+            hadError = !execute(programSymbols.functions[tokens[position]->str].body, programSymbols, left, right, *result);
             return std::move(result);
         }else{
             hadError = true;
             if(errorReporter)
                 errorReporter->report(RuntimeErrorTypeOperationAsParameter);
-            return std::make_unique<std::vector<double>>();
+            return std::make_unique<Value>();
         }
     }
     break;
@@ -267,12 +263,12 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
             hadError = true;
             if(errorReporter)
                 errorReporter->report(RuntimeErrorTypeNoClosingParenthesis);
-            return std::make_unique<std::vector<double>>();
+            return std::make_unique<Value>();
         }
         std::vector<Token*> sub;
         TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos-1);
-        result = std::make_unique<std::vector<double>>();
-        hadError = !execute(sub, functions, localVariables, left, right, *result);
+        result = std::make_unique<Value>();
+        hadError = !execute(sub, programSymbols, left, right, *result);
         position = endPos;
         return std::move(result);
     }
@@ -295,10 +291,10 @@ std::unique_ptr<std::vector<double>> Interpreter::getNextArgument(
     return std::move(result);
 }
     
-bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& leftParam, bool& rightParam, std::map<std::string, Function>& functions)
+bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& leftParam, bool& rightParam, ProgramSymbols& programSymbols)
 {
     if(operation.id == TokenIdFunction){
-        auto func = &functions[operation.str];
+        auto func = &programSymbols.functions[operation.str];
         leftParam = func->left;
         rightParam = func->right;
         return true;
@@ -351,22 +347,21 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
 
 
 
-std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
-    std::vector<double>& leftOfOperator,
-        std::vector<double>& rightOfOperator,
-        Token& operation,
-        std::vector<double>& left,
-        std::vector<double>& right,
-        std::map<std::string, Function>& functions,
-        std::map<std::string, std::vector<double>>& localVariables,
-        bool& hadError)
+std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
+    Value& leftOfOperator,
+    Value& rightOfOperator,
+    Token& operation,
+    Value& left,
+    Value& right,
+    ProgramSymbols& programSymbols,
+    bool& hadError)
 {
     switch (operation.id)
     {
     case TokenIdFunction:
         {
-            auto result = std::make_unique<std::vector<double>>();
-            hadError = !execute(functions[operation.str].body, functions, localVariables, leftOfOperator, rightOfOperator, *result);
+            auto result = std::make_unique<Value>();
+            hadError = !execute(programSymbols.functions[operation.str].body, programSymbols, leftOfOperator, rightOfOperator, *result);
             return result;
         }
     case TokenIdAdd:
@@ -432,29 +427,28 @@ std::unique_ptr<std::vector<double>> Interpreter::executeOperationOrFunction(
     if(errorReporter)
         errorReporter->report(RuntimeErrorTypeNotAnOperation);
 
-    return std::make_unique<std::vector<double>>();
+    return std::make_unique<Value>();
 }
 
-bool Interpreter::isFunctionWithoutParameters(Token& function, std::map<std::string, Function>& functions)
+bool Interpreter::isFunctionWithoutParameters(Token& function, ProgramSymbols& programSymbols)
 {
     bool left, right;
-    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, left, right, functions))
+    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, left, right, programSymbols))
         return false;
 
     return (!left) && (!right);
 }
 
-std::unique_ptr<std::vector<double>> Interpreter::executeModifier(
-    std::vector<double>& leftParameter,
+std::unique_ptr<Value> Interpreter::executeModifier(
+    Value& leftParameter,
     std::vector<Token*> &tokens,
-    std::map<std::string, Function>& functions,
-    std::map<std::string, std::vector<double>>& localVariables,
-    std::vector<double>& left,
-    std::vector<double>& right,
+    ProgramSymbols& programSymbols,
+    Value& left,
+    Value& right,
     int position,
     bool& hadError)
 {
-    auto result = std::make_unique<std::vector<double>>();
+    auto result = std::make_unique<Value>();
     if(position == 0){
         hadError = true;
         if(errorReporter)
@@ -479,10 +473,10 @@ std::unique_ptr<std::vector<double>> Interpreter::executeModifier(
 
     Token* operation = tokens[position+1];
     for(int i=0; i<size; i++){
-        std::vector<double> first = {leftParameter[i]};
-        std::vector<double> second = {(i+1>=size? 0.0:leftParameter[i+1])};
+        Value first = {leftParameter[i]};
+        Value second = {(i+1>=size? 0.0:leftParameter[i+1])};
 
-        auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, functions, localVariables, hadError);
+        auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, programSymbols, hadError);
         for(const auto& j:*operationResult)
             result->push_back(j);
     }
