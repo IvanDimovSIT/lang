@@ -25,8 +25,8 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
     )
 {
     auto p = std::make_unique<Value>();
-    int lsize = left.size();
-    int rsize = right.size();
+    const int lsize = left.size();
+    const int rsize = right.size();
     if(lsize == 0 || rsize == 0){
         hadError = true;
         if(reporter)
@@ -233,7 +233,7 @@ std::unique_ptr<Value> InterpreterCalculator::power(
         dyadicFunction(left, right, hadError, reporter,
             [](double a, double b, bool& err, IRuntimeErrorReporter* r) -> double 
         {
-            if(a == 0 && b == 0){
+            if(a == 0.0 && b == 0.0){
                 if(r)
                     r->report(RuntimeErrorTypeZeroPowerZero);
                 err = true;
