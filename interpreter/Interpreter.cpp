@@ -31,7 +31,7 @@ bool Interpreter::execute(
     std::unique_ptr<Value> rightParameter = std::make_unique<Value>();
     std::unique_ptr<Value> lastResult = std::make_unique<Value>();
     Token* operation = nullptr;
-    LoopStack loopStack;
+    std::stack<LoopReturn> loopStack;
 
     for(int i=0; i<size; i++){
         if(loopStack.size() != 0 && i == loopStack.top().loopEnd){

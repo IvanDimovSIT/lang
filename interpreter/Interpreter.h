@@ -25,7 +25,6 @@ struct LoopReturn{
     int loopStart;
     int loopEnd;
 };
-typedef std::stack<LoopReturn> LoopStack;
 
 class Interpreter{
 public:
