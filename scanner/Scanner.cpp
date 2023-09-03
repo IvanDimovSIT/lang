@@ -3,8 +3,6 @@
 #include "../util/LiteralParser.h"
 #include "../util/TokenSubArrayFinder.h"
 
-#include <iostream> /// TODO: Delete this line
-
 std::map<std::string, TokenId> Scanner::tokenMap = {
     {"+", TokenIdAdd},
     {"-", TokenIdSubtract},
