@@ -5,7 +5,7 @@ f ISPRIME {
 
 t "Enter numbers:"
 INPUT = r
-PRIMES = INPUT : ( INPUT\ISPRIME * (INPUT # i) ) // \ - apply function or operator to each number
+PRIMES = INPUT : ( INPUT\ISPRIME * (INPUT # i) ) & // \ - apply function or operator to each number
 if PRIMES : 1 == 0 {
     t "No primes found"
 }

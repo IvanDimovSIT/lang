@@ -3,6 +3,8 @@
 #include "../util/LiteralParser.h"
 #include "../util/TokenSubArrayFinder.h"
 
+#include <iostream> /// TODO: Delete this line
+
 std::map<std::string, TokenId> Scanner::tokenMap = {
     {"+", TokenIdAdd},
     {"-", TokenIdSubtract},
@@ -125,6 +127,10 @@ bool Scanner::scan(
                 hadError = true;
         }else{
             curr += source[i];
+            if((i+1<sourceLen) && tokenMap.count(curr+source[i+1]) > 0 && matchToken(curr+source[i+1], tokens, functionNames)){
+                i++;
+                curr = "";
+            }
         }
 
         if(source[i] == '\n')
@@ -325,6 +331,15 @@ bool Scanner::isSingleCharToken(char token)
     case ')':
     case '\n':
     case ';':
+    case '@':
+    case '?':
+    case '|':
+    case '&':
+    case ':':
+    case '_':
+    case '$':
+    case '~':
+    case '^':
     case '\\':
         return true;
     default:
