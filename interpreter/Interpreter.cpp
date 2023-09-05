@@ -16,8 +16,7 @@ bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Fun
     initVariables(tokens, programSymbols);
     Value empty;
     bool ret = execute(tokens, programSymbols,  empty, empty, result);
-    for(auto& i: programSymbols.threads)
-        i.join();
+    joinThreads(programSymbols);
 
     return ret;
 }
