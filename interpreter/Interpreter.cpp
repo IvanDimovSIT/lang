@@ -102,6 +102,11 @@ bool Interpreter::execute(
             continue;
         }
 
+        if(tokens[i]->id == TokenIdAsyncJoin){
+            joinThreads(programSymbols);
+            continue;
+        }
+
         if(tokens[i]->id == TokenIdIf){
             std::vector<Token*> condition;
             Value conditionResult;
@@ -567,4 +572,12 @@ bool Interpreter::executeAsync(
     position = endPosition;
 
     return true;
+}
+
+void Interpreter::joinThreads(ProgramSymbols& programSymbols)
+{
+    for(auto& i: programSymbols.threads)
+        i.join();
+
+    programSymbols.threads.clear();
 }

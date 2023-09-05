@@ -49,5 +49,6 @@ enum TokenId{
     TokenIdLeftRotate,          // <<
     TokenIdRightRotate,         // >>
     TokenIdAsyncStart,          // [
-    TokenIdAsyncEnd             // ]
+    TokenIdAsyncEnd,            // ]
+    TokenIdAsyncJoin            // !!
 };

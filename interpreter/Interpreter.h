@@ -98,6 +98,7 @@ private:
     inline void getVariable(Value& value, const std::string& variableName, ProgramSymbols& programSymbols);
 
     void initVariables(std::vector<Token*> &tokens, ProgramSymbols& programSymbols);
+    void joinThreads(ProgramSymbols& programSymbols);
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;

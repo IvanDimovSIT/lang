@@ -50,7 +50,8 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"<<", TokenIdLeftRotate},
     {">>", TokenIdRightRotate},
     {"[", TokenIdAsyncStart},
-    {"]", TokenIdAsyncEnd}
+    {"]", TokenIdAsyncEnd},
+    {"!!", TokenIdAsyncJoin}
 };
 
 
@@ -463,6 +464,9 @@ bool Scanner::validateOperatorModifier(std::vector<Token>& tokens, int line, ISc
     bool isValid = (tokens[size-2].id != TokenIdApplyToEach) ||
         (tokens[size-1].id != TokenIdLiteral &&
         tokens[size-1].id != TokenIdVariable &&
+        tokens[size-1].id != TokenIdAsyncStart &&
+        tokens[size-1].id != TokenIdAsyncEnd &&
+        tokens[size-1].id != TokenIdAsyncJoin &&
         tokens[size-1].id != TokenIdEquals &&
         tokens[size-1].id != TokenIdWrite &&
         tokens[size-1].id != TokenIdWriteText &&

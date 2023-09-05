@@ -1,0 +1,20 @@
+f ISPRIME {
+    ( a % (a - 2 i + 1) #* ) + (a == 2) ! !
+}
+
+f GETPRIMES {
+    ((b - a)i + a) : (((b - a)i + a)\ISPRIME * (b - a i))
+}
+
+t "Enter max number to check:"
+MAX = r
+if MAX < 4 + (MAX # > 1) {
+    MAX = 4
+}
+MIDDLE = MAX / 2 ^
+
+[FIRST = 1 GETPRIMES MIDDLE]        // execute in parallel
+[SECOND = MIDDLE GETPRIMES MAX]
+!!                                  // join threads
+t "Prime numbers:"
+w FIRST | SECOND
