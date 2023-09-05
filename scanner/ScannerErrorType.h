@@ -10,5 +10,7 @@ enum ScannerErrorType{
     ScannerErrorTypeMoreClosingCurlyBrackets,
     ScannerErrorTypeMoreOpenCurlyBrackets,
     ScannerErrorTypeStringLiteralError,
-    ScannerErrorTypeNoOperatorToModify
+    ScannerErrorTypeNoOperatorToModify,
+    ScannerErrorTypeMissingAsyncEnd,
+    ScannerErrorTypeMissingAsyncStart
 };

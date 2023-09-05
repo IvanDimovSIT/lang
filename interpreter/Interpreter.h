@@ -2,6 +2,7 @@
 #include <map>
 #include <memory>
 #include <stack>
+#include <thread>
 #include "../token/Token.h"
 #include "RuntimeErrorType.h"
 #include "ProgramSymbols.h"
@@ -39,6 +40,12 @@ private:
         Value& right,
         Value& result);
 
+    void executeOnThread(
+        std::vector<Token*> tokens,
+        ProgramSymbols& programSymbols,
+        Value left,
+        Value right);
+
     inline bool checkForCalculation(
         std::vector<Token*> &tokens,
         int& position,
@@ -71,6 +78,13 @@ private:
 
     bool isFunctionWithoutParameters(Token& function, ProgramSymbols& programSymbols);
 
+    bool executeAsync(
+        std::vector<Token*> &tokens,
+        int& position,
+        ProgramSymbols& programSymbols,
+        Value& left,
+        Value& right);
+
     inline std::unique_ptr<Value> executeModifier(
         Value& leftParameter,
         std::vector<Token*> &tokens,
@@ -80,8 +94,11 @@ private:
         int position,
         bool& hadError);
 
+    inline void setVariable(const Value& value, const std::string& variableName, ProgramSymbols& programSymbols);
+    inline void getVariable(Value& value, const std::string& variableName, ProgramSymbols& programSymbols);
+
+    void initVariables(std::vector<Token*> &tokens, ProgramSymbols& programSymbols);
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;
-
 };

@@ -12,11 +12,47 @@ Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* i
 
 bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result)
 {
-    ProgramSymbols programSymbols = {functions,{}};
+    ProgramSymbols programSymbols = {functions,{}, {}};
+    initVariables(tokens, programSymbols);
     Value empty;
-    return execute(tokens, programSymbols,  empty, empty, result);
+    bool ret = execute(tokens, programSymbols,  empty, empty, result);
+    for(auto& i: programSymbols.threads)
+        i.join();
+
+    return ret;
 }
 
+void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramSymbols& programSymbols)
+{
+    for(const auto& i: tokens){
+        if(i->id != TokenIdVariable)
+            continue;
+        
+        programSymbols.variables[i->str].value = {0.0};
+    }
+
+    for(const auto& i: programSymbols.functions){
+        for(const auto& j: i.second.body){
+            if(j->id != TokenIdVariable)
+            continue;
+        
+        programSymbols.variables[j->str].value = {0.0};
+        }
+    }
+}
+
+void Interpreter::executeOnThread(
+    std::vector<Token*> tokens,
+    ProgramSymbols& programSymbols,
+    Value left,
+    Value right)
+{
+    Value ignore;
+    if(!execute(tokens, programSymbols, left, right, ignore)){
+        if(errorReporter)
+            errorReporter->report(RuntimeErrorTypeThreadHadError);
+    }
+}
 
 bool Interpreter::execute(
     std::vector<Token*> &tokens,
@@ -52,6 +88,16 @@ bool Interpreter::execute(
                 lastResult = std::move(leftParameter);
                 leftParameter = std::make_unique<Value>();
                 rightParameter = std::make_unique<Value>();
+            }
+            continue;
+        }
+
+        if(tokens[i]->id == TokenIdAsyncStart){
+            if(!executeAsync(tokens, i, programSymbols, left, right)){
+                if(errorReporter)
+                    errorReporter->report(RuntimeErrorTypeThreadHadError);
+
+                return false;
             }
             continue;
         }
@@ -122,7 +168,7 @@ bool Interpreter::execute(
             
             lastResult = std::move(leftParameter);
             leftParameter = std::make_unique<Value>();
-            programSymbols.variables[tokens[i - 1]->str] = *lastResult;
+            setVariable(*lastResult, tokens[i - 1]->str, programSymbols);
             i = statementEnd;
             continue;
         }
@@ -227,7 +273,8 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     switch(tokens[position]->id)
     {
     case TokenIdVariable:
-        result = std::make_unique<Value>(programSymbols.variables[tokens[position]->str]);
+        result = std::make_unique<Value>();
+        getVariable(*result, tokens[position]->str, programSymbols);
         return std::move(result);
     break;
     case TokenIdLiteral:
@@ -439,6 +486,21 @@ bool Interpreter::isFunctionWithoutParameters(Token& function, ProgramSymbols& p
     return (!left) && (!right);
 }
 
+inline void Interpreter::setVariable(const Value& value, const std::string& variableName, ProgramSymbols& programSymbols)
+{
+    programSymbols.variables[variableName].mut.lock();
+    programSymbols.variables[variableName].value = value;
+    programSymbols.variables[variableName].mut.unlock();
+}
+    
+inline void Interpreter::getVariable(Value& value, const std::string& variableName, ProgramSymbols& programSymbols)
+{
+    programSymbols.variables[variableName].mut.lock();
+    value = programSymbols.variables[variableName].value;
+    programSymbols.variables[variableName].mut.unlock();
+}
+
+
 std::unique_ptr<Value> Interpreter::executeModifier(
     Value& leftParameter,
     std::vector<Token*> &tokens,
@@ -487,4 +549,22 @@ std::unique_ptr<Value> Interpreter::executeModifier(
             errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
     }
     return std::move(result);
+}
+
+bool Interpreter::executeAsync(
+    std::vector<Token*> &tokens,
+    int& position,
+    ProgramSymbols& programSymbols,
+    Value& left,
+    Value& right)
+{
+    std::vector<Token*> toExecute;
+    int endPosition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, position, TokenIdAsyncEnd);
+    if(endPosition == TOKEN_INDEX_NOT_FOUND)
+        return false;
+    TokenSubArrayFinder::findSubArray(tokens, toExecute, position+1, endPosition-1);
+    programSymbols.threads.push_back(std::thread(&Interpreter::executeOnThread, this, toExecute, std::ref(programSymbols), left, right));
+    position = endPosition;
+
+    return true;
 }

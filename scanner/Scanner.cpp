@@ -48,7 +48,9 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"t", TokenIdWriteText},
     {"\\", TokenIdApplyToEach},
     {"<<", TokenIdLeftRotate},
-    {">>", TokenIdRightRotate}
+    {">>", TokenIdRightRotate},
+    {"[", TokenIdAsyncStart},
+    {"]", TokenIdAsyncEnd}
 };
 
 
@@ -67,7 +69,6 @@ bool Scanner::scan(
     int lineCounter = 1;
     std::string curr = "";
     bool hadError = !validateParenthesis(source, sourceLen, errorReporter);
-    bool inComment = false;
     if(!findFunctionNames(source, functionNames, errorReporter)){
         hadError = true;
     }
@@ -339,6 +340,8 @@ bool Scanner::isSingleCharToken(char token)
     case '~':
     case '^':
     case '\\':
+    case '[':
+    case ']':
         return true;
     default:
         return false;
@@ -351,10 +354,17 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
     int openCurly = 0;
     int lineCounter = 1;
     bool hadError = false;
+    bool asyncStart = false;
 
     for(int i=0; i<sourceLen; i++){
-        if(source[i] == '\n')
+        if(source[i] == '\n'){
+            if(asyncStart){
+                hadError = true;
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeMissingAsyncEnd);
+            }
             lineCounter++;
+        }
 
         if(source[i] == '"'){
             const int end = StringUtil::findStringLiteralEndIndex(source, i);
@@ -376,6 +386,23 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
             openCurly++;
         }else if(source[i] == '}'){
             openCurly--;
+        }else if(source[i] == '['){
+            if(asyncStart){
+                hadError = true;
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeMissingAsyncEnd);
+            }else{
+                asyncStart = true;
+            }
+        }else if(source[i] == ']'){
+            if(asyncStart){
+                asyncStart = false;
+            }else{
+                hadError = true;
+                if(errorReporter)
+                    errorReporter->report(lineCounter, ScannerErrorTypeMissingAsyncStart);
+
+            }
         }
 
         if(openP < 0){

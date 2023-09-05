@@ -1,5 +1,5 @@
 all:
-	clang++ -flto -O3 -std=c++14 -o lang.out\
+	clang++ -flto -O3 -std=c++14 -pthread -o lang.out\
 	 main/main.cpp\
 	 scanner/Scanner.cpp\
 	 interpreter/InterpreterCalculator.cpp\
@@ -14,7 +14,7 @@ all:
 	 util/RandomGenerator.cpp
 
 buildtest:
-	clang++ -g -std=c++14 -o test.out\
+	clang++ -g -std=c++14 -pthread -o test.out\
 	 main/test.cpp\
 	 scanner/Scanner.cpp\
 	 interpreter/InterpreterCalculator.cpp\

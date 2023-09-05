@@ -8,10 +8,12 @@ std::map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
     {ScannerErrorTypeUnrecognisedToken, "Unrecognised syntax"},
     {ScannerErrorTypeMoreClosingParenthesis, "Extra ')'"},
     {ScannerErrorTypeMoreOpenParenthesis, "Missing ')'"},
-    {ScannerErrorTypeMoreClosingCurlyBrackets, "Extra '{'"},
+    {ScannerErrorTypeMoreClosingCurlyBrackets, "Extra '}'"},
     {ScannerErrorTypeMoreOpenCurlyBrackets, "Missing '}'"},
     {ScannerErrorTypeStringLiteralError, "Invalid string literal"},
-    {ScannerErrorTypeNoOperatorToModify, "No operator to modify"}
+    {ScannerErrorTypeNoOperatorToModify, "No operator to modify"},
+    {ScannerErrorTypeMissingAsyncStart, "Extra ']'"},
+    {ScannerErrorTypeMissingAsyncEnd, "Missing ']'"}
 };
 
 std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
@@ -27,7 +29,8 @@ std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
     {RuntimeErrorTypeMissingIfCondition, "Missing if condition"},
     {RuntimeErrorTypeInvalidIfSyntax, "Invalid if syntax"},
     {RuntimeErrorTypeMissingLoopCondition, "Missing loop condition"},
-    {RuntimeErrorTypeNoOperatorToModify, "No operator to modify"}
+    {RuntimeErrorTypeNoOperatorToModify, "No operator to modify"},
+    {RuntimeErrorTypeThreadHadError, "Thread Error"}
 };
 
 void ErrorPrinter::report(RuntimeErrorType errorType){

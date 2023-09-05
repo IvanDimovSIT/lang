@@ -309,6 +309,29 @@ void testInterpreter9()
     assert(result[5] == 4);
 }
 
+void testInterpreter10()
+{
+    std::string source = 
+        "A = 1\n"
+        "[A = A - 1]\n"
+        "[A = A + 1]\n"
+        "B = A\n"; 
+
+    std::vector<Token> tokens;
+    std::map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    Value result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 1);
+    assert(result[0] == 0 || result[0] == 1 || result[0] == 2);
+}
+
 
 int main(){
     testLiteralParser();
@@ -323,6 +346,7 @@ int main(){
     testInterpreter7();
     testInterpreter8();
     testInterpreter9();
+    testInterpreter10();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

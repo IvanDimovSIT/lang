@@ -13,5 +13,6 @@ enum RuntimeErrorType{
     RuntimeErrorTypeMissingIfCondition,
     RuntimeErrorTypeInvalidIfSyntax,
     RuntimeErrorTypeMissingLoopCondition,
-    RuntimeErrorTypeNoOperatorToModify
+    RuntimeErrorTypeNoOperatorToModify,
+    RuntimeErrorTypeThreadHadError
 };
