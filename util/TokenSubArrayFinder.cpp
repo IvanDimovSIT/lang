@@ -131,3 +131,13 @@ int TokenSubArrayFinder::findFirstTokenIdInLine(std::vector<Token*> &tokens, int
     return TOKEN_INDEX_NOT_FOUND;
 }
 
+int TokenSubArrayFinder::findFirstTokenId(std::vector<Token*> &tokens, int currentPosition, TokenId id)
+{
+    for(const int size = tokens.size(); currentPosition<size; currentPosition++){
+        if(tokens[currentPosition]->id == id)
+            return currentPosition;
+    }
+
+    return TOKEN_INDEX_NOT_FOUND;
+}
+

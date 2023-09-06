@@ -563,7 +563,7 @@ bool Interpreter::executeAsync(
     Value& right)
 {
     std::vector<Token*> toExecute;
-    int endPosition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, position, TokenIdAsyncEnd);
+    int endPosition = TokenSubArrayFinder::findFirstTokenId(tokens, position, TokenIdAsyncEnd);
     if(endPosition == TOKEN_INDEX_NOT_FOUND)
         return false;
     TokenSubArrayFinder::findSubArray(tokens, toExecute, position+1, endPosition-1);

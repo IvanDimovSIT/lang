@@ -25,4 +25,6 @@ public:
 
     //return the index of the first token that matches the id in the current line (empty lines following are currentPosition are ignored) (moves forwards)
     static int findFirstTokenIdInLine(std::vector<Token*> &tokens, int currentPosition, TokenId id);
+
+    static int findFirstTokenId(std::vector<Token*> &tokens, int currentPosition, TokenId id);
 };

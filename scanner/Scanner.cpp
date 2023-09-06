@@ -359,11 +359,6 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
 
     for(int i=0; i<sourceLen; i++){
         if(source[i] == '\n'){
-            if(asyncStart){
-                hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeMissingAsyncEnd);
-            }
             lineCounter++;
         }
 
