@@ -12,7 +12,7 @@ struct Variable{
     std::mutex mut;
 };
 
-struct ProgramSymbols{
+struct ProgramState{
     std::map<std::string, Function> functions;
     std::map<std::string, Variable> variables;
     std::vector<std::thread> threads;
