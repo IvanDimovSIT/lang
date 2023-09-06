@@ -12,42 +12,42 @@ Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* i
 
 bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result)
 {
-    ProgramSymbols programSymbols = {functions,{}, {}};
-    initVariables(tokens, programSymbols);
+    ProgramState programState = {functions,{}, {}};
+    initVariables(tokens, programState);
     Value empty;
-    bool ret = execute(tokens, programSymbols,  empty, empty, result);
-    joinThreads(programSymbols);
+    bool ret = execute(tokens, programState,  empty, empty, result);
+    joinThreads(programState);
 
     return ret;
 }
 
-void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramSymbols& programSymbols)
+void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramState& programState)
 {
     for(const auto& i: tokens){
         if(i->id != TokenIdVariable)
             continue;
         
-        programSymbols.variables[i->str].value = {0.0};
+        programState.variables[i->str].value = {0.0};
     }
 
-    for(const auto& i: programSymbols.functions){
+    for(const auto& i: programState.functions){
         for(const auto& j: i.second.body){
             if(j->id != TokenIdVariable)
             continue;
         
-        programSymbols.variables[j->str].value = {0.0};
+        programState.variables[j->str].value = {0.0};
         }
     }
 }
 
 void Interpreter::executeOnThread(
     std::vector<Token*> tokens,
-    ProgramSymbols& programSymbols,
+    ProgramState& programState,
     Value left,
     Value right)
 {
     Value ignore;
-    if(!execute(tokens, programSymbols, left, right, ignore)){
+    if(!execute(tokens, programState, left, right, ignore)){
         if(errorReporter)
             errorReporter->report(RuntimeErrorTypeThreadHadError);
     }
@@ -55,7 +55,7 @@ void Interpreter::executeOnThread(
 
 bool Interpreter::execute(
     std::vector<Token*> &tokens,
-    ProgramSymbols& programSymbols,
+    ProgramState& programState,
     Value& left,
     Value& right,
     Value& result)
@@ -71,7 +71,7 @@ bool Interpreter::execute(
     for(int i=0; i<size; i++){
         if(loopStack.size() != 0 && i == loopStack.top().loopEnd){
             Value conditionResult;
-            if(!execute(loopStack.top().condition, programSymbols, left, right, conditionResult))
+            if(!execute(loopStack.top().condition, programState, left, right, conditionResult))
                 return false;
 
             if(conditionResult[0] != 0.0)
@@ -92,7 +92,7 @@ bool Interpreter::execute(
         }
 
         if(tokens[i]->id == TokenIdAsyncStart){
-            if(!executeAsync(tokens, i, programSymbols, left, right)){
+            if(!executeAsync(tokens, i, programState, left, right)){
                 if(errorReporter)
                     errorReporter->report(RuntimeErrorTypeThreadHadError);
 
@@ -102,7 +102,7 @@ bool Interpreter::execute(
         }
 
         if(tokens[i]->id == TokenIdAsyncJoin){
-            joinThreads(programSymbols);
+            joinThreads(programState);
             continue;
         }
 
@@ -116,7 +116,7 @@ bool Interpreter::execute(
                 return false;
             }
             TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
-            if(!execute(condition, programSymbols, left, right, conditionResult))
+            if(!execute(condition, programState, left, right, conditionResult))
                 return false;
             
             if(conditionResult[0] != 0.0){
@@ -144,7 +144,7 @@ bool Interpreter::execute(
             }
             TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
             loopData.loopEnd = TokenSubArrayFinder::findClosingCurly(tokens, loopData.loopStart);
-            if(!execute(loopData.condition, programSymbols, left, right, conditionResult))
+            if(!execute(loopData.condition, programState, left, right, conditionResult))
                 return false;
 
             if(conditionResult[0] != 0){
@@ -163,7 +163,7 @@ bool Interpreter::execute(
 
             hadError = !execute(
                 statement,
-                programSymbols,
+                programState,
                 left,
                 right,
                 *leftParameter);
@@ -172,7 +172,7 @@ bool Interpreter::execute(
             
             lastResult = std::move(leftParameter);
             leftParameter = std::make_unique<Value>();
-            setVariable(*lastResult, tokens[i - 1]->str, programSymbols);
+            setVariable(*lastResult, tokens[i - 1]->str, programState);
             i = statementEnd;
             continue;
         }
@@ -184,7 +184,7 @@ bool Interpreter::execute(
             TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
             hadError = !execute(
                 statement,
-                programSymbols,
+                programState,
                 left,
                 right,
                 output);
@@ -203,19 +203,19 @@ bool Interpreter::execute(
         }
 
         if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) ||
-            isFunctionWithoutParameters(*tokens[i], programSymbols))
+            isFunctionWithoutParameters(*tokens[i], programState))
         {
-            leftParameter = getNextArgument(i, tokens, programSymbols, left, right, hadError);
+            leftParameter = getNextArgument(i, tokens, programState, left, right, hadError);
         }else if(operation == nullptr){
             operation = tokens[i];
         }else{
-            rightParameter = getNextArgument(i, tokens, programSymbols, left, right, hadError);
+            rightParameter = getNextArgument(i, tokens, programState, left, right, hadError);
         }
 
         if(hadError)
             return false;
 
-        if(!checkForCalculation(tokens, i, programSymbols, left, right, operation, std::ref(leftParameter), std::ref(rightParameter)))
+        if(!checkForCalculation(tokens, i, programState, left, right, operation, std::ref(leftParameter), std::ref(rightParameter)))
             return false;
     }
 
@@ -229,7 +229,7 @@ bool Interpreter::execute(
 bool Interpreter::checkForCalculation(
     std::vector<Token*> &tokens,
     int& position,
-    ProgramSymbols& programSymbols,
+    ProgramState& ProgramState,
     Value& left,
     Value& right,
     Token*& operation,
@@ -240,21 +240,21 @@ bool Interpreter::checkForCalculation(
         return true;
     
     bool leftArg, rightArg, hadError;
-    hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, programSymbols); 
+    hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, ProgramState); 
     if(hadError){
         if(errorReporter)
                 errorReporter->report(RuntimeErrorTypeNotAnOperation);
         return false;
     }
     if(rightArg && rightParameter->size() > 0){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, programSymbols, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
         rightParameter = std::make_unique<Value>();
                 
     }else if(operation->id == TokenIdApplyToEach){
-        leftParameter = executeModifier(*leftParameter, tokens, programSymbols, left, right, position, hadError);
+        leftParameter = executeModifier(*leftParameter, tokens, ProgramState, left, right, position, hadError);
         position++;
     }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, programSymbols, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
     }else{
         return true;
     }
@@ -267,7 +267,7 @@ bool Interpreter::checkForCalculation(
 std::unique_ptr<Value> Interpreter::getNextArgument(
     int& position,
     std::vector<Token*> &tokens,
-    ProgramSymbols& programSymbols,
+    ProgramState& ProgramState,
     Value& left,
     Value& right,
     bool& hadError)
@@ -278,7 +278,7 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     {
     case TokenIdVariable:
         result = std::make_unique<Value>();
-        getVariable(*result, tokens[position]->str, programSymbols);
+        getVariable(*result, tokens[position]->str, ProgramState);
         return std::move(result);
     break;
     case TokenIdLiteral:
@@ -295,10 +295,10 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     break;
     case TokenIdFunction:{
         bool ArgLeft, ArgRight;
-        getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, programSymbols);
+        getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, ProgramState);
         if((!ArgLeft) && (!ArgRight)){
             result = std::make_unique<Value>();
-            hadError = !execute(programSymbols.functions[tokens[position]->str].body, programSymbols, left, right, *result);
+            hadError = !execute(ProgramState.functions[tokens[position]->str].body, ProgramState, left, right, *result);
             return std::move(result);
         }else{
             hadError = true;
@@ -319,7 +319,7 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         std::vector<Token*> sub;
         TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos-1);
         result = std::make_unique<Value>();
-        hadError = !execute(sub, programSymbols, left, right, *result);
+        hadError = !execute(sub, ProgramState, left, right, *result);
         position = endPos;
         return std::move(result);
     }
@@ -342,10 +342,10 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     return std::move(result);
 }
     
-bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& leftParam, bool& rightParam, ProgramSymbols& programSymbols)
+bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& leftParam, bool& rightParam, ProgramState& programState)
 {
     if(operation.id == TokenIdFunction){
-        auto func = &programSymbols.functions[operation.str];
+        auto func = &programState.functions[operation.str];
         leftParam = func->left;
         rightParam = func->right;
         return true;
@@ -404,7 +404,7 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
     Token& operation,
     Value& left,
     Value& right,
-    ProgramSymbols& programSymbols,
+    ProgramState& programState,
     bool& hadError)
 {
     switch (operation.id)
@@ -412,7 +412,7 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
     case TokenIdFunction:
         {
             auto result = std::make_unique<Value>();
-            hadError = !execute(programSymbols.functions[operation.str].body, programSymbols, leftOfOperator, rightOfOperator, *result);
+            hadError = !execute(programState.functions[operation.str].body, programState, leftOfOperator, rightOfOperator, *result);
             return result;
         }
     case TokenIdAdd:
@@ -481,34 +481,34 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
     return std::make_unique<Value>();
 }
 
-bool Interpreter::isFunctionWithoutParameters(Token& function, ProgramSymbols& programSymbols)
+bool Interpreter::isFunctionWithoutParameters(Token& function, ProgramState& programState)
 {
     bool left, right;
-    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, left, right, programSymbols))
+    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, left, right, programState))
         return false;
 
     return (!left) && (!right);
 }
 
-inline void Interpreter::setVariable(const Value& value, const std::string& variableName, ProgramSymbols& programSymbols)
+inline void Interpreter::setVariable(const Value& value, const std::string& variableName, ProgramState& programState)
 {
-    programSymbols.variables[variableName].mut.lock();
-    programSymbols.variables[variableName].value = value;
-    programSymbols.variables[variableName].mut.unlock();
+    programState.variables[variableName].mut.lock();
+    programState.variables[variableName].value = value;
+    programState.variables[variableName].mut.unlock();
 }
     
-inline void Interpreter::getVariable(Value& value, const std::string& variableName, ProgramSymbols& programSymbols)
+inline void Interpreter::getVariable(Value& value, const std::string& variableName, ProgramState& programState)
 {
-    programSymbols.variables[variableName].mut.lock();
-    value = programSymbols.variables[variableName].value;
-    programSymbols.variables[variableName].mut.unlock();
+    programState.variables[variableName].mut.lock();
+    value = programState.variables[variableName].value;
+    programState.variables[variableName].mut.unlock();
 }
 
 
 std::unique_ptr<Value> Interpreter::executeModifier(
     Value& leftParameter,
     std::vector<Token*> &tokens,
-    ProgramSymbols& programSymbols,
+    ProgramState& programState,
     Value& left,
     Value& right,
     int position,
@@ -542,7 +542,7 @@ std::unique_ptr<Value> Interpreter::executeModifier(
         Value first = {leftParameter[i]};
         Value second = {(i+1>=size? 0.0:leftParameter[i+1])};
 
-        auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, programSymbols, hadError);
+        auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, programState, hadError);
         for(const auto& j:*operationResult)
             result->push_back(j);
     }
@@ -558,7 +558,7 @@ std::unique_ptr<Value> Interpreter::executeModifier(
 bool Interpreter::executeAsync(
     std::vector<Token*> &tokens,
     int& position,
-    ProgramSymbols& programSymbols,
+    ProgramState& programState,
     Value& left,
     Value& right)
 {
@@ -567,16 +567,16 @@ bool Interpreter::executeAsync(
     if(endPosition == TOKEN_INDEX_NOT_FOUND)
         return false;
     TokenSubArrayFinder::findSubArray(tokens, toExecute, position+1, endPosition-1);
-    programSymbols.threads.push_back(std::thread(&Interpreter::executeOnThread, this, toExecute, std::ref(programSymbols), left, right));
+    programState.threads.push_back(std::thread(&Interpreter::executeOnThread, this, toExecute, std::ref(programState), left, right));
     position = endPosition;
 
     return true;
 }
 
-void Interpreter::joinThreads(ProgramSymbols& programSymbols)
+void Interpreter::joinThreads(ProgramState& programState)
 {
-    for(auto& i: programSymbols.threads)
+    for(auto& i: programState.threads)
         i.join();
 
-    programSymbols.threads.clear();
+    programState.threads.clear();
 }

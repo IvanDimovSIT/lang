@@ -5,7 +5,7 @@
 #include <thread>
 #include "../token/Token.h"
 #include "RuntimeErrorType.h"
-#include "ProgramSymbols.h"
+#include "ProgramState.h"
 #include "../scanner/Function.h"
 
 class IRuntimeErrorReporter{
@@ -35,21 +35,21 @@ public:
 private:
     bool execute(
         std::vector<Token*> &tokens,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         Value& left,
         Value& right,
         Value& result);
 
     void executeOnThread(
         std::vector<Token*> tokens,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         Value left,
         Value right);
 
     inline bool checkForCalculation(
         std::vector<Token*> &tokens,
         int& position,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         Value& left,
         Value& right,
         Token*& operation,
@@ -59,13 +59,13 @@ private:
     std::unique_ptr<Value> getNextArgument(
         int& position,
         std::vector<Token*> &tokens,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         Value& left,
         Value& right,
         bool& hadError);
 
     // returns false if not an operation
-    bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam, ProgramSymbols& programSymbols);
+    bool getOperatorOrFunctionParamerters(Token& operation, bool& leftParam, bool& rightParam, ProgramState& programState);
 
     std::unique_ptr<Value> executeOperationOrFunction(
         Value& leftOfOperator,
@@ -73,32 +73,32 @@ private:
         Token& operation,
         Value& left,
         Value& right,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         bool& hadError);
 
-    bool isFunctionWithoutParameters(Token& function, ProgramSymbols& programSymbols);
+    bool isFunctionWithoutParameters(Token& function, ProgramState& programState);
 
     bool executeAsync(
         std::vector<Token*> &tokens,
         int& position,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         Value& left,
         Value& right);
 
     inline std::unique_ptr<Value> executeModifier(
         Value& leftParameter,
         std::vector<Token*> &tokens,
-        ProgramSymbols& programSymbols,
+        ProgramState& programState,
         Value& left,
         Value& right,
         int position,
         bool& hadError);
 
-    inline void setVariable(const Value& value, const std::string& variableName, ProgramSymbols& programSymbols);
-    inline void getVariable(Value& value, const std::string& variableName, ProgramSymbols& programSymbols);
+    inline void setVariable(const Value& value, const std::string& variableName, ProgramState& programState);
+    inline void getVariable(Value& value, const std::string& variableName, ProgramState& programState);
 
-    void initVariables(std::vector<Token*> &tokens, ProgramSymbols& programSymbols);
-    void joinThreads(ProgramSymbols& programSymbols);
+    void initVariables(std::vector<Token*> &tokens, ProgramState& programState);
+    void joinThreads(ProgramState& programState);
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;
