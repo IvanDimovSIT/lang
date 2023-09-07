@@ -471,14 +471,13 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::leftRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdRightRotate:
         return InterpreterCalculator::rightRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
-    default:break;
+    default:
+        hadError = true;
+        if(errorReporter)
+            errorReporter->report(RuntimeErrorTypeNotAnOperation);
+
+        return std::make_unique<Value>();
     }
-
-    hadError = true;
-    if(errorReporter)
-        errorReporter->report(RuntimeErrorTypeNotAnOperation);
-
-    return std::make_unique<Value>();
 }
 
 bool Interpreter::isFunctionWithoutParameters(Token& function, ProgramState& programState)
