@@ -239,21 +239,21 @@ bool Interpreter::checkForCalculation(
     if(operation == nullptr)
         return true;
     
-    bool leftArg, rightArg, hadError;
-    hadError = !getOperatorOrFunctionParamerters(*operation, leftArg, rightArg, ProgramState); 
+    bool hasLeft, hasRight, hadError;
+    hadError = !getOperatorOrFunctionParamerters(*operation, hasLeft, hasRight, ProgramState); 
     if(hadError){
         if(errorReporter)
                 errorReporter->report(RuntimeErrorTypeNotAnOperation);
         return false;
     }
-    if(rightArg && rightParameter->size() > 0){
+    if(hasRight && rightParameter->size() > 0){
         leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
         rightParameter = std::make_unique<Value>();
                 
     }else if(operation->id == TokenIdApplyToEach){
         leftParameter = executeModifier(*leftParameter, tokens, ProgramState, left, right, position, hadError);
         position++;
-    }else if(leftArg && leftParameter->size() > 0 && (!rightArg)){
+    }else if(hasLeft && leftParameter->size() > 0 && (!hasRight)){
         leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
     }else{
         return true;
@@ -294,9 +294,9 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         return std::move(result);
     break;
     case TokenIdFunction:{
-        bool ArgLeft, ArgRight;
-        getOperatorOrFunctionParamerters(*(tokens[position]), ArgLeft, ArgRight, ProgramState);
-        if((!ArgLeft) && (!ArgRight)){
+        bool hasLeft, hasRight;
+        getOperatorOrFunctionParamerters(*(tokens[position]), hasLeft, hasRight, ProgramState);
+        if((!hasLeft) && (!hasRight)){
             result = std::make_unique<Value>();
             hadError = !execute(ProgramState.functions[tokens[position]->str].body, ProgramState, left, right, *result);
             return std::move(result);
@@ -482,11 +482,11 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
 
 bool Interpreter::isFunctionWithoutParameters(Token& function, ProgramState& programState)
 {
-    bool left, right;
-    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, left, right, programState))
+    bool hasLeft, hasRight;
+    if(function.id != TokenIdFunction || !getOperatorOrFunctionParamerters(function, hasLeft, hasRight, programState))
         return false;
 
-    return (!left) && (!right);
+    return (!hasLeft) && (!hasRight);
 }
 
 inline void Interpreter::setVariable(const Value& value, const std::string& variableName, ProgramState& programState)
