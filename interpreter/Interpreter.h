@@ -10,6 +10,8 @@
 
 class IRuntimeErrorReporter{
 public:
+    static const int LINE_NOT_FOUND = -1;
+    virtual void report(int line, RuntimeErrorType errorType) = 0;
     virtual void report(RuntimeErrorType errorType) = 0;
 };
 
@@ -99,6 +101,7 @@ private:
 
     void initVariables(std::vector<Token*> &tokens, ProgramState& programState);
     void joinThreads(ProgramState& programState);
+    int currentLineNumber(std::vector<Token*> &tokens, int position);
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;

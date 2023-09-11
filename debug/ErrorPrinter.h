@@ -4,6 +4,7 @@
 
 class ErrorPrinter : public IScannerErrorReporter, public IRuntimeErrorReporter{
 public:
+    void report(int line, RuntimeErrorType errorType) override;
     void report(RuntimeErrorType errorType) override;
     void report(int line, ScannerErrorType errorType) override;
 private:

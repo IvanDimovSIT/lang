@@ -83,7 +83,7 @@ bool Scanner::scan(
                     errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
             }
             curr += source.substr(i, stringLiteralEnd-i+1);
-            if(!matchToken(curr, tokens, functionNames)){
+            if(!matchToken(curr, tokens, functionNames, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
@@ -96,10 +96,10 @@ bool Scanner::scan(
         }
 
         // special if token case
-        if(curr == "" && source[i] == 'i' && (i+1<sourceLen) && source[i+1] == 'f' && matchToken("if", tokens, functionNames)){
+        if(curr == "" && source[i] == 'i' && (i+1<sourceLen) && source[i+1] == 'f' && matchToken("if", tokens, functionNames, lineCounter)){
             i++;
         }else if(isSingleCharToken(source[i])){
-            if(!matchToken(curr, tokens, functionNames)){
+            if(!matchToken(curr, tokens, functionNames, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -108,7 +108,7 @@ bool Scanner::scan(
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
             curr += source[i];
-            if(!matchToken(curr, tokens, functionNames)){
+            if(!matchToken(curr, tokens, functionNames, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -117,7 +117,7 @@ bool Scanner::scan(
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
         }else if(source[i] == ' ' || source[i] == '\t' /*|| (i+1<sourceLen && source[i+1] == '"')*/){
-            if(!matchToken(curr, tokens, functionNames)){
+            if(!matchToken(curr, tokens, functionNames, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -127,7 +127,7 @@ bool Scanner::scan(
                 hadError = true;
         }else{
             curr += source[i];
-            if((i+1<sourceLen) && tokenMap.count(curr+source[i+1]) > 0 && matchToken(curr+source[i+1], tokens, functionNames)){
+            if((i+1<sourceLen) && tokenMap.count(curr+source[i+1]) > 0 && matchToken(curr+source[i+1], tokens, functionNames, lineCounter)){
                 i++;
                 curr = "";
             }
@@ -137,7 +137,7 @@ bool Scanner::scan(
             lineCounter++;
     }
 
-    if (!matchToken(curr, tokens, functionNames)) {
+    if (!matchToken(curr, tokens, functionNames, lineCounter)) {
         hadError = true;
         if (errorReporter)
             errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -284,7 +284,7 @@ bool Scanner::extractFunctions(std::vector<Token>& tokens, std::map<std::string,
     return true;
 }
 
-bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, std::set<std::string>& functionNames)
+bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, std::set<std::string>& functionNames, int line)
 {
     if(token.size() <= 0 || token[0] == ' ')
         return true;
@@ -294,6 +294,8 @@ bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, s
     
     if(tokenMap.count(token) >= 1){
         t.id = tokenMap[token];
+        if(t.id == TokenIdEndLine)
+            t.val.push_back(line);
         tokens.push_back(t);
         return true;
     }else if(LiteralParser::parse(token, t.val) || LiteralParser::parseString(token, t.val)){

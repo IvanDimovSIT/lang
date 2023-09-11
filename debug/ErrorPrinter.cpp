@@ -30,8 +30,17 @@ std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
     {RuntimeErrorTypeInvalidIfSyntax, "Invalid if syntax"},
     {RuntimeErrorTypeMissingLoopCondition, "Missing loop condition"},
     {RuntimeErrorTypeNoOperatorToModify, "No operator to modify"},
-    {RuntimeErrorTypeThreadHadError, "Thread Error"}
+    {RuntimeErrorTypeThreadHadError, "Thread Error"},
+    {RuntimeErrorTypeOperatorError, "Error executing operator"}
 };
+
+void ErrorPrinter::report(int line, RuntimeErrorType errorType){
+    if(line == IRuntimeErrorReporter::LINE_NOT_FOUND){
+        report(errorType);
+        return;
+    }
+    std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType))  << " (line:" << line << ")" << std::endl;
+}
 
 void ErrorPrinter::report(RuntimeErrorType errorType){
     std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl;

@@ -49,7 +49,7 @@ void Interpreter::executeOnThread(
     Value ignore;
     if(!execute(tokens, programState, left, right, ignore)){
         if(errorReporter)
-            errorReporter->report(RuntimeErrorTypeThreadHadError);
+            errorReporter->report(currentLineNumber(tokens, 0), RuntimeErrorTypeThreadHadError);
     }
 }
 
@@ -94,7 +94,7 @@ bool Interpreter::execute(
         if(tokens[i]->id == TokenIdAsyncStart){
             if(!executeAsync(tokens, i, programState, left, right)){
                 if(errorReporter)
-                    errorReporter->report(RuntimeErrorTypeThreadHadError);
+                    errorReporter->report(currentLineNumber(tokens, i) ,RuntimeErrorTypeThreadHadError);
 
                 return false;
             }
@@ -112,7 +112,7 @@ bool Interpreter::execute(
             int endCondition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
             if(endCondition == TOKEN_INDEX_NOT_FOUND){
                 if(errorReporter)
-                    errorReporter->report(RuntimeErrorTypeMissingIfCondition);
+                    errorReporter->report(currentLineNumber(tokens, i), RuntimeErrorTypeMissingIfCondition);
                 return false;
             }
             TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
@@ -125,7 +125,7 @@ bool Interpreter::execute(
                 int afterIfBody = TokenSubArrayFinder::findClosingCurly(tokens, endCondition);
                 if(afterIfBody == TOKEN_INDEX_NOT_FOUND){
                     if(errorReporter)
-                        errorReporter->report(RuntimeErrorTypeInvalidIfSyntax);
+                        errorReporter->report(currentLineNumber(tokens, i), RuntimeErrorTypeInvalidIfSyntax);
                     return false;
                 }
                 i = afterIfBody;
@@ -139,7 +139,7 @@ bool Interpreter::execute(
             loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
             if(loopData.loopStart == TOKEN_INDEX_NOT_FOUND){
                 if(errorReporter)
-                    errorReporter->report(RuntimeErrorTypeMissingLoopCondition);
+                    errorReporter->report(currentLineNumber(tokens, i), RuntimeErrorTypeMissingLoopCondition);
                 return false;
             }
             TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
@@ -243,11 +243,18 @@ bool Interpreter::checkForCalculation(
     hadError = !getOperatorOrFunctionParamerters(*operation, hasLeft, hasRight, ProgramState); 
     if(hadError){
         if(errorReporter)
-                errorReporter->report(RuntimeErrorTypeNotAnOperation);
+            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNotAnOperation);
+
         return false;
     }
     if(hasRight && rightParameter->size() > 0){
         leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
+        if(hadError){
+            if(errorReporter)
+                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperatorError);
+
+            return false;
+        }
         rightParameter = std::make_unique<Value>();
                 
     }else if(operation->id == TokenIdApplyToEach){
@@ -255,6 +262,12 @@ bool Interpreter::checkForCalculation(
         position++;
     }else if(hasLeft && leftParameter->size() > 0 && (!hasRight)){
         leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
+        if(hadError){
+            if(errorReporter)
+                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperatorError);
+
+            return false;
+        }
     }else{
         return true;
     }
@@ -303,7 +316,7 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         }else{
             hadError = true;
             if(errorReporter)
-                errorReporter->report(RuntimeErrorTypeOperationAsParameter);
+                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperationAsParameter);
             return std::make_unique<Value>();
         }
     }
@@ -313,7 +326,7 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         if(endPos == TOKEN_INDEX_NOT_FOUND){
             hadError = true;
             if(errorReporter)
-                errorReporter->report(RuntimeErrorTypeNoClosingParenthesis);
+                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoClosingParenthesis);
             return std::make_unique<Value>();
         }
         std::vector<Token*> sub;
@@ -337,7 +350,7 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
 
     hadError = true;
     if(errorReporter)
-        errorReporter->report(RuntimeErrorTypeEvaluationError);
+        errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeEvaluationError);
 
     return std::move(result);
 }
@@ -517,7 +530,7 @@ std::unique_ptr<Value> Interpreter::executeModifier(
     if(position == 0){
         hadError = true;
         if(errorReporter)
-            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
         return std::move(result);
     }
 
@@ -525,14 +538,14 @@ std::unique_ptr<Value> Interpreter::executeModifier(
     if(size == 0){
         hadError = true;
         if(errorReporter)
-            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
         return std::move(result);
     }
 
     if(position+1 >= tokens.size()){
         hadError = true;
         if(errorReporter)
-            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
         return std::move(result);
     }
 
@@ -542,6 +555,11 @@ std::unique_ptr<Value> Interpreter::executeModifier(
         Value second = {(i+1>=size? 0.0:leftParameter[i+1])};
 
         auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, programState, hadError);
+        if(hadError){
+            if(errorReporter)
+                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperatorError);
+            return result;
+        }
         for(const auto& j:*operationResult)
             result->push_back(j);
     }
@@ -549,7 +567,7 @@ std::unique_ptr<Value> Interpreter::executeModifier(
     if(result->size() == 0){
         hadError = true;
         if(errorReporter)
-            errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
     }
     return std::move(result);
 }
@@ -578,4 +596,22 @@ void Interpreter::joinThreads(ProgramState& programState)
         i.join();
 
     programState.threads.clear();
+}
+
+int Interpreter::currentLineNumber(std::vector<Token*> &tokens, int position)
+{
+    const int size = tokens.size();
+    for(int i=position; i<size; i++){
+        if(tokens[i]->id == TokenIdEndLine){
+            return tokens[i]->val[0];
+        }
+    }
+
+    for(int i=position; i>=0; i--){
+        if(tokens[i]->id == TokenIdEndLine){
+            return tokens[i]->val[0]+1;
+        }
+    }
+
+    return IRuntimeErrorReporter::LINE_NOT_FOUND;
 }
