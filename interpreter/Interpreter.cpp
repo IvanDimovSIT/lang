@@ -3,6 +3,12 @@
 #include "InterpreterCalculator.h"
 #include <cassert>
 
+struct LoopReturn{
+    std::vector<Token*> condition;
+    int loopStart;
+    int loopEnd;
+};
+
 Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO)
 {
     assert(interpreterIO != nullptr);

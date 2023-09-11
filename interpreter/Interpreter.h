@@ -23,12 +23,6 @@ public:
     virtual void writeText(Value& value) = 0;
 };
 
-struct LoopReturn{
-    std::vector<Token*> condition;
-    int loopStart;
-    int loopEnd;
-};
-
 class Interpreter{
 public:
     Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
