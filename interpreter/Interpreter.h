@@ -27,7 +27,7 @@ class Interpreter{
 public:
     Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
     bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result);
-
+    bool execute(std::vector<Token*> &tokens, ProgramState& programState, Value& result);
 private:
     bool execute(
         std::vector<Token*> &tokens,

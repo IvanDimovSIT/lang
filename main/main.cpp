@@ -5,6 +5,7 @@
 #include "../debug/ErrorPrinter.h"
 #include "../interpreter/InterpreterIO.h"
 #include "../interpreter/FunctionExtractor.h"
+#include "REPL.h"
 
 bool readFile(const std::string& filepath, std::string& contents)
 {
@@ -33,7 +34,7 @@ void printResult(const Value& result)
 
 bool enterFilepath(std::string& filepath)
 {
-    std::cout << "Enter script filepath:" << std::endl;
+    std::cout << "Enter script filepath or \"REPL\" to enter Read Execute Print mode:" << std::endl;
     getline(std::cin, filepath);
     return filepath.size() > 0;
 }
@@ -41,8 +42,6 @@ bool enterFilepath(std::string& filepath)
 int main(int argc, char** argv)
 {
     std::string source = "", filepath="";
-    ErrorPrinter errorPrinter;
-    InterpreterIO io;
 
     if(argc <= 1){
         if(!enterFilepath(filepath)){
@@ -53,11 +52,19 @@ int main(int argc, char** argv)
         filepath = argv[1];
     }
 
+    if(filepath == "REPL"){
+        std::cout << "*Entered REPL mode*\nType \"exit\" to quit the program" << std::endl;
+        REPL::run();
+        return 0;
+    }
+
     if(!readFile(filepath, source)){
         std::cout << "Error reading file:\"" << filepath << "\"" << std::endl;
         return 1;
     }
 
+    ErrorPrinter errorPrinter;
+    InterpreterIO io;
     std::vector<Token> tokens;
     std::map<std::string, Function> functions;
     if(!Scanner::scan(source, tokens, functions, &errorPrinter)){

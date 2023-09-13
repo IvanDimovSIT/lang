@@ -54,11 +54,21 @@ std::map<std::string, TokenId> Scanner::tokenMap = {
     {"!!", TokenIdAsyncJoin}
 };
 
-
 bool Scanner::scan(
     const std::string& programSource,
     std::vector<Token>& tokens,
     std::map<std::string, Function>& functions,
+    IScannerErrorReporter* errorReporter)
+{
+    std::set<std::string> empty;
+    return scanREPL(programSource, tokens, functions, empty, errorReporter);
+}
+
+bool Scanner::scanREPL(
+    const std::string& programSource,
+    std::vector<Token>& tokens,
+    std::map<std::string, Function>& functions,
+    std::set<std::string>& declaredFunctions,
     IScannerErrorReporter* errorReporter)
 {
     tokens.clear();
@@ -83,7 +93,7 @@ bool Scanner::scan(
                     errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
             }
             curr += source.substr(i, stringLiteralEnd-i+1);
-            if(!matchToken(curr, tokens, functionNames, lineCounter)){
+            if(!matchToken(curr, tokens, functionNames, declaredFunctions, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
@@ -96,10 +106,10 @@ bool Scanner::scan(
         }
 
         // special if token case
-        if(curr == "" && source[i] == 'i' && (i+1<sourceLen) && source[i+1] == 'f' && matchToken("if", tokens, functionNames, lineCounter)){
+        if(curr == "" && source[i] == 'i' && (i+1<sourceLen) && source[i+1] == 'f' && matchToken("if", tokens, functionNames, declaredFunctions, lineCounter)){
             i++;
         }else if(isSingleCharToken(source[i])){
-            if(!matchToken(curr, tokens, functionNames, lineCounter)){
+            if(!matchToken(curr, tokens, functionNames, declaredFunctions, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -108,7 +118,7 @@ bool Scanner::scan(
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
             curr += source[i];
-            if(!matchToken(curr, tokens, functionNames, lineCounter)){
+            if(!matchToken(curr, tokens, functionNames, declaredFunctions, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -117,7 +127,7 @@ bool Scanner::scan(
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
         }else if(source[i] == ' ' || source[i] == '\t' /*|| (i+1<sourceLen && source[i+1] == '"')*/){
-            if(!matchToken(curr, tokens, functionNames, lineCounter)){
+            if(!matchToken(curr, tokens, functionNames, declaredFunctions, lineCounter)){
                 hadError = true;
                 if(errorReporter)
                     errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -127,7 +137,7 @@ bool Scanner::scan(
                 hadError = true;
         }else{
             curr += source[i];
-            if((i+1<sourceLen) && tokenMap.count(curr+source[i+1]) > 0 && matchToken(curr+source[i+1], tokens, functionNames, lineCounter)){
+            if((i+1<sourceLen) && tokenMap.count(curr+source[i+1]) > 0 && matchToken(curr+source[i+1], tokens, functionNames, declaredFunctions, lineCounter)){
                 i++;
                 curr = "";
             }
@@ -137,7 +147,7 @@ bool Scanner::scan(
             lineCounter++;
     }
 
-    if (!matchToken(curr, tokens, functionNames, lineCounter)) {
+    if (!matchToken(curr, tokens, functionNames, declaredFunctions, lineCounter)) {
         hadError = true;
         if (errorReporter)
             errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
@@ -284,7 +294,7 @@ bool Scanner::extractFunctions(std::vector<Token>& tokens, std::map<std::string,
     return true;
 }
 
-bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, std::set<std::string>& functionNames, int line)
+bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, std::set<std::string>& functionNames,  std::set<std::string>& declaredFunctions, int line)
 {
     if(token.size() <= 0 || token[0] == ' ')
         return true;
@@ -302,11 +312,11 @@ bool Scanner::matchToken(const std::string& token, std::vector<Token>& tokens, s
         t.id = TokenIdLiteral;
         tokens.push_back(t);
         return true;
-    }else if(functionNames.count(token) != 0){
+    }else if(functionNames.count(token) != 0 || declaredFunctions.count(token) != 0){
         t.id = TokenIdFunction;
         tokens.push_back(t);
         return true;
-    }else if(StringUtil::isValidIdentifierName(token)){
+    }else if(StringUtil::isValidIdentifierName(token) && declaredFunctions.count(token) == 0){
         t.id = TokenIdVariable;
         tokens.push_back(t);
         return true;

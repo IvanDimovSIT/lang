@@ -27,6 +27,15 @@ bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Fun
     return ret;
 }
 
+ bool Interpreter::execute(std::vector<Token*> &tokens, ProgramState& programState, Value& result)
+ {
+    Value empty;
+    bool ret = execute(tokens, programState,  empty, empty, result);
+    joinThreads(programState);
+
+    return ret;
+ }
+
 void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramState& programState)
 {
     for(const auto& i: tokens){
@@ -414,8 +423,6 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
 
     return false;
 }
-
-
 
 std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
     Value& leftOfOperator,

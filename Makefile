@@ -1,6 +1,7 @@
 all:
 	clang++ -flto -O3 -std=c++14 -pthread -o lang.out\
 	 main/main.cpp\
+	 main/REPL.cpp\
 	 scanner/Scanner.cpp\
 	 interpreter/InterpreterCalculator.cpp\
 	 util/LiteralParser.cpp\
