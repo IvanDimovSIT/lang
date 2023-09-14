@@ -59,7 +59,9 @@ std::string REPL::readInput()
     int openCurly = 0, openSquare = 0;
     do{
         if(openCurly > 0 || openSquare > 0)
-            std::cout << "...";
+            std::cout << "... ";
+        else
+            std::cout << ">>> ";
         getline(std::cin, read);
         source += read;
         source += '\n';
@@ -120,7 +122,7 @@ bool REPL::isStringExit(const std::string& line)
 {
     const int size = line.size();
     for(int i=0; i<size-3; i++){
-        if(line[i] == ' ' || line[i] == '\n')
+        if(line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
             continue;
         
         if(line[i] == 'e'){

@@ -34,10 +34,10 @@ private:
     static bool isSingleCharToken(char token);
 
     static void determineFunctionPrameters(Function& function);
-    
-    static std::map<std::string, TokenId> tokenMap;
 
     static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
 
     static bool validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter);
+
+    static std::map<std::string, TokenId> tokenMap;
 };

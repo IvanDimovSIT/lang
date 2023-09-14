@@ -1,5 +1,5 @@
 all:
-	clang++ -flto -O3 -std=c++14 -pthread -o lang.out\
+	clang++ -flto -O3 -std=c++14 -pthread -march=native -mtune=native -o lang.out\
 	 main/main.cpp\
 	 main/REPL.cpp\
 	 scanner/Scanner.cpp\
