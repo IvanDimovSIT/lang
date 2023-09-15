@@ -4,6 +4,6 @@
 
 struct Function{
     std::vector<Token*> body;
-    bool left;
-    bool right;
+    bool hasLeft;
+    bool hasRight;
 };

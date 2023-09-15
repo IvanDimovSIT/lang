@@ -21,19 +21,19 @@ bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Fun
     ProgramState programState = {functions,{}, {}};
     initVariables(tokens, programState);
     Value empty;
-    bool ret = execute(tokens, programState,  empty, empty, result);
+    bool successfulExecution = execute(tokens, programState,  empty, empty, result);
     joinThreads(programState);
 
-    return ret;
+    return successfulExecution;
 }
 
  bool Interpreter::execute(std::vector<Token*> &tokens, ProgramState& programState, Value& result)
  {
     Value empty;
-    bool ret = execute(tokens, programState,  empty, empty, result);
+    bool successfulExecution = execute(tokens, programState,  empty, empty, result);
     joinThreads(programState);
 
-    return ret;
+    return successfulExecution;
  }
 
 void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramState& programState)
@@ -58,21 +58,20 @@ void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramState& progr
 void Interpreter::executeOnThread(
     std::vector<Token*> tokens,
     ProgramState& programState,
-    Value left,
-    Value right)
+    Value argumentA,
+    Value argumentB)
 {
     Value ignore;
-    if(!execute(tokens, programState, left, right, ignore)){
-        if(errorReporter)
-            errorReporter->report(currentLineNumber(tokens, 0), RuntimeErrorTypeThreadHadError);
+    if(!execute(tokens, programState, argumentA, argumentB, ignore)){
+        report(tokens, 0, RuntimeErrorTypeThreadHadError);
     }
 }
 
 bool Interpreter::execute(
     std::vector<Token*> &tokens,
     ProgramState& programState,
-    Value& left,
-    Value& right,
+    Value& argumentA,
+    Value& argumentB,
     Value& result)
 {
     const int size = tokens.size();
@@ -86,7 +85,7 @@ bool Interpreter::execute(
     for(int i=0; i<size; i++){
         if(loopStack.size() != 0 && i == loopStack.top().loopEnd){
             Value conditionResult;
-            if(!execute(loopStack.top().condition, programState, left, right, conditionResult))
+            if(!execute(loopStack.top().condition, programState, argumentA, argumentB, conditionResult))
                 return false;
 
             if(conditionResult[0] != 0.0)
@@ -107,9 +106,8 @@ bool Interpreter::execute(
         }
 
         if(tokens[i]->id == TokenIdAsyncStart){
-            if(!executeAsync(tokens, i, programState, left, right)){
-                if(errorReporter)
-                    errorReporter->report(currentLineNumber(tokens, i) ,RuntimeErrorTypeThreadHadError);
+            if(!executeAsync(tokens, i, programState, argumentA, argumentB)){
+                report(tokens, i, RuntimeErrorTypeThreadHadError);
 
                 return false;
             }
@@ -125,22 +123,20 @@ bool Interpreter::execute(
             std::vector<Token*> condition;
             Value conditionResult;
             int endCondition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
-            if(endCondition == TOKEN_INDEX_NOT_FOUND){
-                if(errorReporter)
-                    errorReporter->report(currentLineNumber(tokens, i), RuntimeErrorTypeMissingIfCondition);
+            if(endCondition == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
+                report(tokens, i, RuntimeErrorTypeMissingIfCondition);
                 return false;
             }
             TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
-            if(!execute(condition, programState, left, right, conditionResult))
+            if(!execute(condition, programState, argumentA, argumentB, conditionResult))
                 return false;
             
             if(conditionResult[0] != 0.0){
                 i = endCondition;
             }else{
                 int afterIfBody = TokenSubArrayFinder::findClosingCurly(tokens, endCondition);
-                if(afterIfBody == TOKEN_INDEX_NOT_FOUND){
-                    if(errorReporter)
-                        errorReporter->report(currentLineNumber(tokens, i), RuntimeErrorTypeInvalidIfSyntax);
+                if(afterIfBody == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
+                    report(tokens, i, RuntimeErrorTypeInvalidIfSyntax);
                     return false;
                 }
                 i = afterIfBody;
@@ -152,14 +148,13 @@ bool Interpreter::execute(
             LoopReturn loopData;
             Value conditionResult;
             loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
-            if(loopData.loopStart == TOKEN_INDEX_NOT_FOUND){
-                if(errorReporter)
-                    errorReporter->report(currentLineNumber(tokens, i), RuntimeErrorTypeMissingLoopCondition);
+            if(loopData.loopStart == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
+                report(tokens, i, RuntimeErrorTypeMissingLoopCondition);
                 return false;
             }
             TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
             loopData.loopEnd = TokenSubArrayFinder::findClosingCurly(tokens, loopData.loopStart);
-            if(!execute(loopData.condition, programState, left, right, conditionResult))
+            if(!execute(loopData.condition, programState, argumentA, argumentB, conditionResult))
                 return false;
 
             if(conditionResult[0] != 0){
@@ -179,8 +174,8 @@ bool Interpreter::execute(
             hadError = !execute(
                 statement,
                 programState,
-                left,
-                right,
+                argumentA,
+                argumentB,
                 *leftParameter);
             if(hadError)
                 return false;
@@ -200,8 +195,8 @@ bool Interpreter::execute(
             hadError = !execute(
                 statement,
                 programState,
-                left,
-                right,
+                argumentA,
+                argumentB,
                 output);
             if(hadError)
                 return false;
@@ -220,17 +215,17 @@ bool Interpreter::execute(
         if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) ||
             isFunctionWithoutParameters(*tokens[i], programState))
         {
-            leftParameter = getNextArgument(i, tokens, programState, left, right, hadError);
+            leftParameter = getNextArgument(i, tokens, programState, argumentA, argumentB, hadError);
         }else if(operation == nullptr){
             operation = tokens[i];
         }else{
-            rightParameter = getNextArgument(i, tokens, programState, left, right, hadError);
+            rightParameter = getNextArgument(i, tokens, programState, argumentA, argumentB, hadError);
         }
 
         if(hadError)
             return false;
 
-        if(!checkForCalculation(tokens, i, programState, left, right, operation, std::ref(leftParameter), std::ref(rightParameter)))
+        if(!checkForCalculation(tokens, i, programState, argumentA, argumentB, operation, std::ref(leftParameter), std::ref(rightParameter)))
             return false;
     }
 
@@ -245,8 +240,8 @@ bool Interpreter::checkForCalculation(
     std::vector<Token*> &tokens,
     int& position,
     ProgramState& ProgramState,
-    Value& left,
-    Value& right,
+    Value& argumentA,
+    Value& argumentB,
     Token*& operation,
     std::unique_ptr<Value>& leftParameter,
     std::unique_ptr<Value>& rightParameter)
@@ -257,29 +252,26 @@ bool Interpreter::checkForCalculation(
     bool hasLeft, hasRight, hadError;
     hadError = !getOperatorOrFunctionParamerters(*operation, hasLeft, hasRight, ProgramState); 
     if(hadError){
-        if(errorReporter)
-            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNotAnOperation);
+        report(tokens, position, RuntimeErrorTypeNotAnOperation);
 
         return false;
     }
     if(hasRight && rightParameter->size() > 0){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, argumentA, argumentB, ProgramState, hadError);
         if(hadError){
-            if(errorReporter)
-                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperatorError);
+            report(tokens, position, RuntimeErrorTypeOperatorError);
 
             return false;
         }
         rightParameter = std::make_unique<Value>();
                 
     }else if(operation->id == TokenIdApplyToEach){
-        leftParameter = executeModifier(*leftParameter, tokens, ProgramState, left, right, position, hadError);
+        leftParameter = executeModifier(*leftParameter, tokens, ProgramState, argumentA, argumentB, position, hadError);
         position++;
     }else if(hasLeft && leftParameter->size() > 0 && (!hasRight)){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, left, right, ProgramState, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, argumentA, argumentB, ProgramState, hadError);
         if(hadError){
-            if(errorReporter)
-                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperatorError);
+            report(tokens, position, RuntimeErrorTypeOperatorError);
 
             return false;
         }
@@ -296,8 +288,8 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     int& position,
     std::vector<Token*> &tokens,
     ProgramState& ProgramState,
-    Value& left,
-    Value& right,
+    Value& argumentA,
+    Value& argumentB,
     bool& hadError)
 {
     std::unique_ptr<Value> result;
@@ -314,11 +306,11 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         return std::move(result);
     break;
     case TokenIdLeftParam:
-        result = std::make_unique<Value>(left);
+        result = std::make_unique<Value>(argumentA);
         return std::move(result);
     break;
     case TokenIdRightParam:
-        result = std::make_unique<Value>(right);
+        result = std::make_unique<Value>(argumentB);
         return std::move(result);
     break;
     case TokenIdFunction:{
@@ -326,28 +318,26 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         getOperatorOrFunctionParamerters(*(tokens[position]), hasLeft, hasRight, ProgramState);
         if((!hasLeft) && (!hasRight)){
             result = std::make_unique<Value>();
-            hadError = !execute(ProgramState.functions[tokens[position]->str].body, ProgramState, left, right, *result);
+            hadError = !execute(ProgramState.functions[tokens[position]->str].body, ProgramState, argumentA, argumentB, *result);
             return std::move(result);
         }else{
             hadError = true;
-            if(errorReporter)
-                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperationAsParameter);
+            report(tokens, position, RuntimeErrorTypeOperationAsParameter);
             return std::make_unique<Value>();
         }
     }
     break;
     case TokenIdOpenParenthesis:{
         int endPos = TokenSubArrayFinder::findClosingParenthesis(tokens, position);
-        if(endPos == TOKEN_INDEX_NOT_FOUND){
+        if(endPos == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
             hadError = true;
-            if(errorReporter)
-                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoClosingParenthesis);
+            report(tokens, position, RuntimeErrorTypeNoClosingParenthesis);
             return std::make_unique<Value>();
         }
         std::vector<Token*> sub;
         TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos-1);
         result = std::make_unique<Value>();
-        hadError = !execute(sub, ProgramState, left, right, *result);
+        hadError = !execute(sub, ProgramState, argumentA, argumentB, *result);
         position = endPos;
         return std::move(result);
     }
@@ -359,23 +349,21 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         return interpreterIO->readText();
     break;
     default:
-        // ...
-        break;
+    break;
     }
 
     hadError = true;
-    if(errorReporter)
-        errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeEvaluationError);
+    report(tokens, position, RuntimeErrorTypeEvaluationError);
 
     return std::move(result);
 }
     
-bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& leftParam, bool& rightParam, ProgramState& programState)
+bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& hasLeftParam, bool& hasRightParam, ProgramState& programState)
 {
     if(operation.id == TokenIdFunction){
         auto func = &programState.functions[operation.str];
-        leftParam = func->left;
-        rightParam = func->right;
+        hasLeftParam = func->hasLeft;
+        hasRightParam = func->hasRight;
         return true;
     }
 
@@ -394,8 +382,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdReverse:
     case TokenIdApplyToEach:
     case TokenIdMakeSet:
-        leftParam = true;
-        rightParam = false;
+        hasLeftParam = true;
+        hasRightParam = false;
         return true;
     break;
     case TokenIdAdd:
@@ -414,8 +402,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& left
     case TokenIdSelect:
     case TokenIdLeftRotate:
     case TokenIdRightRotate:
-        leftParam = true;
-        rightParam = true;
+        hasLeftParam = true;
+        hasRightParam = true;
         return true;
     break;
     default:break;
@@ -428,8 +416,8 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
     Value& leftOfOperator,
     Value& rightOfOperator,
     Token& operation,
-    Value& left,
-    Value& right,
+    Value& argumentA,
+    Value& argumentB,
     ProgramState& programState,
     bool& hadError)
 {
@@ -499,8 +487,7 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::rightRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(RuntimeErrorTypeNotAnOperation);
+        report(RuntimeErrorTypeNotAnOperation);
 
         return std::make_unique<Value>();
     }
@@ -534,31 +521,28 @@ std::unique_ptr<Value> Interpreter::executeModifier(
     Value& leftParameter,
     std::vector<Token*> &tokens,
     ProgramState& programState,
-    Value& left,
-    Value& right,
+    Value& argumentA,
+    Value& argumentB,
     int position,
     bool& hadError)
 {
     auto result = std::make_unique<Value>();
     if(position == 0){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
+        report(tokens, position, RuntimeErrorTypeNoOperatorToModify);
         return std::move(result);
     }
 
     const int size = leftParameter.size();
     if(size == 0){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
+        report(tokens, position, RuntimeErrorTypeNoOperatorToModify);
         return std::move(result);
     }
 
     if(position+1 >= tokens.size()){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
+        report(tokens, position, RuntimeErrorTypeNoOperatorToModify);
         return std::move(result);
     }
 
@@ -567,10 +551,9 @@ std::unique_ptr<Value> Interpreter::executeModifier(
         Value first = {leftParameter[i]};
         Value second = {(i+1>=size? 0.0:leftParameter[i+1])};
 
-        auto operationResult = executeOperationOrFunction(first, second, *operation, left, right, programState, hadError);
+        auto operationResult = executeOperationOrFunction(first, second, *operation, argumentA, argumentB, programState, hadError);
         if(hadError){
-            if(errorReporter)
-                errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeOperatorError);
+            report(tokens, position, RuntimeErrorTypeOperatorError);
             return result;
         }
         for(const auto& j:*operationResult)
@@ -579,8 +562,7 @@ std::unique_ptr<Value> Interpreter::executeModifier(
 
     if(result->size() == 0){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify);
+        report(tokens, position, RuntimeErrorTypeNoOperatorToModify);
     }
     return std::move(result);
 }
@@ -589,15 +571,15 @@ bool Interpreter::executeAsync(
     std::vector<Token*> &tokens,
     int& position,
     ProgramState& programState,
-    Value& left,
-    Value& right)
+    Value& argumentA,
+    Value& argumentB)
 {
     std::vector<Token*> toExecute;
     int endPosition = TokenSubArrayFinder::findFirstTokenId(tokens, position, TokenIdAsyncEnd);
-    if(endPosition == TOKEN_INDEX_NOT_FOUND)
+    if(endPosition == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND)
         return false;
     TokenSubArrayFinder::findSubArray(tokens, toExecute, position+1, endPosition-1);
-    programState.threads.push_back(std::thread(&Interpreter::executeOnThread, this, toExecute, std::ref(programState), left, right));
+    programState.threads.push_back(std::thread(&Interpreter::executeOnThread, this, toExecute, std::ref(programState), argumentA, argumentB));
     position = endPosition;
 
     return true;
@@ -627,4 +609,16 @@ int Interpreter::currentLineNumber(std::vector<Token*> &tokens, int position)
     }
 
     return IRuntimeErrorReporter::LINE_NOT_FOUND;
+}
+
+inline void Interpreter::report(RuntimeErrorType errorType)
+{
+    if(errorReporter)
+        errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+}
+
+inline void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
+{
+    if(errorReporter)
+        errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify); 
 }

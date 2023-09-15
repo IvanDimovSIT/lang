@@ -69,41 +69,6 @@ int TokenSubArrayFinder::findClosingCurly(std::vector<Token> &tokens, int curren
     return TOKEN_INDEX_NOT_FOUND;
 }
 
-int TokenSubArrayFinder::findOpenCurly(std::vector<Token*> &tokens, int currentPosition)
-{
-    int p;
-    int open = -1;
-    for(p = currentPosition-1; p>=0; p--){
-        if(tokens[p]->id == TokenIdOpenCurly){
-            open++;
-            if(open == 0)
-                return p;
-        }else if(tokens[p]->id == TokenIdCloseCurly){
-            open--;
-        }
-    }
-
-    return TOKEN_INDEX_NOT_FOUND;
-}
-
-
-int TokenSubArrayFinder::findOpenCurly(std::vector<Token> &tokens, int currentPosition)
-{
-    int p;
-    int open = -1;
-    for(p = currentPosition-1; p>=0; p--){
-        if(tokens[p].id == TokenIdOpenCurly){
-            open++;
-            if(open == 0)
-                return p;
-        }else if(tokens[p].id == TokenIdCloseCurly){
-            open--;
-        }
-    }
-
-    return TOKEN_INDEX_NOT_FOUND;
-}
-
 int TokenSubArrayFinder::findStatementEnd(std::vector<Token*> &tokens, int currentPosition)
 {
     const int size = tokens.size();

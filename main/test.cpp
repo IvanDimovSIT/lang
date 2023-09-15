@@ -60,8 +60,8 @@ void testScanner(){
     //DebugPrinter::printTokens(tokens);
     assert(functions.size() == 1);
     assert(functions["FUNC"].body.size() == 3);
-    assert(functions["FUNC"].left);
-    assert(!functions["FUNC"].right);
+    assert(functions["FUNC"].hasLeft);
+    assert(!functions["FUNC"].hasRight);
 
     assert(tokens[0].id == TokenIdFunctionDeclaration);
     assert(tokens[1].id == TokenIdFunction);

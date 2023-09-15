@@ -27,6 +27,7 @@ void REPL::run()
             continue;
         }
         if(!FunctionExtractor::extractFunctions(tokens, tokensRef)){
+            std::cout << "Definition error" << std::endl;
             continue;
         }
         addFunctionNames(functionNames, functions);

@@ -11,8 +11,12 @@ bool FunctionExtractor::extractFunctions(std::vector<Token> &tokens, std::vector
         }else{
             while(tokens[i].id != TokenIdOpenCurly && i<size)
                 i++;
+            
+            if(i >= size)
+                return false;
+
             i = TokenSubArrayFinder::findClosingCurly(tokens, i);
-            if(i == TOKEN_INDEX_NOT_FOUND)
+            if(i == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND)
                 return false;
         }
     }
