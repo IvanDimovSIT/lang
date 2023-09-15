@@ -96,120 +96,123 @@ bool Interpreter::execute(
             continue;
         }
 
-        if(tokens[i]->id == TokenIdEndLine || tokens[i]->id == TokenIdOpenCurly || tokens[i]->id == TokenIdCloseCurly){
-            if(leftParameter->size() != 0){
-                lastResult = std::move(leftParameter);
-                leftParameter = std::make_unique<Value>();
-                rightParameter = std::make_unique<Value>();
+        switch(tokens[i]->id){
+            case TokenIdEndLine:
+            case TokenIdOpenCurly:
+            case TokenIdCloseCurly:
+            {
+                endStatement(lastResult, leftParameter, rightParameter);
+                continue;
             }
-            continue;
-        }
-
-        if(tokens[i]->id == TokenIdAsyncStart){
-            if(!executeAsync(tokens, i, programState, argumentA, argumentB)){
-                report(tokens, i, RuntimeErrorTypeThreadHadError);
-
-                return false;
-            }
-            continue;
-        }
-
-        if(tokens[i]->id == TokenIdAsyncJoin){
-            joinThreads(programState);
-            continue;
-        }
-
-        if(tokens[i]->id == TokenIdIf){
-            std::vector<Token*> condition;
-            Value conditionResult;
-            int endCondition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
-            if(endCondition == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
-                report(tokens, i, RuntimeErrorTypeMissingIfCondition);
-                return false;
-            }
-            TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
-            if(!execute(condition, programState, argumentA, argumentB, conditionResult))
-                return false;
-            
-            if(conditionResult[0] != 0.0){
-                i = endCondition;
-            }else{
-                int afterIfBody = TokenSubArrayFinder::findClosingCurly(tokens, endCondition);
-                if(afterIfBody == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
-                    report(tokens, i, RuntimeErrorTypeInvalidIfSyntax);
+            case TokenIdAsyncStart:
+            {
+                if(!executeAsync(tokens, i, programState, argumentA, argumentB)){
+                    report(tokens, i, RuntimeErrorTypeThreadHadError);
                     return false;
                 }
-                i = afterIfBody;
+                continue;
             }
-            continue;
-        }
-
-        if(tokens[i]->id == TokenIdLoop){
-            LoopReturn loopData;
-            Value conditionResult;
-            loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
-            if(loopData.loopStart == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
-                report(tokens, i, RuntimeErrorTypeMissingLoopCondition);
-                return false;
+            case TokenIdAsyncJoin:
+            {
+                joinThreads(programState);
+                continue;
             }
-            TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
-            loopData.loopEnd = TokenSubArrayFinder::findClosingCurly(tokens, loopData.loopStart);
-            if(!execute(loopData.condition, programState, argumentA, argumentB, conditionResult))
-                return false;
-
-            if(conditionResult[0] != 0){
-                loopStack.push(loopData);
-                i = loopData.loopStart;
-            }else{
-                i = loopData.loopEnd;
-            }
-            continue;
-        }
-
-        if(tokens[i]->id == TokenIdEquals && i-1>=0 && tokens[i-1]->id == TokenIdVariable){
-            const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
-            std::vector<Token*> statement;
-            TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
-
-            hadError = !execute(
-                statement,
-                programState,
-                argumentA,
-                argumentB,
-                *leftParameter);
-            if(hadError)
-                return false;
+            case TokenIdIf:
+            {
+                std::vector<Token*> condition;
+                Value conditionResult;
+                int endCondition = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
+                if(endCondition == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
+                    report(tokens, i, RuntimeErrorTypeMissingIfCondition);
+                    return false;
+                }
+                TokenSubArrayFinder::findSubArray(tokens, condition, i+1, endCondition-1);
+                if(!execute(condition, programState, argumentA, argumentB, conditionResult))
+                    return false;
             
-            lastResult = std::move(leftParameter);
-            leftParameter = std::make_unique<Value>();
-            setVariable(*lastResult, tokens[i - 1]->str, programState);
-            i = statementEnd;
-            continue;
-        }
-
-        if(tokens[i]->id == TokenIdWrite || tokens[i]->id == TokenIdWriteText){
-            const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
-            Value output;
-            std::vector<Token*> statement;
-            TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
-            hadError = !execute(
-                statement,
-                programState,
-                argumentA,
-                argumentB,
-                output);
-            if(hadError)
-                return false;
-            
-            if(output.size() >= 1){
-                if(tokens[i]->id == TokenIdWrite)
-                    interpreterIO->write(output);
-                else
-                    interpreterIO->writeText(output);
-                *lastResult = output;
+                if(conditionResult[0] != 0.0){
+                    i = endCondition;
+                }else{
+                    int afterIfBody = TokenSubArrayFinder::findClosingCurly(tokens, endCondition);
+                    if(afterIfBody == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
+                        report(tokens, i, RuntimeErrorTypeInvalidIfSyntax);
+                        return false;
+                    }
+                    i = afterIfBody;
+                }
+                continue;
             }
-            i = statementEnd;
-            continue;
+            case TokenIdLoop:
+            {
+                LoopReturn loopData;
+                Value conditionResult;
+                loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
+                if(loopData.loopStart == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
+                    report(tokens, i, RuntimeErrorTypeMissingLoopCondition);
+                    return false;
+                }
+                TokenSubArrayFinder::findSubArray(tokens, loopData.condition, i+1, loopData.loopStart-1);
+                loopData.loopEnd = TokenSubArrayFinder::findClosingCurly(tokens, loopData.loopStart);
+                if(!execute(loopData.condition, programState, argumentA, argumentB, conditionResult))
+                    return false;
+
+                if(conditionResult[0] != 0){
+                    loopStack.push(loopData);
+                    i = loopData.loopStart;
+                }else{
+                    i = loopData.loopEnd;
+                }
+                continue;
+            }
+            case TokenIdWrite:
+            case TokenIdWriteText:
+            {
+                const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
+                Value output;
+                std::vector<Token*> statement;
+                TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
+                hadError = !execute(
+                    statement,
+                    programState,
+                    argumentA,
+                    argumentB,
+                    output);
+                if(hadError)
+                    return false;
+            
+                if(output.size() >= 1){
+                    if(tokens[i]->id == TokenIdWrite)
+                        interpreterIO->write(output);
+                    else
+                        interpreterIO->writeText(output);
+                    *lastResult = output;
+                }
+                i = statementEnd;
+                continue;
+            }
+            case TokenIdEquals:
+            if(i-1>=0 && tokens[i-1]->id == TokenIdVariable){
+                const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
+                std::vector<Token*> statement;
+                TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
+
+                hadError = !execute(
+                    statement,
+                    programState,
+                    argumentA,
+                    argumentB,
+                    *leftParameter);
+                if(hadError)
+                    return false;
+            
+                lastResult = std::move(leftParameter);
+                leftParameter = std::make_unique<Value>();
+                setVariable(*lastResult, tokens[i - 1]->str, programState);
+                i = statementEnd;
+                continue;
+            }
+            break;
+            default:break;
         }
 
         if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) ||
@@ -313,7 +316,8 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         result = std::make_unique<Value>(argumentB);
         return std::move(result);
     break;
-    case TokenIdFunction:{
+    case TokenIdFunction:
+    {
         bool hasLeft, hasRight;
         getOperatorOrFunctionParamerters(*(tokens[position]), hasLeft, hasRight, ProgramState);
         if((!hasLeft) && (!hasRight)){
@@ -327,7 +331,8 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         }
     }
     break;
-    case TokenIdOpenParenthesis:{
+    case TokenIdOpenParenthesis:
+    {
         int endPos = TokenSubArrayFinder::findClosingParenthesis(tokens, position);
         if(endPos == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
             hadError = true;
@@ -614,11 +619,21 @@ int Interpreter::currentLineNumber(std::vector<Token*> &tokens, int position)
 inline void Interpreter::report(RuntimeErrorType errorType)
 {
     if(errorReporter)
-        errorReporter->report(RuntimeErrorTypeNoOperatorToModify);
+        errorReporter->report(errorType);
 }
 
 inline void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
 {
     if(errorReporter)
-        errorReporter->report(currentLineNumber(tokens, position), RuntimeErrorTypeNoOperatorToModify); 
+        errorReporter->report(currentLineNumber(tokens, position), errorType); 
 }
+
+inline void Interpreter::endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter)
+{
+    if(leftParameter->size() != 0){
+        lastResult = std::move(leftParameter);
+        leftParameter = std::make_unique<Value>();
+        rightParameter = std::make_unique<Value>();
+    }
+}
+

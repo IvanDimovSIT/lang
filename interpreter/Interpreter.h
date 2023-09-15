@@ -107,6 +107,8 @@ private:
 
     inline void report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
 
+    inline void endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter);
+
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;
