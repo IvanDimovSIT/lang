@@ -109,6 +109,14 @@ private:
 
     inline void endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter);
 
+    inline std::unique_ptr<Value> readNumbers(ProgramState& programState);
+
+    inline std::unique_ptr<Value> readText(ProgramState& programState);
+    
+    inline void writeNumbers(ProgramState& programState, Value& value);
+    
+    inline void writeText(ProgramState& programState, Value& value);
+    
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;

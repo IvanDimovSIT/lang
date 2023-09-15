@@ -16,4 +16,6 @@ struct ProgramState{
     std::map<std::string, Function> functions;
     std::map<std::string, Variable> variables;
     std::vector<std::thread> threads;
+    std::mutex IOReadLock;
+    std::mutex IOWriteLock;
 };

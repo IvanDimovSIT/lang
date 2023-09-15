@@ -182,9 +182,9 @@ bool Interpreter::execute(
             
                 if(output.size() >= 1){
                     if(tokens[i]->id == TokenIdWrite)
-                        interpreterIO->write(output);
+                        writeNumbers(programState, output);
                     else
-                        interpreterIO->writeText(output);
+                        writeText(programState, output);
                     *lastResult = output;
                 }
                 i = statementEnd;
@@ -242,7 +242,7 @@ bool Interpreter::execute(
 bool Interpreter::checkForCalculation(
     std::vector<Token*> &tokens,
     int& position,
-    ProgramState& ProgramState,
+    ProgramState& programState,
     Value& argumentA,
     Value& argumentB,
     Token*& operation,
@@ -253,14 +253,14 @@ bool Interpreter::checkForCalculation(
         return true;
     
     bool hasLeft, hasRight, hadError;
-    hadError = !getOperatorOrFunctionParamerters(*operation, hasLeft, hasRight, ProgramState); 
+    hadError = !getOperatorOrFunctionParamerters(*operation, hasLeft, hasRight, programState); 
     if(hadError){
         report(tokens, position, RuntimeErrorTypeNotAnOperation);
 
         return false;
     }
     if(hasRight && rightParameter->size() > 0){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, argumentA, argumentB, ProgramState, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, argumentA, argumentB, programState, hadError);
         if(hadError){
             report(tokens, position, RuntimeErrorTypeOperatorError);
 
@@ -269,10 +269,10 @@ bool Interpreter::checkForCalculation(
         rightParameter = std::make_unique<Value>();
                 
     }else if(operation->id == TokenIdApplyToEach){
-        leftParameter = executeModifier(*leftParameter, tokens, ProgramState, argumentA, argumentB, position, hadError);
+        leftParameter = executeModifier(*leftParameter, tokens, programState, argumentA, argumentB, position, hadError);
         position++;
     }else if(hasLeft && leftParameter->size() > 0 && (!hasRight)){
-        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, argumentA, argumentB, ProgramState, hadError);
+        leftParameter = executeOperationOrFunction(*leftParameter, *rightParameter, *operation, argumentA, argumentB, programState, hadError);
         if(hadError){
             report(tokens, position, RuntimeErrorTypeOperatorError);
 
@@ -290,7 +290,7 @@ bool Interpreter::checkForCalculation(
 std::unique_ptr<Value> Interpreter::getNextArgument(
     int& position,
     std::vector<Token*> &tokens,
-    ProgramState& ProgramState,
+    ProgramState& programState,
     Value& argumentA,
     Value& argumentB,
     bool& hadError)
@@ -301,7 +301,7 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     {
     case TokenIdVariable:
         result = std::make_unique<Value>();
-        getVariable(*result, tokens[position]->str, ProgramState);
+        getVariable(*result, tokens[position]->str, programState);
         return std::move(result);
     break;
     case TokenIdLiteral:
@@ -319,10 +319,10 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     case TokenIdFunction:
     {
         bool hasLeft, hasRight;
-        getOperatorOrFunctionParamerters(*(tokens[position]), hasLeft, hasRight, ProgramState);
+        getOperatorOrFunctionParamerters(*(tokens[position]), hasLeft, hasRight, programState);
         if((!hasLeft) && (!hasRight)){
             result = std::make_unique<Value>();
-            hadError = !execute(ProgramState.functions[tokens[position]->str].body, ProgramState, argumentA, argumentB, *result);
+            hadError = !execute(programState.functions[tokens[position]->str].body, programState, argumentA, argumentB, *result);
             return std::move(result);
         }else{
             hadError = true;
@@ -342,16 +342,16 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
         std::vector<Token*> sub;
         TokenSubArrayFinder::findSubArray(tokens, sub, position+1, endPos-1);
         result = std::make_unique<Value>();
-        hadError = !execute(sub, ProgramState, argumentA, argumentB, *result);
+        hadError = !execute(sub, programState, argumentA, argumentB, *result);
         position = endPos;
         return std::move(result);
     }
     break;
     case TokenIdRead:
-        return interpreterIO->read();
+        return readNumbers(programState);
     break;
     case TokenIdReadText:
-        return interpreterIO->readText();
+        return readText(programState);
     break;
     default:
     break;
@@ -637,3 +637,32 @@ inline void Interpreter::endStatement(std::unique_ptr<Value>& lastResult, std::u
     }
 }
 
+inline std::unique_ptr<Value> Interpreter::readNumbers(ProgramState& programState)
+{
+    programState.IOReadLock.lock();
+    auto result = interpreterIO->read();
+    programState.IOReadLock.unlock();
+    return std::move(result);
+}
+
+inline std::unique_ptr<Value> Interpreter::readText(ProgramState& programState)
+{
+    programState.IOReadLock.lock();
+    auto result = interpreterIO->readText();
+    programState.IOReadLock.unlock();
+    return std::move(result);
+}
+    
+inline void Interpreter::writeNumbers(ProgramState& programState, Value& value)
+{
+    programState.IOWriteLock.lock();
+    interpreterIO->write(value);
+    programState.IOWriteLock.unlock();
+}
+    
+inline void Interpreter::writeText(ProgramState& programState, Value& value)
+{
+    programState.IOWriteLock.lock();
+    interpreterIO->writeText(value);
+    programState.IOWriteLock.unlock();
+}
