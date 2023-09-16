@@ -1,44 +1,50 @@
-all:
-	clang++ -flto -O3 -std=c++14 -pthread -march=native -mtune=native -o lang.out\
-	 main/main.cpp\
-	 main/REPL.cpp\
-	 scanner/Scanner.cpp\
-	 token/OperatorArguments.cpp\
-	 token/TokenSyntax.cpp\
-	 interpreter/InterpreterCalculator.cpp\
-	 util/LiteralParser.cpp\
-	 util/StringUtil.cpp\
-	 util/TokenSubArrayFinder.cpp\
-	 debug/DebugPrinter.cpp\
-	 debug/ErrorPrinter.cpp\
-	 interpreter/FunctionExtractor.cpp\
-	 interpreter/Interpreter.cpp\
-	 interpreter/InterpreterIO.cpp\
-	 util/RandomGenerator.cpp
+ifeq ($(OS),Windows_NT)
+	EXE := .exe
+else
+	EXE := .out
+endif
 
-buildtest:
-	clang++ -g -std=c++14 -pthread -o test.out\
-	 main/test.cpp\
-	 scanner/Scanner.cpp\
-	 token/OperatorArguments.cpp\
-	 token/TokenSyntax.cpp\
-	 interpreter/InterpreterCalculator.cpp\
-	 util/LiteralParser.cpp\
-	 util/StringUtil.cpp\
-	 util/TokenSubArrayFinder.cpp\
-	 debug/DebugPrinter.cpp\
-	 debug/ErrorPrinter.cpp\
-	 interpreter/FunctionExtractor.cpp\
-	 interpreter/Interpreter.cpp\
-	 interpreter/InterpreterIO.cpp\
-	 util/RandomGenerator.cpp
+CXX := clang++
+CXXFLAGS := -flto -O3 -std=c++14 -pthread -march=native -mtune=native
+DEBUG_CXXFLAGS := -g -std=c++14 -pthread
+
+SRC := \
+	scanner/Scanner.cpp \
+	token/OperatorArguments.cpp \
+	token/TokenSyntax.cpp \
+	interpreter/InterpreterCalculator.cpp \
+	util/LiteralParser.cpp \
+	util/StringUtil.cpp \
+	util/TokenSubArrayFinder.cpp \
+	debug/DebugPrinter.cpp \
+	debug/ErrorPrinter.cpp \
+	interpreter/FunctionExtractor.cpp \
+	interpreter/Interpreter.cpp \
+	interpreter/InterpreterIO.cpp \
+	util/RandomGenerator.cpp \
+	main/REPL.cpp
+
+LANG_SRC := main/main.cpp $(SRC)
+TEST_SRC := main/test.cpp $(SRC)
+
+LANG_EXE := lang$(EXE)
+TEST_EXE := test$(EXE)
+
+all: $(LANG_EXE)
+
+buildtest: $(TEST_EXE)
+
+$(LANG_EXE): $(LANG_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $(LANG_SRC)
+
+$(TEST_EXE): $(TEST_SRC)
+	$(CXX) $(DEBUG_CXXFLAGS) -o $@ $(TEST_SRC)
 
 run: all
-	./lang.out
+	./$(LANG_EXE)
 
 test: buildtest
-	./test.out
+	./$(TEST_EXE)
 
 clean:
-	rm -f lang.out
-	rm -f test.out
+	rm -f $(LANG_EXE) $(TEST_EXE)
