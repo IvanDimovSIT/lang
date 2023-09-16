@@ -219,7 +219,7 @@ bool Interpreter::execute(
         if(!getArgumentsAndOperation(i, tokens, programState, leftParameter, rightParameter, argumentA, argumentB, operation))
             return false;
 
-        if(!checkForCalculation(tokens, i, programState, argumentA, argumentB, operation, std::ref(leftParameter), std::ref(rightParameter)))
+        if(!checkForCalculation(tokens, i, programState, argumentA, argumentB, operation, leftParameter, rightParameter))
             return false;
     }
 

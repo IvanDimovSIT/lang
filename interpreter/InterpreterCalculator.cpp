@@ -24,21 +24,21 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
         DyadicFunctionLambda lambda
     )
 {
-    auto p = std::make_unique<Value>();
-    const int lsize = left.size();
-    const int rsize = right.size();
-    if(lsize == 0 || rsize == 0){
+    auto result = std::make_unique<Value>();
+    const int leftSize = left.size();
+    const int rightSize = right.size();
+    if(leftSize == 0 || rightSize == 0){
         hadError = true;
         if(reporter)
             reporter->report(RuntimeErrorTypeEmptyData);
     }
-    int max = lsize > rsize ? lsize : rsize;
+    const int maxSize = leftSize > rightSize ? leftSize : rightSize;
 
-    for(int i=0; i<max; i++){
-        p->push_back(lambda(left[i%lsize],right[i%rsize], hadError, reporter));
+    for(int i=0; i<maxSize; i++){
+        result->push_back(lambda(left[i%leftSize],right[i%rightSize], hadError, reporter));
     }
 
-    return std::move(p);
+    return std::move(result);
 }
 
 std::unique_ptr<Value> InterpreterCalculator::add(
