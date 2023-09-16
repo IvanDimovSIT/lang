@@ -3,6 +3,8 @@ all:
 	 main/main.cpp\
 	 main/REPL.cpp\
 	 scanner/Scanner.cpp\
+	 token/OperatorArguments.cpp\
+	 token/TokenSyntax.cpp\
 	 interpreter/InterpreterCalculator.cpp\
 	 util/LiteralParser.cpp\
 	 util/StringUtil.cpp\
@@ -18,6 +20,8 @@ buildtest:
 	clang++ -g -std=c++14 -pthread -o test.out\
 	 main/test.cpp\
 	 scanner/Scanner.cpp\
+	 token/OperatorArguments.cpp\
+	 token/TokenSyntax.cpp\
 	 interpreter/InterpreterCalculator.cpp\
 	 util/LiteralParser.cpp\
 	 util/StringUtil.cpp\

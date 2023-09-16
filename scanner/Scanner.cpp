@@ -2,57 +2,7 @@
 #include "../util/StringUtil.h"
 #include "../util/LiteralParser.h"
 #include "../util/TokenSubArrayFinder.h"
-
-std::map<std::string, TokenId> Scanner::tokenMap = {
-    {"+", TokenIdAdd},
-    {"-", TokenIdSubtract},
-    {"*", TokenIdMultiply},
-    {"/", TokenIdDivide},
-    {"%", TokenIdMod},
-    {"**",TokenIdPower},
-    {"<", TokenIdLessThan},
-    {">", TokenIdGreaterThan},
-    {"<=",TokenIdLessThanOrEquals},
-    {">=",TokenIdGreaterThanOrEquals},
-    {"==",TokenIdIsEquals},
-    {"!=",TokenIdNotEquals},
-    {"=", TokenIdEquals},
-    {"!", TokenIdLogicalNot},
-    {"|", TokenIdUnion},
-    {":", TokenIdSelect},
-    {"?", TokenIdRandom},
-    {"^", TokenIdCeil},
-    {"_", TokenIdFloor},
-    {"~", TokenIdRound},
-    {"$", TokenIdSort},
-    {"@", TokenIdReverse},
-    {"&", TokenIdMakeSet},
-    {"#", TokenIdCount},
-    {"#+",TokenIdSumAll},
-    {"#*",TokenIdMultiplyAll},
-    {"f", TokenIdFunctionDeclaration},
-    {"a", TokenIdLeftParam},
-    {"b", TokenIdRightParam},
-    {"{", TokenIdOpenCurly},
-    {"}", TokenIdCloseCurly},
-    {"(", TokenIdOpenParenthesis},
-    {")", TokenIdCloseParenthesis},
-    {"\n",TokenIdEndLine},
-    {";",TokenIdEndLine},
-    {"if",TokenIdIf},
-    {"do",TokenIdLoop},
-    {"i", TokenIdIterate},
-    {"r", TokenIdRead},
-    {"w", TokenIdWrite},
-    {"g", TokenIdReadText},
-    {"t", TokenIdWriteText},
-    {"\\", TokenIdApplyToEach},
-    {"<<", TokenIdLeftRotate},
-    {">>", TokenIdRightRotate},
-    {"[", TokenIdAsyncStart},
-    {"]", TokenIdAsyncEnd},
-    {"!!", TokenIdAsyncJoin}
-};
+#include "../token/TokenSyntax.h"
 
 bool Scanner::scan(
     const std::string& programSource,
@@ -112,7 +62,7 @@ bool Scanner::scanREPL(
             source[i+1] == 'f' &&
             matchToken("if", tokens, functionNames, declaredFunctionNames, lineCounter)){
             i++;
-        }else if(isSingleCharToken(source[i])){
+        }else if(TokenSyntax::isSingleCharToken(source[i])){
             if(!matchToken(curr, tokens, functionNames, declaredFunctionNames, lineCounter)){
                 hadError = true;
                 if(errorReporter)
@@ -142,7 +92,7 @@ bool Scanner::scanREPL(
         }else{
             curr += source[i];
             if((i+1<sourceLen) &&
-                tokenMap.count(curr+source[i+1]) > 0 &&
+                TokenSyntax::isValidToken(curr+source[i+1]) &&
                 matchToken(curr+source[i+1], tokens, functionNames, declaredFunctionNames, lineCounter)){
                 i++;
                 curr = "";
@@ -316,8 +266,8 @@ bool Scanner::matchToken(
     Token token;
     token.str = tokenString;
     
-    if(tokenMap.count(tokenString) >= 1){
-        token.id = tokenMap[tokenString];
+    if(TokenSyntax::isValidToken(tokenString)){
+        token.id = TokenSyntax::getToken(tokenString);
         if(token.id == TokenIdEndLine)
             token.val.push_back(line);
         tokens.push_back(token);
@@ -337,42 +287,6 @@ bool Scanner::matchToken(
     }
 
     return false;
-}
-
-bool Scanner::isSingleCharToken(char token)
-{
-    switch (token)
-    {
-    case 'i':
-    case 'f':
-    case 'a':
-    case 'b':
-    case 'r':
-    case 'w':
-    case 'g':
-    case 't':
-    case '{':
-    case '}':
-    case '(':
-    case ')':
-    case '\n':
-    case ';':
-    case '@':
-    case '?':
-    case '|':
-    case '&':
-    case ':':
-    case '_':
-    case '$':
-    case '~':
-    case '^':
-    case '\\':
-    case '[':
-    case ']':
-        return true;
-    default:
-        return false;
-    }
 }
 
 bool Scanner::validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter)
@@ -482,7 +396,7 @@ bool Scanner::validateOperatorModifier(std::vector<Token>& tokens, int line, ISc
         return true;
 
 
-    bool isValid = (tokens[size-2].id != TokenIdApplyToEach) ||
+    const bool isValid = (tokens[size-2].id != TokenIdApplyToEach) ||
         (tokens[size-1].id != TokenIdLiteral &&
         tokens[size-1].id != TokenIdVariable &&
         tokens[size-1].id != TokenIdAsyncStart &&

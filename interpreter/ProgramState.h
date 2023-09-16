@@ -12,6 +12,7 @@ struct Variable{
     std::mutex mut;
 };
 
+// global program state
 struct ProgramState{
     std::map<std::string, Function> functions;
     std::map<std::string, Variable> variables;

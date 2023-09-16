@@ -1,6 +1,7 @@
 #include "Interpreter.h"
 #include "../util/TokenSubArrayFinder.h"
 #include "InterpreterCalculator.h"
+#include "../token/OperatorArguments.h"
 #include <cassert>
 
 struct LoopReturn{
@@ -371,50 +372,8 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& hasL
         hasRightParam = func->hasRight;
         return true;
     }
-
-    switch (operation.id)
-    {
-    case TokenIdCount:
-    case TokenIdLogicalNot:
-    case TokenIdIterate:
-    case TokenIdSumAll:
-    case TokenIdMultiplyAll:
-    case TokenIdRandom:
-    case TokenIdFloor:
-    case TokenIdCeil:
-    case TokenIdRound:
-    case TokenIdSort:
-    case TokenIdReverse:
-    case TokenIdApplyToEach:
-    case TokenIdMakeSet:
-        hasLeftParam = true;
-        hasRightParam = false;
-        return true;
-    break;
-    case TokenIdAdd:
-    case TokenIdSubtract:
-    case TokenIdMultiply:
-    case TokenIdDivide:
-    case TokenIdMod:
-    case TokenIdPower:
-    case TokenIdLessThan:
-    case TokenIdGreaterThan:
-    case TokenIdLessThanOrEquals:
-    case TokenIdGreaterThanOrEquals:
-    case TokenIdIsEquals:
-    case TokenIdNotEquals:
-    case TokenIdUnion:
-    case TokenIdSelect:
-    case TokenIdLeftRotate:
-    case TokenIdRightRotate:
-        hasLeftParam = true;
-        hasRightParam = true;
-        return true;
-    break;
-    default:break;
-    }
-
-    return false;
+    else 
+        return OperatorArguments::getArgs(operation.id, hasLeftParam, hasRightParam);
 }
 
 std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
