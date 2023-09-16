@@ -216,24 +216,17 @@ bool Interpreter::execute(
             default:break;
         }
 
-        if((leftParameter->size() == 0 && tokens[i]->id != TokenIdFunction && operation == nullptr) ||
-            isFunctionWithoutParameters(*tokens[i], programState))
-        {
-            leftParameter = getNextArgument(i, tokens, programState, argumentA, argumentB, hadError);
-        }else if(operation == nullptr){
-            operation = tokens[i];
-        }else{
-            rightParameter = getNextArgument(i, tokens, programState, argumentA, argumentB, hadError);
-        }
-
-        if(hadError)
+        if(!getArgumentsAndOperation(i, tokens, programState, leftParameter, rightParameter, argumentA, argumentB, operation))
             return false;
 
         if(!checkForCalculation(tokens, i, programState, argumentA, argumentB, operation, std::ref(leftParameter), std::ref(rightParameter)))
             return false;
     }
 
-
+    if(operation != nullptr){
+        report(tokens, tokens.size()-1, RuntimeErrorTypeMissingParameter);
+        return false;
+    }
     if(leftParameter->size() != 0)
         lastResult = std::move(leftParameter);
     result = *lastResult;
@@ -287,6 +280,29 @@ bool Interpreter::checkForCalculation(
     return true;
 }
 
+inline bool Interpreter::getArgumentsAndOperation(
+    int& position,
+    std::vector<Token*> &tokens,
+    ProgramState& programState,
+    std::unique_ptr<Value>& leftParameter,
+    std::unique_ptr<Value>& rightParameter,
+    Value& argumentA,
+    Value& argumentB,
+    Token*& operation)
+{
+    bool hadError = false;
+    if((leftParameter->size() == 0 && tokens[position]->id != TokenIdFunction && operation == nullptr) ||
+        isFunctionWithoutParameters(*tokens[position], programState))
+    {
+        leftParameter = getNextArgument(position, tokens, programState, argumentA, argumentB, hadError);
+    }else if(operation == nullptr){
+        operation = tokens[position];
+    }else{
+        rightParameter = getNextArgument(position, tokens, programState, argumentA, argumentB, hadError);
+    }
+
+    return !hadError;
+}
     
 std::unique_ptr<Value> Interpreter::getNextArgument(
     int& position,

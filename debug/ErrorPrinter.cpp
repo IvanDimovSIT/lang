@@ -24,14 +24,15 @@ std::unordered_map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = 
     {RuntimeErrorTypeOperationAsParameter, "Invalid operation"},
     {RuntimeErrorTypeNoClosingParenthesis, "Missing ')'"},
     {RuntimeErrorTypeEvaluationError, "Missing operation"},
-    {RuntimeErrorTypeParameterError, "Invalid Parameter"},
+    {RuntimeErrorTypeParameterError, "Invalid parameter"},
     {RuntimeErrorTypeNotAnOperation, "No operation found"},
     {RuntimeErrorTypeMissingIfCondition, "Missing if condition"},
     {RuntimeErrorTypeInvalidIfSyntax, "Invalid if syntax"},
     {RuntimeErrorTypeMissingLoopCondition, "Missing loop condition"},
     {RuntimeErrorTypeNoOperatorToModify, "No operator to modify"},
     {RuntimeErrorTypeThreadHadError, "Thread Error"},
-    {RuntimeErrorTypeOperatorError, "Error executing operator"}
+    {RuntimeErrorTypeOperatorError, "Error executing operator"},
+    {RuntimeErrorTypeMissingParameter, "Missing parameter"}
 };
 
 void ErrorPrinter::report(int line, RuntimeErrorType errorType){

@@ -55,6 +55,16 @@ private:
         std::unique_ptr<Value>& leftParameter,
         std::unique_ptr<Value>& rightParameter);
 
+    inline bool getArgumentsAndOperation(
+        int& position,
+        std::vector<Token*> &tokens,
+        ProgramState& programState,
+        std::unique_ptr<Value>& leftParameter,
+        std::unique_ptr<Value>& rightParameter,
+        Value& argumentA,
+        Value& argumentB,
+        Token*& operation);
+
     std::unique_ptr<Value> getNextArgument(
         int& position,
         std::vector<Token*> &tokens,
