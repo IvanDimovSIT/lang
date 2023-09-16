@@ -44,4 +44,6 @@ private:
     static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
 
     static bool validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter);
+
+    static void report(IScannerErrorReporter* errorReporter, int line, ScannerErrorType error);
 };

@@ -39,14 +39,12 @@ bool Scanner::scanREPL(
             const int stringLiteralEnd = StringUtil::findStringLiteralEndIndex(source, i-1);
             if(stringLiteralEnd == StringUtil::STRING_END_NOT_FOUND){
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+                report(errorReporter, lineCounter, ScannerErrorTypeStringLiteralError);
             }
             curr += source.substr(i, stringLiteralEnd-i+1);
             if(!matchToken(curr, tokens, functionNames, declaredFunctionNames, lineCounter)){
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+                report(errorReporter, lineCounter, ScannerErrorTypeStringLiteralError);
             }else{
                 i = stringLiteralEnd;
             }
@@ -65,8 +63,7 @@ bool Scanner::scanREPL(
         }else if(TokenSyntax::isSingleCharToken(source[i])){
             if(!matchToken(curr, tokens, functionNames, declaredFunctionNames, lineCounter)){
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
+                report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
@@ -74,8 +71,7 @@ bool Scanner::scanREPL(
             curr += source[i];
             if(!matchToken(curr, tokens, functionNames, declaredFunctionNames, lineCounter)){
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
+                report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
@@ -83,8 +79,7 @@ bool Scanner::scanREPL(
         }else if(source[i] == ' ' || source[i] == '\t' /*|| (i+1<sourceLen && source[i+1] == '"')*/){
             if(!matchToken(curr, tokens, functionNames, declaredFunctionNames, lineCounter)){
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
+                report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
             }
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
@@ -105,16 +100,14 @@ bool Scanner::scanREPL(
 
     if (!matchToken(curr, tokens, functionNames, declaredFunctionNames, lineCounter)) {
         hadError = true;
-        if (errorReporter)
-            errorReporter->report(lineCounter, ScannerErrorTypeUnrecognisedToken);
+        report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
     }
     if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
         hadError = true;
 
     if(!extractFunctions(tokens, functions)){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(lineCounter, ScannerErrorTypeFunctionDefinitionError);
+        report(errorReporter, lineCounter, ScannerErrorTypeFunctionDefinitionError);
     }
 
     return !hadError;
@@ -137,8 +130,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
         if(source[i] == '"'){
             const int end = StringUtil::findStringLiteralEndIndex(source, i);
             if(end == StringUtil::STRING_END_NOT_FOUND){
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+                report(errorReporter, lineCounter, ScannerErrorTypeStringLiteralError);
                 foundError = true;
             }else{
                 i = end;
@@ -153,8 +145,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                 continue;
             }else{
                 foundError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeFunctionDefinitionError);
+                report(errorReporter, lineCounter, ScannerErrorTypeFunctionDefinitionError);
             }
         }
         else if(isScanningFunctionName){
@@ -165,14 +156,12 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                 isScanningFunctionName = false;
                 if(functionNames.count(curr) != 0){
                     foundError = true;
-                    if(errorReporter)
-                        errorReporter->report(lineCounter, ScannerErrorTypeFunctionRedefinition);
+                    report(errorReporter, lineCounter, ScannerErrorTypeFunctionRedefinition);
                 }
                 if(!StringUtil::isValidIdentifierName(curr)){
                     foundError = true;
                     curr = "";
-                    if(errorReporter)
-                        errorReporter->report(lineCounter, ScannerErrorTypeFunctionDefinitionError);
+                    report(errorReporter, lineCounter, ScannerErrorTypeFunctionDefinitionError);
                 }else{
                     functionNames.insert(curr);
                     curr = "";
@@ -182,16 +171,14 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                 isAfterFirstFunctionChar = true;
             }else{
                 foundError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeFunctionNameDefinitionError);
+                report(errorReporter, lineCounter, ScannerErrorTypeFunctionNameDefinitionError);
             }
         }
     }
 
     if(isScanningFunctionName){
         foundError = true;
-        if(errorReporter)
-            errorReporter->report(lineCounter, ScannerErrorTypeFunctionDefinitionError);
+        report(errorReporter, lineCounter, ScannerErrorTypeFunctionDefinitionError);
     }
 
     return !foundError;
@@ -207,6 +194,9 @@ void Scanner::determineFunctionPrameters(Function& function)
             function.hasLeft = true;
         else if(function.body[i]->id == TokenIdRightParam)
             function.hasRight = true;
+        
+        if(function.hasLeft && function.hasRight)
+            return;
     }
 }
 
@@ -305,8 +295,7 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
         if(source[i] == '"'){
             const int end = StringUtil::findStringLiteralEndIndex(source, i);
             if(end == StringUtil::STRING_END_NOT_FOUND){
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeStringLiteralError);
+                report(errorReporter, lineCounter, ScannerErrorTypeStringLiteralError);
                 hadError = true;
             }else{
                 i = end;
@@ -325,8 +314,7 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
         }else if(source[i] == '['){
             if(asyncStart){
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeMissingAsyncEnd);
+                report(errorReporter, lineCounter, ScannerErrorTypeMissingAsyncEnd);
             }else{
                 asyncStart = true;
             }
@@ -335,21 +323,17 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
                 asyncStart = false;
             }else{
                 hadError = true;
-                if(errorReporter)
-                    errorReporter->report(lineCounter, ScannerErrorTypeMissingAsyncStart);
-
+                report(errorReporter, lineCounter, ScannerErrorTypeMissingAsyncStart);
             }
         }
 
         if(openP < 0){
             hadError = true;
-            if(errorReporter)
-                errorReporter->report(lineCounter, ScannerErrorTypeMoreClosingParenthesis);
+            report(errorReporter, lineCounter, ScannerErrorTypeMoreClosingParenthesis);
         }
         if(openCurly < 0){
             hadError = true;
-            if(errorReporter)
-                errorReporter->report(lineCounter, ScannerErrorTypeMoreClosingCurlyBrackets);
+            report(errorReporter, lineCounter, ScannerErrorTypeMoreClosingCurlyBrackets);
         }
 
     }
@@ -362,8 +346,7 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
 
     if(openCurly > 0){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(lineCounter, ScannerErrorTypeMoreOpenCurlyBrackets);
+        report(errorReporter, lineCounter, ScannerErrorTypeMoreOpenCurlyBrackets);
     }
     
     return !hadError;
@@ -415,8 +398,14 @@ bool Scanner::validateOperatorModifier(std::vector<Token>& tokens, int line, ISc
     if(isValid){
         return true;
     }else{
-        if(errorReporter)
-            errorReporter->report(line, ScannerErrorTypeNoOperatorToModify);
+        report(errorReporter, line, ScannerErrorTypeNoOperatorToModify);
         return false;
     }
 }
+
+void Scanner::report(IScannerErrorReporter* errorReporter, int line, ScannerErrorType error)
+{
+    if(errorReporter)
+        errorReporter->report(line, error);
+}
+

@@ -17,15 +17,14 @@ void TokenSubArrayFinder::findSubArray(std::vector<Token*>& src, std::vector<Tok
 int TokenSubArrayFinder::findClosingCurly(std::vector<Token*> &tokens, int currentPosition)
 {
     const int size = tokens.size();
-    int p;
     int open = 1;
-    for(p = currentPosition+1; p<size; p++){
-        if(tokens[p]->id == TokenIdOpenCurly){
+    for(currentPosition++; currentPosition<size; currentPosition++){
+        if(tokens[currentPosition]->id == TokenIdOpenCurly){
             open++;
-        }else if(tokens[p]->id == TokenIdCloseCurly){
+        }else if(tokens[currentPosition]->id == TokenIdCloseCurly){
             open--;
             if(open == 0)
-                return p;
+                return currentPosition;
         }
     }
 
@@ -35,15 +34,14 @@ int TokenSubArrayFinder::findClosingCurly(std::vector<Token*> &tokens, int curre
 int TokenSubArrayFinder::findClosingParenthesis(std::vector<Token*> &tokens, int currentPosition)
 {
     const int size = tokens.size();
-    int p;
     int open = 1;
-    for(p = currentPosition+1; p<size; p++){
-        if(tokens[p]->id == TokenIdOpenParenthesis){
+    for(currentPosition++; currentPosition<size; currentPosition++){
+        if(tokens[currentPosition]->id == TokenIdOpenParenthesis){
             open++;
-        }else if(tokens[p]->id == TokenIdCloseParenthesis){
+        }else if(tokens[currentPosition]->id == TokenIdCloseParenthesis){
             open--;
             if(open == 0)
-                return p;
+                return currentPosition;
         }
     }
 
@@ -54,15 +52,14 @@ int TokenSubArrayFinder::findClosingParenthesis(std::vector<Token*> &tokens, int
 int TokenSubArrayFinder::findClosingCurly(std::vector<Token> &tokens, int currentPosition)
 {
     const int size = tokens.size();
-    int p;
     int open = 1;
-    for(p = currentPosition+1; p<size; p++){
-        if(tokens[p].id == TokenIdOpenCurly){
+    for(currentPosition++; currentPosition<size; currentPosition++){
+        if(tokens[currentPosition].id == TokenIdOpenCurly){
             open++;
-        }else if(tokens[p].id == TokenIdCloseCurly){
+        }else if(tokens[currentPosition].id == TokenIdCloseCurly){
             open--;
             if(open == 0)
-                return p;
+                return currentPosition;
         }
     }
 
@@ -83,8 +80,7 @@ int TokenSubArrayFinder::findStatementEnd(std::vector<Token*> &tokens, int curre
 int TokenSubArrayFinder::findFirstTokenIdInLine(std::vector<Token*> &tokens, int currentPosition, TokenId id)
 {
     const int size = tokens.size();
-    bool seenEndLine = false;
-    for(; currentPosition<size; currentPosition++){
+    for(bool seenEndLine = false; currentPosition<size; currentPosition++){
         if(tokens[currentPosition]->id == id)
             return currentPosition;
         else if(tokens[currentPosition]->id == TokenIdEndLine)
