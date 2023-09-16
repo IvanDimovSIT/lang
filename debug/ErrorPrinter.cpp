@@ -1,7 +1,7 @@
 #include "ErrorPrinter.h"
 #include <iostream>
 
-std::map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
+std::unordered_map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
     {ScannerErrorTypeFunctionDefinitionError, "Function definition error"},
     {ScannerErrorTypeFunctionNameDefinitionError, "Invalid Function name error"},
     {ScannerErrorTypeFunctionRedefinition, "Function redefinition error"},
@@ -16,7 +16,7 @@ std::map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
     {ScannerErrorTypeMissingAsyncEnd, "Missing ']'"}
 };
 
-std::map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
+std::unordered_map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = {
     {RuntimeErrorTypeEmptyData, "Empty Data"},
     {RuntimeErrorTypeDivisionByZero, "Division By Zero"},
     {RuntimeErrorTypeZeroPowerZero, "Zero power of zero"},

@@ -546,3 +546,53 @@ std::unique_ptr<Value> InterpreterCalculator::rightRotate(
     
     return std::move(result);
 }
+
+std::unique_ptr<Value> InterpreterCalculator::remove(
+    Value& left,
+    Value& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<Value>();
+    if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
+        return std::move(result);
+
+    std::unordered_set<double> toRemove;
+    for(const auto& i: right)
+        toRemove.insert(i);
+
+    for(const auto& i: left){
+        if(toRemove.find(i) == toRemove.end())
+            result->push_back(i);
+    }
+
+    if(result->size() <= 0)
+        result->push_back(0.0);
+
+    return std::move(result);
+}
+
+ std::unique_ptr<Value> InterpreterCalculator::remain(
+    Value& left,
+    Value& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<Value>();
+    if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
+        return std::move(result);
+
+    std::unordered_set<double> toRemain;
+    for(const auto& i: right)
+        toRemain.insert(i);
+
+    for(const auto& i: left){
+        if(toRemain.find(i) != toRemain.end())
+            result->push_back(i);
+    }
+
+    if(result->size() <= 0)
+        result->push_back(0.0);
+
+    return std::move(result);
+}

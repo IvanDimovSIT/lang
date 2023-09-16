@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     ErrorPrinter errorPrinter;
     InterpreterIO io;
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     if(!Scanner::scan(source, tokens, functions, &errorPrinter)){
         return 1;
     }

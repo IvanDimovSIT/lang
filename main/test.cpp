@@ -55,7 +55,7 @@ void testStringUtil(){
 void testScanner(){
     std::string source = "f FUNC { a + 1,2,3 }\nA = 2,1 FUNC ";
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     //DebugPrinter::printTokens(tokens);
     assert(functions.size() == 1);
@@ -107,7 +107,7 @@ void testInterpreter1()
         "}\n";
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
@@ -122,7 +122,7 @@ void testInterpreter2()
     std::string source = "C = 4,2.2 i + (6 i * 0 + 1) \n";
     
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
@@ -148,7 +148,7 @@ void testInterpreter3()
         "A\n";
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
     std::vector<Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
@@ -173,7 +173,7 @@ void testInterpreter4()
         "MAIN\n";
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -198,7 +198,7 @@ void testInterpreter5()
         "MAIN\n";
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -219,7 +219,7 @@ void testInterpreter6()
         "A = A - 1"; 
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -242,7 +242,7 @@ void testInterpreter7()
         "A = 1,2,3 \\ +\n"; 
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -264,7 +264,7 @@ void testInterpreter8()
         "A = 1,2,2,-2.5,2,5,1,8,7,8,7,7,0 &\n"; 
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -290,7 +290,7 @@ void testInterpreter9()
         "A = 1,2,3,4,5,6 << -7 >> 1\n"; 
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -318,7 +318,7 @@ void testInterpreter10()
         "B = A\n"; 
 
     std::vector<Token> tokens;
-    std::map<std::string, Function> functions;
+    std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
     std::vector<Token*> exec;
@@ -330,6 +330,49 @@ void testInterpreter10()
 
     assert(result.size() == 1);
     assert(result[0] == 0 || result[0] == 1 || result[0] == 2);
+}
+
+void testInterpreter11()
+{
+    std::string source = 
+        "A = 3,1,2,2,4 -> 3,3,2,3";
+
+    std::vector<Token> tokens;
+    std::unordered_map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    Value result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 2);
+    assert(result[0] == 1); 
+    assert(result[1] == 4);
+}
+
+void testInterpreter12()
+{
+    std::string source = 
+        "A = 3,1,2,2,4 <- 3,3,2,3";
+
+    std::vector<Token> tokens;
+    std::unordered_map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    Value result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 3);
+    assert(result[0] == 3); 
+    assert(result[1] == 2);
+    assert(result[2] == 2);
 }
 
 
@@ -347,6 +390,8 @@ int main(){
     testInterpreter8();
     testInterpreter9();
     testInterpreter10();
+    testInterpreter11();
+    testInterpreter12();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

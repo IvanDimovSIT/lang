@@ -1,6 +1,6 @@
 #pragma once
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include "Function.h"
 #include "../token/Token.h"
 #include "ScannerErrorType.h"
@@ -15,28 +15,28 @@ public:
     static bool scan(
         const std::string& programSource,
         std::vector<Token>& tokens,
-        std::map<std::string, Function>& functions,
+        std::unordered_map<std::string, Function>& functions,
         IScannerErrorReporter* errorReporter);
 
     static bool scanREPL(
         const std::string& programSource,
         std::vector<Token>& tokens,
-        std::map<std::string, Function>& functions,
-        std::set<std::string>& declaredFunctionNames,
+        std::unordered_map<std::string, Function>& functions,
+        std::unordered_set<std::string>& declaredFunctionNames,
         IScannerErrorReporter* errorReporter);
         
 private:
     static std::string removeComments(const std::string& source);
 
-    static bool findFunctionNames(const std::string& source, std::set<std::string>& functionNames, IScannerErrorReporter* errorReporter);
+    static bool findFunctionNames(const std::string& source, std::unordered_set<std::string>& functionNames, IScannerErrorReporter* errorReporter);
 
-    static bool extractFunctions(std::vector<Token>& tokens, std::map<std::string, Function>& functions);
+    static bool extractFunctions(std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions);
     
     static bool matchToken(
         const std::string& tokenString,
         std::vector<Token>& tokens,
-        std::set<std::string>& functionNames,
-        std::set<std::string>& previousDeclaredFunctionNames,
+        std::unordered_set<std::string>& functionNames,
+        std::unordered_set<std::string>& previousDeclaredFunctionNames,
         int line);
 
     static void determineFunctionPrameters(Function& function);

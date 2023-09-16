@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <mutex>
 #include <thread>
@@ -14,8 +14,8 @@ struct Variable{
 
 // global program state
 struct ProgramState{
-    std::map<std::string, Function> functions;
-    std::map<std::string, Variable> variables;
+    std::unordered_map<std::string, Function> functions;
+    std::unordered_map<std::string, Variable> variables;
     std::vector<std::thread> threads;
     std::mutex IOReadLock;
     std::mutex IOWriteLock;

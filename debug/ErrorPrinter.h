@@ -8,6 +8,6 @@ public:
     void report(RuntimeErrorType errorType) override;
     void report(int line, ScannerErrorType errorType) override;
 private:
-    static std::map<ScannerErrorType, std::string> scannerErrors;
-    static std::map<RuntimeErrorType, std::string> runtimeErrors;
+    static std::unordered_map<ScannerErrorType, std::string> scannerErrors;
+    static std::unordered_map<RuntimeErrorType, std::string> runtimeErrors;
 };

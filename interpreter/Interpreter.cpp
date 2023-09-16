@@ -17,7 +17,7 @@ Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* i
     this->interpreterIO = interpreterIO;
 }
 
-bool Interpreter::execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result)
+bool Interpreter::execute(std::vector<Token*> &tokens, std::unordered_map<std::string, Function>& functions, Value& result)
 {
     ProgramState programState = {functions,{}, {}};
     initVariables(tokens, programState);
@@ -449,6 +449,10 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::leftRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdRightRotate:
         return InterpreterCalculator::rightRotate(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdRemove:
+        return InterpreterCalculator::remove(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdRemain:
+        return InterpreterCalculator::remain(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:
         hadError = true;
         report(RuntimeErrorTypeNotAnOperation);

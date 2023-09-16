@@ -8,8 +8,8 @@ void REPL::run()
     Interpreter interpreter(&errorPrinter, &io);
     std::vector<Token> tokens;
     std::vector<Token*> tokensRef;
-    std::map<std::string, Function> functions = {};
-    std::set<std::string> functionNames;
+    std::unordered_map<std::string, Function> functions = {};
+    std::unordered_set<std::string> functionNames;
     ProgramState programState;
 
     std::string source;
@@ -81,7 +81,7 @@ void REPL::deleteFunction(Function& function)
 }
 
 
-void REPL::copyFunctions(std::map<std::string, Function>& functions, ProgramState& programState)
+void REPL::copyFunctions(std::unordered_map<std::string, Function>& functions, ProgramState& programState)
 {
     for(auto& i: functions){
         Function functionCopy = i.second;
@@ -136,7 +136,7 @@ bool REPL::isStringExit(const std::string& line)
     return false;
 }
 
-void REPL::addFunctionNames(std::set<std::string>& functionNames, std::map<std::string, Function>& functions){
+void REPL::addFunctionNames(std::unordered_set<std::string>& functionNames, std::unordered_map<std::string, Function>& functions){
     for(auto& i:functions)
         functionNames.insert(i.first);
 }

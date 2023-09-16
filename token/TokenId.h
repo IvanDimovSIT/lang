@@ -48,6 +48,8 @@ enum TokenId{
     TokenIdApplyToEach,         // '\'
     TokenIdLeftRotate,          // <<
     TokenIdRightRotate,         // >>
+    TokenIdRemove,              // ->
+    TokenIdRemain,              // <-
     TokenIdAsyncStart,          // [
     TokenIdAsyncEnd,            // ]
     TokenIdAsyncJoin            // !!

@@ -7,18 +7,18 @@
 bool Scanner::scan(
     const std::string& programSource,
     std::vector<Token>& tokens,
-    std::map<std::string, Function>& functions,
+    std::unordered_map<std::string, Function>& functions,
     IScannerErrorReporter* errorReporter)
 {
-    std::set<std::string> empty;
+    std::unordered_set<std::string> empty;
     return scanREPL(programSource, tokens, functions, empty, errorReporter);
 }
 
 bool Scanner::scanREPL(
     const std::string& programSource,
     std::vector<Token>& tokens,
-    std::map<std::string, Function>& functions,
-    std::set<std::string>& declaredFunctionNames,
+    std::unordered_map<std::string, Function>& functions,
+    std::unordered_set<std::string>& declaredFunctionNames,
     IScannerErrorReporter* errorReporter)
 {
     tokens.clear();
@@ -26,7 +26,7 @@ bool Scanner::scanREPL(
 
     std::string source = removeComments(programSource);
     const int sourceLen = source.size();
-    std::set<std::string> functionNames;
+    std::unordered_set<std::string> functionNames;
     int lineCounter = 1;
     std::string curr = "";
     bool hadError = !validateParenthesis(source, sourceLen, errorReporter);
@@ -120,7 +120,7 @@ bool Scanner::scanREPL(
     return !hadError;
 }
 
-bool Scanner::findFunctionNames(const std::string& source, std::set<std::string>& functionNames, IScannerErrorReporter* errorReporter)
+bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<std::string>& functionNames, IScannerErrorReporter* errorReporter)
 {
     functionNames.clear();
     const int stringLen = source.size();
@@ -210,7 +210,7 @@ void Scanner::determineFunctionPrameters(Function& function)
     }
 }
 
-bool Scanner::extractFunctions(std::vector<Token>& tokens, std::map<std::string, Function>& functions)
+bool Scanner::extractFunctions(std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions)
 {
     const int size = tokens.size();
     Function function;
@@ -256,8 +256,8 @@ bool Scanner::extractFunctions(std::vector<Token>& tokens, std::map<std::string,
 bool Scanner::matchToken(
     const std::string& tokenString,
     std::vector<Token>& tokens,
-    std::set<std::string>& functionNames,
-    std::set<std::string>& previousDeclaredFunctionNames,
+    std::unordered_set<std::string>& functionNames,
+    std::unordered_set<std::string>& previousDeclaredFunctionNames,
     int line)
 {
     if(tokenString.size() <= 0 || tokenString[0] == ' ')

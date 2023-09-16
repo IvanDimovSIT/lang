@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <stack>
 #include <thread>
@@ -27,7 +27,7 @@ class Interpreter{
 public:
     Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
 
-    bool execute(std::vector<Token*> &tokens, std::map<std::string, Function>& functions, Value& result);
+    bool execute(std::vector<Token*> &tokens, std::unordered_map<std::string, Function>& functions, Value& result);
 
     bool execute(std::vector<Token*> &tokens, ProgramState& programState, Value& result);
 

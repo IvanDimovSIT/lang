@@ -37,6 +37,8 @@ bool OperatorArguments::getArgs(TokenId id, bool& hasLeft, bool& hasRight)
     case TokenIdSelect:
     case TokenIdLeftRotate:
     case TokenIdRightRotate:
+    case TokenIdRemove:
+    case TokenIdRemain:
         hasLeft = true;
         hasRight = true;
         return true;
