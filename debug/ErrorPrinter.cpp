@@ -35,7 +35,11 @@ std::unordered_map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = 
     {RuntimeErrorTypeMissingParameter, "Missing parameter"}
 };
 
-void ErrorPrinter::report(int line, RuntimeErrorType errorType){
+void ErrorPrinter::report(int line, RuntimeErrorType errorType)
+{
+    if(hasSeenError(line, errorType))
+        return;
+    
     if(line == IRuntimeErrorReporter::LINE_NOT_FOUND){
         report(errorType);
         return;
@@ -43,10 +47,49 @@ void ErrorPrinter::report(int line, RuntimeErrorType errorType){
     std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType))  << " (line:" << line << ")" << std::endl;
 }
 
-void ErrorPrinter::report(RuntimeErrorType errorType){
+void ErrorPrinter::report(RuntimeErrorType errorType)
+{
     std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl;
 }
 
-void ErrorPrinter::report(int line, ScannerErrorType errorType){
+void ErrorPrinter::report(int line, ScannerErrorType errorType)
+{
+    if(hasSeenError(line, errorType))
+        return;
+
     std::cout << "ScannerError:" << (scannerErrors.count(errorType)?scannerErrors[errorType]:std::to_string(errorType)) << " (line:" << line << ")" << std::endl; 
+}
+
+void ErrorPrinter::resetErrors()
+{
+    seenScannerErrors.clear();
+    seenRuntimeErrors.clear();
+}
+
+bool ErrorPrinter::hasSeenError(int line, RuntimeErrorType errorType)
+{
+    auto errors = seenRuntimeErrors.find(line);
+    if(errors == seenRuntimeErrors.end()){
+        seenRuntimeErrors[line] = {errorType};
+    }else if(errors->second.find(errorType) == errors->second.end()){
+        errors->second.insert(errorType);
+    }else{
+        return true;
+    }
+
+    return false;
+}
+
+bool ErrorPrinter::hasSeenError(int line, ScannerErrorType errorType)
+{
+    auto errors = seenScannerErrors.find(line);
+    if(errors == seenScannerErrors.end()){
+        seenScannerErrors[line] = {errorType};
+    }else if(errors->second.find(errorType) == errors->second.end()){
+        errors->second.insert(errorType);
+    }else{
+        return true;
+    }
+
+    return false;
 }

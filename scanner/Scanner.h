@@ -22,7 +22,7 @@ public:
         const std::string& programSource,
         std::vector<Token>& tokens,
         std::unordered_map<std::string, Function>& functions,
-        std::unordered_set<std::string>& declaredFunctionNames,
+        std::unordered_set<std::string>& previousFunctions,
         IScannerErrorReporter* errorReporter);
         
 private:
@@ -36,7 +36,7 @@ private:
         const std::string& tokenString,
         std::vector<Token>& tokens,
         std::unordered_set<std::string>& functionNames,
-        std::unordered_set<std::string>& previousDeclaredFunctionNames,
+        std::unordered_set<std::string>& previousFunctions,
         int line);
 
     static void determineFunctionPrameters(Function& function);
@@ -46,4 +46,6 @@ private:
     static bool validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter);
 
     static void report(IScannerErrorReporter* errorReporter, int line, ScannerErrorType error);
+
+    static inline bool isSeparator(char c);
 };

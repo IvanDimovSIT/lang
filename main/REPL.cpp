@@ -14,6 +14,7 @@ void REPL::run()
 
     std::string source;
     do{
+        errorPrinter.resetErrors();
         functions = programState.functions;
         tokens.clear();
         tokensRef.clear();
