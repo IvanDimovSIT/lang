@@ -3,7 +3,7 @@
 
 bool LiteralParser::isValidChar(char c){
     return (
-        (c>='0' && c<='9') ||
+        std::isdigit(c)||
         (c == '-') ||
         (c == '.') ||
         (c == ',')
