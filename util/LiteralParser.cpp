@@ -60,7 +60,7 @@ bool LiteralParser::parseString(const std::string& literal, Value& value)
     for(int i=1; i<size; i++){
         if(literal[i]!='\\'){
             value.push_back((double)literal[i]);
-        }else{
+        }else if(i+1<size){
             i++;
             switch (literal[i])
             {
@@ -77,6 +77,8 @@ bool LiteralParser::parseString(const std::string& literal, Value& value)
                 value.push_back((double)literal[i]);
                 break;
             }
+        }else{
+            return false;
         }
     }
 

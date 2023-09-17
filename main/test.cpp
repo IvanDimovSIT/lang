@@ -15,6 +15,7 @@ InterpreterIO io;
 
 void testLiteralParser(){
     Value lit;
+
     assert(!LiteralParser::parse("sssa",lit));
     assert(LiteralParser::parse("123",lit));
     assert(lit.size() == 1);
@@ -38,6 +39,10 @@ void testLiteralParser(){
     assert(LiteralParser::parseString("\" \"", lit));
     assert(lit.size() == 1);
     assert(lit[0] == ' ');
+
+    assert(LiteralParser::parseString("\"\\\\\"", lit));
+    assert(lit.size() == 1);
+    assert(lit[0] == '\\');
 }
 
 void testStringUtil(){
@@ -375,6 +380,26 @@ void testInterpreter12()
     assert(result[2] == 2);
 }
 
+void testInterpreter13()
+{
+    std::string source = 
+        "A = \"\\\\\""; 
+
+    std::vector<Token> tokens;
+    std::unordered_map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    Value result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 1);
+    assert(result[0] == '\\');
+}
+
 
 int main(){
     testLiteralParser();
@@ -392,6 +417,7 @@ int main(){
     testInterpreter10();
     testInterpreter11();
     testInterpreter12();
+    testInterpreter13();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

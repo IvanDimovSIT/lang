@@ -32,6 +32,15 @@ private:
 
     static bool extractFunctions(std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions);
     
+    static void addNextToken(
+        const std::string& tokenString,
+        std::vector<Token>& tokens,
+        std::unordered_set<std::string>& functionNames,
+        std::unordered_set<std::string>& previousFunctions,
+        int line,
+        bool& hadError,
+        IScannerErrorReporter* errorReporter);
+
     static bool matchToken(
         const std::string& tokenString,
         std::vector<Token>& tokens,

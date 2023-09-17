@@ -61,29 +61,23 @@ bool Scanner::scanREPL(
             matchToken("if", tokens, functionNames, previousFunctions, lineCounter)){
             i++;
         }else if(TokenSyntax::isSingleCharToken(source[i])){ // End current token and add next token
-            if(!matchToken(curr, tokens, functionNames, previousFunctions, lineCounter)){
-                hadError = true;
-                report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
-            }
+            addNextToken(curr, tokens, functionNames, previousFunctions, lineCounter, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
+
             curr += source[i];
-            if(!matchToken(curr, tokens, functionNames, previousFunctions, lineCounter)){
-                hadError = true;
-                report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
-            }
+            addNextToken(curr, tokens, functionNames, previousFunctions, lineCounter, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
+
         }else if(isSeparator(source[i])){ // End token scanning and add it
-            if(!matchToken(curr, tokens, functionNames, previousFunctions, lineCounter)){
-                hadError = true;
-                report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
-            }
+            addNextToken(curr, tokens, functionNames, previousFunctions, lineCounter, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
+
         }else{ // Add character
             curr += source[i];
             if((i+1<sourceLen) &&
@@ -98,10 +92,7 @@ bool Scanner::scanREPL(
             lineCounter++;
     }
 
-    if (!matchToken(curr, tokens, functionNames, previousFunctions, lineCounter)) {
-        hadError = true;
-        report(errorReporter, lineCounter, ScannerErrorTypeUnrecognisedToken);
-    }
+    addNextToken(curr, tokens, functionNames, previousFunctions, lineCounter, hadError, errorReporter);
     if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
         hadError = true;
 
@@ -166,7 +157,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                     functionNames.insert(curr);
                     curr = "";
                 }
-            }else if(source[i] >= 'A' && source[i] <= 'Z' || (isAfterFirstFunctionChar && source[i] >= '0' && source[i] <= '9')){
+            }else if(std::isupper(source[i]) || (isAfterFirstFunctionChar && std::isdigit(source[i]))){
                 curr += source[i];
                 isAfterFirstFunctionChar = true;
             }else{
@@ -277,6 +268,21 @@ bool Scanner::matchToken(
     }
 
     return false;
+}
+
+void Scanner::addNextToken(
+    const std::string& tokenString,
+    std::vector<Token>& tokens,
+    std::unordered_set<std::string>& functionNames,
+    std::unordered_set<std::string>& previousFunctions,
+    int line,
+    bool& hadError,
+    IScannerErrorReporter* errorReporter)
+{
+    if (!matchToken(tokenString, tokens, functionNames, previousFunctions, line)) {
+        hadError = true;
+        report(errorReporter, line, ScannerErrorTypeUnrecognisedToken);
+    }
 }
 
 bool Scanner::validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter)

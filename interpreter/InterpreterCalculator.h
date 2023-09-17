@@ -187,6 +187,6 @@ private:
     );
 
     static bool validateInput(Value& val, IRuntimeErrorReporter* reporter, bool& hadError);
-    static void rotateToLeft(const Value& src, Value& dest, long long positions);
 
+    static void rotateToLeft(const Value& src, Value& dest, long long positions);
 };
