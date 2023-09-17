@@ -4,7 +4,7 @@
 #include "../token/OperatorArguments.h"
 #include <cassert>
 
-struct LoopReturn{
+struct Loop{
     std::vector<Token*> condition;
     int loopStart;
     int loopEnd;
@@ -81,7 +81,7 @@ bool Interpreter::execute(
     std::unique_ptr<Value> rightParameter = std::make_unique<Value>();
     std::unique_ptr<Value> lastResult = std::make_unique<Value>();
     Token* operation = nullptr;
-    std::stack<LoopReturn> loopStack;
+    std::stack<Loop> loopStack;
 
     for(int i=0; i<size; i++){
         if(loopStack.size() != 0 && i == loopStack.top().loopEnd){
@@ -145,7 +145,7 @@ bool Interpreter::execute(
             }
             case TokenIdLoop:
             {
-                LoopReturn loopData;
+                Loop loopData;
                 Value conditionResult;
                 loopData.loopStart = TokenSubArrayFinder::findFirstTokenIdInLine(tokens, i, TokenIdOpenCurly);
                 if(loopData.loopStart == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND){
