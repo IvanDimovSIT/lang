@@ -1,9 +1,9 @@
 #pragma once
 #include "../scanner/Scanner.h"
-#include "../scanner/Preprocessor.h"
+#include "BasePreprocessorErrorPrinter.h"
 #include "../interpreter/Interpreter.h"
 
-class ErrorPrinter : public IScannerErrorReporter, public IRuntimeErrorReporter, public IPreprocessorErrorReporter{
+class ErrorPrinter : public IScannerErrorReporter, public IRuntimeErrorReporter, public BasePreprocessorErrorPrinter{
 public:
     void report(int line, RuntimeErrorType errorType) override;
 

@@ -20,6 +20,7 @@ SRC := \
 	util/TokenSubArrayFinder.cpp \
 	debug/DebugPrinter.cpp \
 	debug/ErrorPrinter.cpp \
+	debug/BasePreprocessorErrorPrinter.cpp \
 	debug/REPLPreprocessorErrorPrinter.cpp \
 	interpreter/FunctionExtractor.cpp \
 	interpreter/Interpreter.cpp \

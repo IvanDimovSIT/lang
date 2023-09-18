@@ -10,16 +10,21 @@
 
 class IRuntimeErrorReporter{
 public:
-    static const int LINE_NOT_FOUND = -1;
     virtual void report(int line, RuntimeErrorType errorType) = 0;
+    
     virtual void report(RuntimeErrorType errorType) = 0;
+
+    static const int LINE_NOT_FOUND = -1;
 };
 
 class IInterpreterIO{
 public:
     virtual std::unique_ptr<Value> read() = 0;
+    
     virtual void write(Value& value) = 0;
+    
     virtual std::unique_ptr<Value> readText() = 0;
+    
     virtual void writeText(Value& value) = 0;
 };
 

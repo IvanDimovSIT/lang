@@ -1,7 +1,7 @@
 #pragma once
-#include "../scanner/Preprocessor.h"
+#include "BasePreprocessorErrorPrinter.h"
 
-class REPLPreprocessorErrorPrinter : public IPreprocessorErrorReporter{
+class REPLPreprocessorErrorPrinter : public BasePreprocessorErrorPrinter{
 public:
     void reportFilepathError(const std::string& containingFile, int line, std::string& filePath) override;
     

@@ -4,6 +4,22 @@
 
 bool Preprocessor::process(std::string source, std::string& dest, const std::string& sourceFilepath, IPreprocessorErrorReporter* errorReporter)
 {
+    return process(MAX_RECURSION, source, dest, sourceFilepath, errorReporter);
+}
+
+bool Preprocessor::process(
+    int recursionLimit,
+    std::string source,
+    std::string& dest,
+    const std::string& sourceFilepath,
+    IPreprocessorErrorReporter* errorReporter)
+{
+    if(recursionLimit<=0){
+        if(errorReporter)
+            errorReporter->reportIncludeRecursionLimitReached();
+        return false;
+    }
+
     source = removeComments(source);
     dest = "";
     
@@ -26,7 +42,7 @@ bool Preprocessor::process(std::string source, std::string& dest, const std::str
         if(source[i] == '\''){
             isSearchingForInclude = true;
             std::string includedSource;
-            if(!includeSource(i, line, source, includedSource, sourceFilepath, errorReporter))
+            if(!includeSource(recursionLimit, i, line, source, includedSource, sourceFilepath, errorReporter))
                 return false;
             dest += includedSource + '\n';
         }
@@ -35,7 +51,14 @@ bool Preprocessor::process(std::string source, std::string& dest, const std::str
     return true;
 }
 
-bool Preprocessor::includeSource(int& position, int line, std::string source, std::string& dest, const std::string& sourceFilepath, IPreprocessorErrorReporter* errorReporter)
+bool Preprocessor::includeSource(
+    int recursionLimit,
+    int& position,
+    int line,
+    std::string source,
+    std::string& dest,
+    const std::string& sourceFilepath,
+    IPreprocessorErrorReporter* errorReporter)
 {
     const int size = source.size();
     std::string include = "";
@@ -55,7 +78,7 @@ bool Preprocessor::includeSource(int& position, int line, std::string source, st
                 
                 return false;
             }
-            if(!process(rawContents, include, fullIncludedFilepath, errorReporter))
+            if(!process(recursionLimit-1, rawContents, include, fullIncludedFilepath, errorReporter))
                 return false;
             
             dest = include;
