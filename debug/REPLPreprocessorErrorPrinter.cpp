@@ -1,7 +1,7 @@
 #include "REPLPreprocessorErrorPrinter.h"
 #include <iostream>
 
-void REPLPreprocessorErrorPrinter::reportFilepathError(const std::string& containingFile, int line, std::string& filePath)
+void REPLPreprocessorErrorPrinter::reportFilepathError(const std::string& containingFile, std::string& filePath)
 {
     if(containingFile != ""){
         std::cout << "PreprocessorError: Incorrect Filepath \"" << filePath << "\" in \"" << containingFile << "\"" << std::endl; 
@@ -10,11 +10,12 @@ void REPLPreprocessorErrorPrinter::reportFilepathError(const std::string& contai
     }
 }
     
-void REPLPreprocessorErrorPrinter::reportIncorrectIncludeSyntax(const std::string& containingFile, int line)
+void REPLPreprocessorErrorPrinter::reportIncorrectIncludeSyntax(const std::string& containingFile, const std::string& line)
 {
     if(containingFile != ""){
-        std::cout << "PreprocessorError: Incorrect Include Syntax (line:" << line << ") in \"" << containingFile << "\"" << std::endl; 
+        std::cout << "PreprocessorError: Incorrect Include Syntax in \"" << containingFile << "\":" << line << std::endl; 
     }else{
-        std::cout << "PreprocessorError: Incorrect Include Syntax (line:" << line << ")" << std::endl; 
+        std::cout << "PreprocessorError: Incorrect Include Syntax:" << line << std::endl; 
+
     }
 }

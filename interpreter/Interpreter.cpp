@@ -64,7 +64,7 @@ void Interpreter::executeOnThread(
 {
     Value ignore;
     if(!execute(tokens, programState, argumentA, argumentB, ignore)){
-        report(tokens, 0, RuntimeErrorTypeThreadHadError);
+        report(RuntimeErrorTypeThreadHadError);
     }
 }
 
@@ -224,7 +224,8 @@ bool Interpreter::execute(
     }
 
     if(operation != nullptr){
-        report(tokens, tokens.size()-1, RuntimeErrorTypeMissingParameter);
+        if(errorReporter)
+            errorReporter->report(operation->str, RuntimeErrorTypeMissingParameter);
         return false;
     }
     if(leftParameter->size() != 0)
@@ -471,7 +472,8 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::remain(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:
         hadError = true;
-        report(RuntimeErrorTypeNotAnOperation);
+        if(errorReporter)
+            errorReporter->report(operation.str, RuntimeErrorTypeNotAnOperation);
 
         return std::make_unique<Value>();
     }
@@ -546,7 +548,7 @@ std::unique_ptr<Value> Interpreter::executeModifier(
 
     if(result->size() == 0){
         hadError = true;
-        report(tokens, position, RuntimeErrorTypeNoOperatorToModify);
+        report(RuntimeErrorTypeNoOperatorToModify);
     }
     return std::move(result);
 }
@@ -577,34 +579,10 @@ void Interpreter::joinThreads(ProgramState& programState)
     programState.threads.clear();
 }
 
-int Interpreter::currentLineNumber(std::vector<Token*> &tokens, int position)
-{
-    const int size = tokens.size();
-    for(int i=position; i<size; i++){
-        if(tokens[i]->id == TokenIdEndLine){
-            return tokens[i]->val[0];
-        }
-    }
-
-    for(int i=position; i>=0; i--){
-        if(tokens[i]->id == TokenIdEndLine){
-            return tokens[i]->val[0]+1;
-        }
-    }
-
-    return IRuntimeErrorReporter::LINE_NOT_FOUND;
-}
-
 inline void Interpreter::report(RuntimeErrorType errorType)
 {
     if(errorReporter)
         errorReporter->report(errorType);
-}
-
-inline void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
-{
-    if(errorReporter)
-        errorReporter->report(currentLineNumber(tokens, position), errorType); 
 }
 
 inline void Interpreter::endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter)
@@ -645,3 +623,31 @@ inline void Interpreter::writeText(ProgramState& programState, Value& value)
     interpreterIO->writeText(value);
     programState.IOWriteLock.unlock();
 }
+
+void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
+{
+    if(errorReporter == nullptr || tokens.size() == 0)
+        return;
+
+    const int size = tokens.size();
+    std::string line = "";
+    if(position>=0 && position <size)
+        line = tokens[position]->str;
+    
+
+    if(position+1<size && tokens[position+1]->str != "\n"){
+        line = line + " " + tokens[position+1]->str;
+    }
+    if(position+2<size && tokens[position+2]->str != "\n"){
+        line = line + " " + tokens[position+2]->str;
+    }
+    if(position-1 >= 0 && tokens[position-1]->str != "\n"){
+        line = tokens[position-1]->str + " " + line;
+    }
+    if(position-2 >= 0 && tokens[position-2]->str != "\n"){
+        line = tokens[position-2]->str + " " + line;
+    }
+
+    errorReporter->report(line, errorType);
+}
+

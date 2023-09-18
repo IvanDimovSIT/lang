@@ -10,6 +10,8 @@ public:
     static int findNextEndline(const std::string& str, int start);
 
     static bool isSeparator(char c);
-    
+
+    static std::string getLine(const std::string& str, int position);
+
     static const int STRING_END_NOT_FOUND = -1;
 };

@@ -7,7 +7,7 @@
 
 class IScannerErrorReporter{
 public:
-    virtual void report(int line, ScannerErrorType errorType) = 0;
+    virtual void report(const std::string& line, ScannerErrorType errorType) = 0;
 };
 
 class Scanner{
@@ -35,7 +35,6 @@ private:
         std::vector<Token>& tokens,
         std::unordered_set<std::string>& functionNames,
         std::unordered_set<std::string>& previousFunctions,
-        int line,
         bool& hadError,
         IScannerErrorReporter* errorReporter);
 
@@ -43,14 +42,13 @@ private:
         const std::string& tokenString,
         std::vector<Token>& tokens,
         std::unordered_set<std::string>& functionNames,
-        std::unordered_set<std::string>& previousFunctions,
-        int line);
+        std::unordered_set<std::string>& previousFunctions);
 
     static void determineFunctionPrameters(Function& function);
 
     static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
 
-    static bool validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter);
+    static bool validateOperatorModifier(std::vector<Token>& tokens);
 
-    static void report(IScannerErrorReporter* errorReporter, int line, ScannerErrorType error);
+    static void report(IScannerErrorReporter* errorReporter, const std::string& line, ScannerErrorType error);
 };

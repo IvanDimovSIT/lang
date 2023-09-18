@@ -28,7 +28,7 @@ bool LiteralParser::parse(const std::string& literal, Value& value){
     std::string curr = "";
     double val;
     for(const auto& i: literal){
-        if(!isValidChar(i))
+        if(!isValidChar(i) || (i == '-' && curr.size()>0))
             return false;
 
         if(i == ','){

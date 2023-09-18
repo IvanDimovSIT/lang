@@ -41,3 +41,17 @@ bool StringUtil::isSeparator(char c)
 {
     return c == ' ' || c == '\t';
 }
+
+std::string StringUtil::getLine(const std::string& str, int position)
+{
+    const int size = str.size();
+    std::string line = "";
+    while(position >= 0 && str[position] != ';' && str[position] != '\n')
+        position--;
+
+    for(position++; position<size && str[position] != ';' && str[position] != '\n'; position++)
+        line += str[position];
+
+    return line;
+}
+

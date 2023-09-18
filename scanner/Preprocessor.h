@@ -3,9 +3,9 @@
 
 class IPreprocessorErrorReporter{
 public:
-    virtual void reportFilepathError(const std::string& containingFile, int line, std::string& filePath) = 0;
+    virtual void reportFilepathError(const std::string& containingFile, std::string& filePath) = 0;
     
-    virtual void reportIncorrectIncludeSyntax(const std::string& containingFile, int line) = 0;
+    virtual void reportIncorrectIncludeSyntax(const std::string& containingFile, const std::string& line) = 0;
 
     virtual void reportIncludeRecursionLimitReached() = 0;
 };
@@ -25,7 +25,6 @@ private:
     static bool includeSource(
         int recursionLimit,
         int& position,
-        int line,
         std::string source,
         std::string& dest,
         const std::string& sourceFilepath,
@@ -34,8 +33,6 @@ private:
     static std::string removeComments(const std::string& source);
 
     static std::string getDirectoryPath(const std::string& filepath);
-
-    static void addSemicolonsToCodeBlocks(std::string& source);
 
     static const int MAX_RECURSION = 20;
 };

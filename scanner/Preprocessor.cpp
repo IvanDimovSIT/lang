@@ -23,11 +23,8 @@ bool Preprocessor::process(
     source = removeComments(source);
     dest = "";
     
-    int line = 1;
     bool isSearchingForInclude = true;
     for(int i=0; i<source.size(); i++){
-        if(source[i] == '\n')
-            line++;
         
         if(!isSearchingForInclude || source[i] != '\''){
             dest += source[i];
@@ -42,12 +39,11 @@ bool Preprocessor::process(
         if(source[i] == '\''){
             isSearchingForInclude = true;
             std::string includedSource;
-            if(!includeSource(recursionLimit, i, line, source, includedSource, sourceFilepath, errorReporter))
+            if(!includeSource(recursionLimit, i, source, includedSource, sourceFilepath, errorReporter))
                 return false;
             dest += includedSource + '\n';
         }
     }
-    addSemicolonsToCodeBlocks(dest);
     
     return true;
 }
@@ -55,7 +51,6 @@ bool Preprocessor::process(
 bool Preprocessor::includeSource(
     int recursionLimit,
     int& position,
-    int line,
     std::string source,
     std::string& dest,
     const std::string& sourceFilepath,
@@ -68,14 +63,14 @@ bool Preprocessor::includeSource(
     for(int i = position+1; i<size; i++){
         if(source[i] == '\n'){
             if(errorReporter)
-                errorReporter->reportIncorrectIncludeSyntax(sourceFilepath, line);
+                errorReporter->reportIncorrectIncludeSyntax(sourceFilepath, StringUtil::getLine(source, i-1));
             return false;
         }else if(source[i] == '\''){
             std::string rawContents;
             std::string fullIncludedFilepath = getDirectoryPath(sourceFilepath)+relativeFilepath;
             if(!FileReader::read(fullIncludedFilepath, rawContents)){
                 if(errorReporter)
-                    errorReporter->reportFilepathError(sourceFilepath, line, fullIncludedFilepath);
+                    errorReporter->reportFilepathError(sourceFilepath, fullIncludedFilepath);
                 
                 return false;
             }
@@ -91,7 +86,7 @@ bool Preprocessor::includeSource(
     }
 
     if(errorReporter)
-        errorReporter->reportIncorrectIncludeSyntax(sourceFilepath, line);
+        errorReporter->reportIncorrectIncludeSyntax(sourceFilepath, StringUtil::getLine(source, size-1));
 
     return false;
 }
@@ -130,26 +125,5 @@ std::string Preprocessor::getDirectoryPath(const std::string& filepath)
     }
 
     return path;
-}
-
-void Preprocessor::addSemicolonsToCodeBlocks(std::string& source)
-{
-    const int size = source.size();
-    std::string result = "";
-    bool isInString = false;
-
-    for(int i=0; i<size; i++)
-    {
-        if(isInString && source[i] == '"' && (source[i-1] != '\\' || (i-2>=0 && source[i-2] == '\\'))){
-            isInString = false;
-        }else if(i>0 && source[i] == '}' && (source[i-1] != '\n' || source[i-1] != ';')){
-            result += ';';
-        }else if(source[i] == '"')
-            isInString = true;
-
-        result += source[i];
-    }
-
-    source = result;
 }
 

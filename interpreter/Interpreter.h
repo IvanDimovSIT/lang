@@ -10,11 +10,9 @@
 
 class IRuntimeErrorReporter{
 public:
-    virtual void report(int line, RuntimeErrorType errorType) = 0;
-    
-    virtual void report(RuntimeErrorType errorType) = 0;
+    virtual void report(const std::string& line, RuntimeErrorType errorType) = 0;
 
-    static const int LINE_NOT_FOUND = -1;
+    virtual void report(RuntimeErrorType errorType) = 0;
 };
 
 class IInterpreterIO{
@@ -115,12 +113,10 @@ private:
     void initVariables(std::vector<Token*> &tokens, ProgramState& programState);
 
     void joinThreads(ProgramState& programState);
-
-    int currentLineNumber(std::vector<Token*> &tokens, int position);
     
     inline void report(RuntimeErrorType errorType);
 
-    inline void report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
+    void report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
 
     inline void endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter);
 

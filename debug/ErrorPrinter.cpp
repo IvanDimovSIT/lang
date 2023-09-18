@@ -35,39 +35,47 @@ std::unordered_map<RuntimeErrorType, std::string> ErrorPrinter::runtimeErrors = 
     {RuntimeErrorTypeMissingParameter, "Missing parameter"}
 };
 
-void ErrorPrinter::report(int line, RuntimeErrorType errorType)
-{
-    if(hasSeenError(line, errorType))
-        return;
-    
-    if(line == IRuntimeErrorReporter::LINE_NOT_FOUND){
-        report(errorType);
-        return;
-    }
-    std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType))  << " (line:" << line << ")" << std::endl;
-}
-
 void ErrorPrinter::report(RuntimeErrorType errorType)
 {
+    if(hasSeenError("", errorType))
+        return;
+    
+    
     std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl;
 }
 
-void ErrorPrinter::report(int line, ScannerErrorType errorType)
+void ErrorPrinter::report(const std::string& line, RuntimeErrorType errorType)
 {
-    if(hasSeenError(line, errorType))
+    bool onNewLine = false;
+    if(hasSeenError(line, errorType, onNewLine))
         return;
 
-    std::cout << "ScannerError:" << (scannerErrors.count(errorType)?scannerErrors[errorType]:std::to_string(errorType)) << " (line:" << line << ")" << std::endl; 
+    if(onNewLine)
+        std::cout << "RuntimeError in: " << line << std::endl; 
+
+    std::cout << " - " << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl; 
 }
 
-void ErrorPrinter::reportFilepathError(const std::string& containingFile, int line, std::string& filePath)
+void ErrorPrinter::report(const std::string& line, ScannerErrorType errorType)
+{
+    bool onNewLine = false;
+    if(hasSeenError(line, errorType, onNewLine))
+        return;
+
+    if(onNewLine)
+        std::cout << "ScannerError in: " << line << std::endl; 
+
+    std::cout << " - " << (scannerErrors.count(errorType)?scannerErrors[errorType]:std::to_string(errorType)) << std::endl; 
+}
+
+void ErrorPrinter::reportFilepathError(const std::string& containingFile, std::string& filePath)
 {
     std::cout << "PreprocessorError: Incorrect Filepath \"" << filePath << "\" in \"" << containingFile << "\"" << std::endl; 
 }
     
-void ErrorPrinter::reportIncorrectIncludeSyntax(const std::string& containingFile, int line)
+void ErrorPrinter::reportIncorrectIncludeSyntax(const std::string& containingFile, const std::string& line)
 {
-    std::cout << "PreprocessorError: Incorrect Include Syntax (line:" << line << ") in \"" << containingFile << "\"" << std::endl; 
+    std::cout << "PreprocessorError: Incorrect Include Syntax in \"" << containingFile << "\":" << line << std::endl; 
 }
 
 void ErrorPrinter::resetErrors()
@@ -76,7 +84,7 @@ void ErrorPrinter::resetErrors()
     seenRuntimeErrors.clear();
 }
 
-bool ErrorPrinter::hasSeenError(int line, RuntimeErrorType errorType)
+bool ErrorPrinter::hasSeenError(const std::string& line, RuntimeErrorType errorType)
 {
     auto errors = seenRuntimeErrors.find(line);
     if(errors == seenRuntimeErrors.end()){
@@ -90,10 +98,28 @@ bool ErrorPrinter::hasSeenError(int line, RuntimeErrorType errorType)
     return false;
 }
 
-bool ErrorPrinter::hasSeenError(int line, ScannerErrorType errorType)
+bool ErrorPrinter::hasSeenError(const std::string& line, RuntimeErrorType errorType, bool& lineNotSeen)
 {
+    lineNotSeen = false;
+    auto errors = seenRuntimeErrors.find(line);
+    if(errors == seenRuntimeErrors.end()){
+        lineNotSeen = true;
+        seenRuntimeErrors[line] = {errorType};
+    }else if(errors->second.find(errorType) == errors->second.end()){
+        errors->second.insert(errorType);
+    }else{
+        return true;
+    }
+
+    return false;
+}
+
+bool ErrorPrinter::hasSeenError(const std::string& line, ScannerErrorType errorType, bool& lineNotSeen)
+{
+    lineNotSeen = false;
     auto errors = seenScannerErrors.find(line);
     if(errors == seenScannerErrors.end()){
+        lineNotSeen = true;
         seenScannerErrors[line] = {errorType};
     }else if(errors->second.find(errorType) == errors->second.end()){
         errors->second.insert(errorType);
