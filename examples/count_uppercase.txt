@@ -1,0 +1,4 @@
+t "Enter text"
+INP = g
+t "Number of uppercase letters in text:"
+w INP <- "ABCDEFGHIJKLMNOPQRSTUVWXYZ" != 0 #+ 

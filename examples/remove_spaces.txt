@@ -1,0 +1,3 @@
+t "Enter text:"
+INP = g
+t "Text without spaces:\"" | (INP -> " \t\n") | "\""
