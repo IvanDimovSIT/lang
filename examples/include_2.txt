@@ -1,0 +1,4 @@
+// find largest number in array
+f LARGEST {
+    a $ @ : 1
+}

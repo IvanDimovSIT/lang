@@ -5,17 +5,17 @@
 #include "../token/TokenSyntax.h"
 
 bool Scanner::scan(
-    const std::string& programSource,
+    const std::string& source,
     std::vector<Token>& tokens,
     std::unordered_map<std::string, Function>& functions,
     IScannerErrorReporter* errorReporter)
 {
     std::unordered_set<std::string> empty;
-    return scanREPL(programSource, tokens, functions, empty, errorReporter);
+    return scanREPL(source, tokens, functions, empty, errorReporter);
 }
 
 bool Scanner::scanREPL(
-    const std::string& programSource,
+    const std::string& source,
     std::vector<Token>& tokens,
     std::unordered_map<std::string, Function>& functions,
     std::unordered_set<std::string>& previousFunctions,
@@ -24,7 +24,6 @@ bool Scanner::scanREPL(
     tokens.clear();
     functions.clear();
 
-    std::string source = removeComments(programSource);
     const int sourceLen = source.size();
     std::unordered_set<std::string> functionNames;
     int lineCounter = 1;
@@ -72,7 +71,7 @@ bool Scanner::scanREPL(
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
                 hadError = true;
 
-        }else if(isSeparator(source[i])){ // End token scanning and add it
+        }else if(StringUtil::isSeparator(source[i])){ // End token scanning and add it
             addNextToken(curr, tokens, functionNames, previousFunctions, lineCounter, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens, lineCounter, errorReporter))
@@ -140,10 +139,10 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
             }
         }
         else if(isScanningFunctionName){
-            if(isSeparator(source[i]) && curr.size() <= 0)
+            if(StringUtil::isSeparator(source[i]) && curr.size() <= 0)
                 continue;
             
-            if(isSeparator(source[i]) || source[i] == '{' || source[i] == '\n' || source[i] == ';'){
+            if(StringUtil::isSeparator(source[i]) || source[i] == '{' || source[i] == '\n' || source[i] == ';'){
                 isScanningFunctionName = false;
                 if(functionNames.count(curr) != 0){
                     foundError = true;
@@ -241,7 +240,7 @@ bool Scanner::matchToken(
     std::unordered_set<std::string>& previousFunctions,
     int line)
 {
-    if(tokenString.size() <= 0 || isSeparator(tokenString[0]))
+    if(tokenString.size() <= 0 || StringUtil::isSeparator(tokenString[0]))
         return true;
 
     Token token;
@@ -358,26 +357,6 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
     return !hadError;
 }
 
-std::string Scanner::removeComments(const std::string& source)
-{
-    std::string program = "";
-    bool inComment = false;
-    const int sourceLen = source.size();
-    
-    for(int i=0; i<sourceLen; i++){
-        if(inComment && source[i]=='\n'){
-            inComment = false;
-            program += '\n';
-        }else if((!inComment) && source[i] == '/' && (i+1<sourceLen) && source[i+1] == '/'){
-            inComment = true;
-        }else if(!inComment){
-            program += source[i];
-        }
-    }
-
-    return program;
-}
-
 bool Scanner::validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter)
 {
     const int size = tokens.size();
@@ -413,9 +392,4 @@ void Scanner::report(IScannerErrorReporter* errorReporter, int line, ScannerErro
 {
     if(errorReporter)
         errorReporter->report(line, error);
-}
-
-inline bool Scanner::isSeparator(char c)
-{
-    return c == ' ' || c == '\t';
 }

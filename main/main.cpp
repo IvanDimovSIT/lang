@@ -1,26 +1,13 @@
 #include <iostream>
 #include <fstream>
+#include "../scanner/Preprocessor.h"
+#include "../util/FileReader.h"
 #include "../interpreter/Interpreter.h"
 #include "../scanner/Scanner.h"
 #include "../debug/ErrorPrinter.h"
 #include "../interpreter/InterpreterIO.h"
 #include "../interpreter/FunctionExtractor.h"
 #include "REPL.h"
-
-bool readFile(const std::string& filepath, std::string& contents)
-{
-    std::ifstream file(filepath);   
-    if(!file.is_open())
-        return false;
-
-    std::string line;
-    while(getline(file, line)){
-        contents += line;
-        contents += '\n';
-    }
-
-    return true;
-}
 
 void printResult(const Value& result)
 {
@@ -58,7 +45,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    if(!readFile(filepath, source)){
+    if(!FileReader::read(filepath, source)){
         std::cout << "Error reading file:\"" << filepath << "\"" << std::endl;
         return 1;
     }
@@ -66,6 +53,11 @@ int main(int argc, char** argv)
     ErrorPrinter errorPrinter;
     InterpreterIO io;
     std::vector<Token> tokens;
+
+    if(!Preprocessor::process(source, source, filepath, &errorPrinter)){
+        return 1;
+    }
+
     std::unordered_map<std::string, Function> functions;
     if(!Scanner::scan(source, tokens, functions, &errorPrinter)){
         return 1;

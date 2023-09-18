@@ -1,0 +1,7 @@
+// include must be the first operator on the line
+'include_1.txt' // include file 'include_1.txt' in this file
+
+t "Enter array:"
+ARR = r
+t "Largest number times 2:"
+ARR LARGESTTIMES2

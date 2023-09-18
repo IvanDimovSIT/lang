@@ -1,9 +1,12 @@
 #include "REPL.h"
+#include "../debug/REPLPreprocessorErrorPrinter.h"
+#include "../scanner/Preprocessor.h"
 #include <iostream>
 
 void REPL::run()
 {
     ErrorPrinter errorPrinter;
+    REPLPreprocessorErrorPrinter preprocessorErrorPrinter;
     InterpreterIO io;
     Interpreter interpreter(&errorPrinter, &io);
     std::vector<Token> tokens;
@@ -23,6 +26,9 @@ void REPL::run()
         if(isStringExit(source)){
             deleteProgramState(programState);
             return;
+        }
+        if(!Preprocessor::process(source, source, "", &preprocessorErrorPrinter)){
+            continue;
         }
         if(!Scanner::scanREPL(source, tokens, functions, functionNames, &errorPrinter)){
             continue;

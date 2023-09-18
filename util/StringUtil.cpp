@@ -25,3 +25,19 @@ int StringUtil::findStringLiteralEndIndex(const std::string& source, int start)
 
     return STRING_END_NOT_FOUND;
 }
+
+int StringUtil::findNextEndline(const std::string& str, int start)
+{
+    const int size = str.size();
+    for(start++; start<size; start++){
+        if(str[start] == '\n')
+            return start;
+    }
+
+    return STRING_END_NOT_FOUND;
+}
+
+bool StringUtil::isSeparator(char c)
+{
+    return c == ' ' || c == '\t';
+}

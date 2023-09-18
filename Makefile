@@ -9,15 +9,18 @@ CXXFLAGS := -flto -O3 -std=c++14 -pthread -march=native -mtune=native
 DEBUG_CXXFLAGS := -g -std=c++14 -pthread
 
 SRC := \
+	scanner/Preprocessor.cpp \
 	scanner/Scanner.cpp \
 	token/OperatorArguments.cpp \
 	token/TokenSyntax.cpp \
 	interpreter/InterpreterCalculator.cpp \
+	util/FileReader.cpp \
 	util/LiteralParser.cpp \
 	util/StringUtil.cpp \
 	util/TokenSubArrayFinder.cpp \
 	debug/DebugPrinter.cpp \
 	debug/ErrorPrinter.cpp \
+	debug/REPLPreprocessorErrorPrinter.cpp \
 	interpreter/FunctionExtractor.cpp \
 	interpreter/Interpreter.cpp \
 	interpreter/InterpreterIO.cpp \

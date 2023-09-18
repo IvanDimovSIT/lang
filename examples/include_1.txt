@@ -1,0 +1,6 @@
+'include_2.txt' // include file 'include_2.txt' in this file
+
+// multipy largest number in array by 2
+f LARGESTTIMES2 {
+    a LARGEST * 2
+}

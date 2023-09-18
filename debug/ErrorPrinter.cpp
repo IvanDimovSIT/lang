@@ -60,6 +60,16 @@ void ErrorPrinter::report(int line, ScannerErrorType errorType)
     std::cout << "ScannerError:" << (scannerErrors.count(errorType)?scannerErrors[errorType]:std::to_string(errorType)) << " (line:" << line << ")" << std::endl; 
 }
 
+void ErrorPrinter::reportFilepathError(const std::string& containingFile, int line, std::string& filePath)
+{
+    std::cout << "PreprocessorError: Incorrect Filepath \"" << filePath << "\" in \"" << containingFile << "\"" << std::endl; 
+}
+    
+void ErrorPrinter::reportIncorrectIncludeSyntax(const std::string& containingFile, int line)
+{
+    std::cout << "PreprocessorError: Incorrect Include Syntax (line:" << line << ") in \"" << containingFile << "\"" << std::endl; 
+}
+
 void ErrorPrinter::resetErrors()
 {
     seenScannerErrors.clear();

@@ -13,21 +13,19 @@ public:
 class Scanner{
 public:
     static bool scan(
-        const std::string& programSource,
+        const std::string& source,
         std::vector<Token>& tokens,
         std::unordered_map<std::string, Function>& functions,
         IScannerErrorReporter* errorReporter);
 
     static bool scanREPL(
-        const std::string& programSource,
+        const std::string& source,
         std::vector<Token>& tokens,
         std::unordered_map<std::string, Function>& functions,
         std::unordered_set<std::string>& previousFunctions,
         IScannerErrorReporter* errorReporter);
         
 private:
-    static std::string removeComments(const std::string& source);
-
     static bool findFunctionNames(const std::string& source, std::unordered_set<std::string>& functionNames, IScannerErrorReporter* errorReporter);
 
     static bool extractFunctions(std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions);
@@ -55,6 +53,4 @@ private:
     static bool validateOperatorModifier(std::vector<Token>& tokens, int line, IScannerErrorReporter* errorReporter);
 
     static void report(IScannerErrorReporter* errorReporter, int line, ScannerErrorType error);
-
-    static inline bool isSeparator(char c);
 };
