@@ -47,7 +47,8 @@ bool Preprocessor::process(
             dest += includedSource + '\n';
         }
     }
-
+    addSemicolonsToCodeBlocks(dest);
+    
     return true;
 }
 
@@ -129,5 +130,26 @@ std::string Preprocessor::getDirectoryPath(const std::string& filepath)
     }
 
     return path;
+}
+
+void Preprocessor::addSemicolonsToCodeBlocks(std::string& source)
+{
+    const int size = source.size();
+    std::string result = "";
+    bool isInString = false;
+
+    for(int i=0; i<size; i++)
+    {
+        if(isInString && source[i] == '"' && (source[i-1] != '\\' || (i-2>=0 && source[i-2] == '\\'))){
+            isInString = false;
+        }else if(i>0 && source[i] == '}' && (source[i-1] != '\n' || source[i-1] != ';')){
+            result += ';';
+        }else if(source[i] == '"')
+            isInString = true;
+
+        result += source[i];
+    }
+
+    source = result;
 }
 

@@ -35,5 +35,7 @@ private:
 
     static std::string getDirectoryPath(const std::string& filepath);
 
+    static void addSemicolonsToCodeBlocks(std::string& source);
+
     static const int MAX_RECURSION = 20;
 };
