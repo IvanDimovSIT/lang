@@ -131,4 +131,6 @@ private:
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;
+
+    static const int MAX_REPORT_TOKENS_COUNT = 3;
 };

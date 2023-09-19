@@ -29,7 +29,7 @@ SRC := \
 	main/REPL.cpp
 
 LANG_SRC := main/main.cpp $(SRC)
-TEST_SRC := main/test.cpp $(SRC)
+TEST_SRC := test/test.cpp $(SRC)
 
 LANG_EXE := lang$(EXE)
 TEST_EXE := test$(EXE)

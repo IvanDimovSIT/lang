@@ -11,10 +11,10 @@ bool Scanner::scan(
     IScannerErrorReporter* errorReporter)
 {
     std::unordered_set<std::string> empty;
-    return scanREPL(source, tokens, functions, empty, errorReporter);
+    return scan(source, tokens, functions, empty, errorReporter);
 }
 
-bool Scanner::scanREPL(
+bool Scanner::scan(
     const std::string& source,
     std::vector<Token>& tokens,
     std::unordered_map<std::string, Function>& functions,

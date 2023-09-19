@@ -18,7 +18,7 @@ public:
         std::unordered_map<std::string, Function>& functions,
         IScannerErrorReporter* errorReporter);
 
-    static bool scanREPL(
+    static bool scan(
         const std::string& source,
         std::vector<Token>& tokens,
         std::unordered_map<std::string, Function>& functions,

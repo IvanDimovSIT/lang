@@ -634,18 +634,17 @@ void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeError
     if(position>=0 && position <size)
         line = tokens[position]->str;
     
-
-    if(position+1<size && tokens[position+1]->str != "\n"){
-        line = line + " " + tokens[position+1]->str;
+    for(int offset=1; offset <= MAX_REPORT_TOKENS_COUNT; offset++){
+        if(position + offset < size && tokens[position+offset]->str != "\n"){
+            line = line + " " + tokens[position+offset]->str;
+        }else 
+            break;
     }
-    if(position+2<size && tokens[position+2]->str != "\n"){
-        line = line + " " + tokens[position+2]->str;
-    }
-    if(position-1 >= 0 && tokens[position-1]->str != "\n"){
-        line = tokens[position-1]->str + " " + line;
-    }
-    if(position-2 >= 0 && tokens[position-2]->str != "\n"){
-        line = tokens[position-2]->str + " " + line;
+    for(int offset=1; offset <= MAX_REPORT_TOKENS_COUNT; offset++){
+        if(position - offset >= 0 && tokens[position-offset]->str != "\n"){
+            line = tokens[position-offset]->str + " " + line;
+        }else 
+            break;
     }
 
     errorReporter->report(line, errorType);

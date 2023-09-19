@@ -30,7 +30,7 @@ void REPL::run()
         if(!Preprocessor::process(source, source, "", &preprocessorErrorPrinter)){
             continue;
         }
-        if(!Scanner::scanREPL(source, tokens, functions, functionNames, &errorPrinter)){
+        if(!Scanner::scan(source, tokens, functions, functionNames, &errorPrinter)){
             continue;
         }
         if(!FunctionExtractor::extractFunctions(tokens, tokensRef)){

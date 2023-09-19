@@ -33,10 +33,7 @@ bool Preprocessor::process(
             }else if(!StringUtil::isSeparator(source[i])){
                 isSearchingForInclude = false;
             }
-            continue;
-        }
-
-        if(source[i] == '\''){
+        }else if(source[i] == '\''){
             isSearchingForInclude = true;
             std::string includedSource;
             if(!includeSource(recursionLimit, i, source, includedSource, sourceFilepath, errorReporter))
