@@ -1,7 +1,7 @@
 // include must be the first operator on the line
 'include_1.txt' // include file 'include_1.txt' in this file
+'include_3.txt'
 
-t "Enter array:"
-ARR = r
+ARR = READ
 t "Largest number times 2:"
-ARR LARGESTTIMES2
+w ARR LARGESTTIMES2

@@ -1,0 +1,4 @@
+f READ {
+    t "Enter array:"
+    r
+}

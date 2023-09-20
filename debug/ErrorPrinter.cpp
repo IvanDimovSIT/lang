@@ -44,14 +44,21 @@ void ErrorPrinter::report(RuntimeErrorType errorType)
     std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl;
 }
 
-void ErrorPrinter::report(const std::string& line, RuntimeErrorType errorType)
+void ErrorPrinter::report(const std::vector<Token*>& tokens, int errorPosition, RuntimeErrorType errorType)
 {
+    static const std::string runtimeError = "RuntimeError in: ";
+    static const int runtimeErrorSize = runtimeError.size();
+
     bool onNewLine = false;
+    int tokenPositionInLine;
+    std::string line = generateErrorLine(tokens, errorPosition, tokenPositionInLine);
     if(hasSeenError(line, errorType, onNewLine))
         return;
 
-    if(onNewLine)
+    if(onNewLine){
         std::cout << "RuntimeError in: " << line << std::endl; 
+        std::cout << std::string(tokenPositionInLine+runtimeErrorSize, ' ') + '^' << std::endl; 
+    }
 
     std::cout << " - " << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl; 
 }
@@ -129,3 +136,29 @@ bool ErrorPrinter::hasSeenError(const std::string& line, ScannerErrorType errorT
 
     return false;
 }
+
+std::string ErrorPrinter::generateErrorLine(const std::vector<Token*>& tokens, int errorPosition, int& tokenPositionInLine)
+{
+    const int size = tokens.size();
+    tokenPositionInLine = 0;
+    std::string line = "";
+    line = tokens[errorPosition]->str;
+    
+    
+    for(int offset=1; offset <= MAX_REPORT_TOKENS_COUNT; offset++){
+        if(errorPosition + offset < size && tokens[errorPosition+offset]->str != "\n"){
+            line = line + " " + tokens[errorPosition+offset]->str;
+        }else 
+            break;
+    }
+    for(int offset=1; offset <= MAX_REPORT_TOKENS_COUNT; offset++){
+        if(errorPosition - offset >= 0 && tokens[errorPosition-offset]->str != "\n"){
+            line = tokens[errorPosition-offset]->str + " " + line;
+            tokenPositionInLine += tokens[errorPosition-offset]->str.size()+1;
+        }else 
+            break;
+    }
+
+    return line;
+}
+

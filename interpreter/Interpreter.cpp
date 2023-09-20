@@ -224,8 +224,7 @@ bool Interpreter::execute(
     }
 
     if(operation != nullptr){
-        if(errorReporter)
-            errorReporter->report(operation->str, RuntimeErrorTypeMissingParameter);
+        report(tokens, tokens.size()-1, RuntimeErrorTypeMissingParameter);
         return false;
     }
     if(leftParameter->size() != 0)
@@ -472,8 +471,7 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::remain(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(operation.str, RuntimeErrorTypeNotAnOperation);
+        report(RuntimeErrorTypeNotAnOperation);
 
         return std::make_unique<Value>();
     }
@@ -579,12 +577,6 @@ void Interpreter::joinThreads(ProgramState& programState)
     programState.threads.clear();
 }
 
-inline void Interpreter::report(RuntimeErrorType errorType)
-{
-    if(errorReporter)
-        errorReporter->report(errorType);
-}
-
 inline void Interpreter::endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter)
 {
     if(leftParameter->size() != 0){
@@ -624,29 +616,15 @@ inline void Interpreter::writeText(ProgramState& programState, Value& value)
     programState.IOWriteLock.unlock();
 }
 
+void Interpreter::report(RuntimeErrorType errorType)
+{
+    if(errorReporter)
+        errorReporter->report(errorType);
+}
+
 void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
 {
-    if(errorReporter == nullptr || tokens.size() == 0)
-        return;
-
-    const int size = tokens.size();
-    std::string line = "";
-    if(position>=0 && position <size)
-        line = tokens[position]->str;
-    
-    for(int offset=1; offset <= MAX_REPORT_TOKENS_COUNT; offset++){
-        if(position + offset < size && tokens[position+offset]->str != "\n"){
-            line = line + " " + tokens[position+offset]->str;
-        }else 
-            break;
-    }
-    for(int offset=1; offset <= MAX_REPORT_TOKENS_COUNT; offset++){
-        if(position - offset >= 0 && tokens[position-offset]->str != "\n"){
-            line = tokens[position-offset]->str + " " + line;
-        }else 
-            break;
-    }
-
-    errorReporter->report(line, errorType);
+    if(errorReporter != nullptr && tokens.size() > 0)
+        errorReporter->report(tokens, position, errorType);
 }
 

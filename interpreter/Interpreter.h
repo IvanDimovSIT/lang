@@ -10,7 +10,7 @@
 
 class IRuntimeErrorReporter{
 public:
-    virtual void report(const std::string& line, RuntimeErrorType errorType) = 0;
+    virtual void report(const std::vector<Token*>& tokens, int errorPosition, RuntimeErrorType errorType) = 0;
 
     virtual void report(RuntimeErrorType errorType) = 0;
 };
@@ -114,7 +114,7 @@ private:
 
     void joinThreads(ProgramState& programState);
     
-    inline void report(RuntimeErrorType errorType);
+    void report(RuntimeErrorType errorType);
 
     void report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
 
@@ -131,6 +131,4 @@ private:
 private:
     IRuntimeErrorReporter* errorReporter;
     IInterpreterIO* interpreterIO;
-
-    static const int MAX_REPORT_TOKENS_COUNT = 3;
 };
