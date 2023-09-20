@@ -9,7 +9,7 @@ public:
 
     void report(const std::vector<Token*>& tokens, int errorPosition, RuntimeErrorType errorType) override;
 
-    void report(const std::string& line, ScannerErrorType errorType) override;
+    void report(const std::string& source, int position, ScannerErrorType errorType) override;
 
     void reportFilepathError(const std::string& containingFile, std::string& filePath) override;
     

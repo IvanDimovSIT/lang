@@ -11,6 +11,8 @@ public:
 
     static bool isSeparator(char c);
 
+    static std::string getLine(const std::string& str, int position, int& substringStartPosition);
+
     static std::string getLine(const std::string& str, int position);
 
     static const int STRING_END_NOT_FOUND = -1;

@@ -7,7 +7,7 @@
 
 class IScannerErrorReporter{
 public:
-    virtual void report(const std::string& line, ScannerErrorType errorType) = 0;
+    virtual void report(const std::string& source, int position, ScannerErrorType errorType) = 0;
 };
 
 class Scanner{
@@ -35,6 +35,8 @@ private:
         std::vector<Token>& tokens,
         std::unordered_set<std::string>& functionNames,
         std::unordered_set<std::string>& previousFunctions,
+        const std::string& source,
+        int position,
         bool& hadError,
         IScannerErrorReporter* errorReporter);
 
@@ -62,5 +64,5 @@ private:
 
     static bool validateOperatorModifier(const std::vector<Token>& tokens);
 
-    static void report(IScannerErrorReporter* errorReporter, const std::string& line, ScannerErrorType error);
+    static void report(IScannerErrorReporter* errorReporter, const std::string& source, int position, ScannerErrorType error);
 };

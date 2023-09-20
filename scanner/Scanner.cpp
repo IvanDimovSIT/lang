@@ -37,12 +37,12 @@ bool Scanner::scan(
             const int stringLiteralEnd = StringUtil::findStringLiteralEndIndex(source, i-1);
             if(stringLiteralEnd == StringUtil::STRING_END_NOT_FOUND){
                 hadError = true;
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeStringLiteralError);
+                report(errorReporter, source, i, ScannerErrorTypeStringLiteralError);
             }
             curr += source.substr(i, stringLiteralEnd-i+1);
             if(!matchToken(curr, tokens, functionNames, previousFunctions)){
                 hadError = true;
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeStringLiteralError);
+                report(errorReporter, source, i, ScannerErrorTypeStringLiteralError);
             }else{
                 i = stringLiteralEnd;
             }
@@ -59,26 +59,26 @@ bool Scanner::scan(
             matchToken("if", tokens, functionNames, previousFunctions)){
             i++;
         }else if(TokenSyntax::isSingleCharToken(source[i])){ // End current token and add next token
-            addNextToken(curr, tokens, functionNames, previousFunctions, hadError, errorReporter);
+            addNextToken(curr, tokens, functionNames, previousFunctions, source, i, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens)){
-                report(errorReporter, StringUtil::getLine(source, i) ,ScannerErrorTypeNoOperatorToModify);
+                report(errorReporter, source, i, ScannerErrorTypeNoOperatorToModify);
                 hadError = true;
             }
 
             curr += source[i];
-            addNextToken(curr, tokens, functionNames, previousFunctions, hadError, errorReporter);
+            addNextToken(curr, tokens, functionNames, previousFunctions, source, i, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens)){
-                report(errorReporter, StringUtil::getLine(source, i) ,ScannerErrorTypeNoOperatorToModify);
+                report(errorReporter, source, i, ScannerErrorTypeNoOperatorToModify);
                 hadError = true;
             }
 
         }else if(StringUtil::isSeparator(source[i])){ // End token scanning and add it
-            addNextToken(curr, tokens, functionNames, previousFunctions, hadError, errorReporter);
+            addNextToken(curr, tokens, functionNames, previousFunctions, source, i, hadError, errorReporter);
             curr = "";
             if(!validateOperatorModifier(tokens)){
-                report(errorReporter, StringUtil::getLine(source, i) ,ScannerErrorTypeNoOperatorToModify);
+                report(errorReporter, source, i, ScannerErrorTypeNoOperatorToModify);
                 hadError = true;
             }
 
@@ -88,15 +88,15 @@ bool Scanner::scan(
         }
     }
 
-    addNextToken(curr, tokens, functionNames, previousFunctions, hadError, errorReporter);
+    addNextToken(curr, tokens, functionNames, previousFunctions, source, sourceLen-1, hadError, errorReporter);
     if(!validateOperatorModifier(tokens)){
-        report(errorReporter, StringUtil::getLine(source, sourceLen-1) ,ScannerErrorTypeNoOperatorToModify);
+        report(errorReporter, source, sourceLen-1, ScannerErrorTypeNoOperatorToModify);
         hadError = true;
     }
 
     if(!extractFunctions(tokens, functions)){
         hadError = true;
-        report(errorReporter, StringUtil::getLine(source, 0), ScannerErrorTypeFunctionDefinitionError);
+        report(errorReporter, source, 0, ScannerErrorTypeFunctionDefinitionError);
     }
 
     return !hadError;
@@ -119,7 +119,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
         if(source[i] == '"'){
             const int end = StringUtil::findStringLiteralEndIndex(source, i);
             if(end == StringUtil::STRING_END_NOT_FOUND){
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeStringLiteralError);
+                report(errorReporter, source, i, ScannerErrorTypeStringLiteralError);
                 foundError = true;
             }else{
                 i = end;
@@ -134,7 +134,7 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                 continue;
             }else{
                 foundError = true;
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeFunctionDefinitionError);
+                report(errorReporter, source, i, ScannerErrorTypeFunctionDefinitionError);
             }
         }
         else if(isScanningFunctionName){
@@ -145,12 +145,12 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                 isScanningFunctionName = false;
                 if(functionNames.count(curr) != 0){
                     foundError = true;
-                    report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeFunctionRedefinition);
+                    report(errorReporter, source, i, ScannerErrorTypeFunctionRedefinition);
                 }
                 if(!StringUtil::isValidIdentifierName(curr)){
                     foundError = true;
                     curr = "";
-                    report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeFunctionDefinitionError);
+                    report(errorReporter, source, i, ScannerErrorTypeFunctionDefinitionError);
                 }else{
                     functionNames.insert(curr);
                     curr = "";
@@ -160,14 +160,14 @@ bool Scanner::findFunctionNames(const std::string& source, std::unordered_set<st
                 isAfterFirstFunctionChar = true;
             }else{
                 foundError = true;
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeFunctionNameDefinitionError);
+                report(errorReporter, source, i, ScannerErrorTypeFunctionNameDefinitionError);
             }
         }
     }
 
     if(isScanningFunctionName){
         foundError = true;
-        report(errorReporter, StringUtil::getLine(source, stringLen-1), ScannerErrorTypeFunctionDefinitionError);
+        report(errorReporter, source, 0, ScannerErrorTypeFunctionDefinitionError);
     }
 
     return !foundError;
@@ -270,12 +270,14 @@ void Scanner::addNextToken(
     std::vector<Token>& tokens,
     std::unordered_set<std::string>& functionNames,
     std::unordered_set<std::string>& previousFunctions,
+    const std::string& source,
+    int position,
     bool& hadError,
     IScannerErrorReporter* errorReporter)
 {
     if (!matchToken(tokenString, tokens, functionNames, previousFunctions)) {
         hadError = true;
-        report(errorReporter, tokenString, ScannerErrorTypeUnrecognisedToken);
+        report(errorReporter, source, position, ScannerErrorTypeUnrecognisedToken);
     }
 }
 
@@ -296,7 +298,7 @@ inline void Scanner::earlyTokenMatch(
         position++;
         currentToken = "";
     }else if(source[position] != '"' && isIdentifierNextToSymbol(source, position)){
-        addNextToken(currentToken, tokens, functionNames, previousFunctions, hadError, errorReporter);
+        addNextToken(currentToken, tokens, functionNames, previousFunctions, source, position, hadError, errorReporter);
         currentToken = "";
     }
 }
@@ -328,7 +330,7 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
         if(source[i] == '"'){
             const int end = StringUtil::findStringLiteralEndIndex(source, i);
             if(end == StringUtil::STRING_END_NOT_FOUND){
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeStringLiteralError);
+                report(errorReporter, source, i, ScannerErrorTypeStringLiteralError);
                 hadError = true;
             }else{
                 i = end;
@@ -347,7 +349,7 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
         }else if(source[i] == '['){
             if(asyncStart){
                 hadError = true;
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeMissingAsyncEnd);
+                report(errorReporter, source, i, ScannerErrorTypeMissingAsyncEnd);
             }else{
                 asyncStart = true;
             }
@@ -356,30 +358,29 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
                 asyncStart = false;
             }else{
                 hadError = true;
-                report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeMissingAsyncStart);
+                report(errorReporter, source, i, ScannerErrorTypeMissingAsyncStart);
             }
         }
 
         if(openP < 0){
             hadError = true;
-            report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeMoreClosingParenthesis);
+            report(errorReporter, source, i, ScannerErrorTypeMoreClosingParenthesis);
         }
         if(openCurly < 0){
             hadError = true;
-            report(errorReporter, StringUtil::getLine(source, i), ScannerErrorTypeMoreClosingCurlyBrackets);
+            report(errorReporter, source, i, ScannerErrorTypeMoreClosingCurlyBrackets);
         }
 
     }
 
     if(openP > 0){
         hadError = true;
-        if(errorReporter)
-            errorReporter->report(StringUtil::getLine(source, sourceLen-1), ScannerErrorTypeMoreOpenParenthesis);
+        report(errorReporter ,source, sourceLen-1, ScannerErrorTypeMoreOpenParenthesis);
     }
 
     if(openCurly > 0){
         hadError = true;
-        report(errorReporter, StringUtil::getLine(source, sourceLen-1), ScannerErrorTypeMoreOpenCurlyBrackets);
+        report(errorReporter, source, sourceLen-1, ScannerErrorTypeMoreOpenCurlyBrackets);
     }
     
     return !hadError;
@@ -415,8 +416,8 @@ bool Scanner::validateOperatorModifier(const std::vector<Token>& tokens)
     }
 }
 
-void Scanner::report(IScannerErrorReporter* errorReporter, const std::string& line, ScannerErrorType error)
+void Scanner::report(IScannerErrorReporter* errorReporter, const std::string& source, int position, ScannerErrorType error)
 {
     if(errorReporter)
-        errorReporter->report(line, error);
+        errorReporter->report(source, position, error);
 }

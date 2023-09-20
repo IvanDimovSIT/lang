@@ -1,5 +1,6 @@
 #include "ErrorPrinter.h"
 #include <iostream>
+#include "../util/StringUtil.h"
 
 std::unordered_map<ScannerErrorType, std::string> ErrorPrinter::scannerErrors = {
     {ScannerErrorTypeFunctionDefinitionError, "Function definition error"},
@@ -63,14 +64,24 @@ void ErrorPrinter::report(const std::vector<Token*>& tokens, int errorPosition, 
     std::cout << " - " << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl; 
 }
 
-void ErrorPrinter::report(const std::string& line, ScannerErrorType errorType)
+void ErrorPrinter::report(const std::string& source, int position, ScannerErrorType errorType)
 {
+    static const std::string scannerError = "ScannerError in: ";
+    static const int scannerErrorSize = scannerError.size();
+    position--;
+
     bool onNewLine = false;
+    int startPosition;
+    std::string line = StringUtil::getLine(source, position, startPosition);
+    const int errorPositionInLine = position - startPosition;
+
     if(hasSeenError(line, errorType, onNewLine))
         return;
 
-    if(onNewLine)
-        std::cout << "ScannerError in: " << line << std::endl; 
+    if(onNewLine){
+        std::cout << scannerError << line << std::endl; 
+        std::cout << std::string(errorPositionInLine+scannerErrorSize, ' ') << '^' << std::endl;
+    }
 
     std::cout << " - " << (scannerErrors.count(errorType)?scannerErrors[errorType]:std::to_string(errorType)) << std::endl; 
 }

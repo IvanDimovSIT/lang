@@ -307,10 +307,16 @@ std::unique_ptr<Value> Interpreter::getNextArgument(
     break;
     case TokenIdLeftParam:
         result = std::make_unique<Value>(argumentA);
+        if(argumentA.size() == 0)
+            result->push_back(0.0);
+        
         return std::move(result);
     break;
     case TokenIdRightParam:
         result = std::make_unique<Value>(argumentB);
+        if(argumentB.size() == 0)
+            result->push_back(0.0);
+    
         return std::move(result);
     break;
     case TokenIdFunction:
