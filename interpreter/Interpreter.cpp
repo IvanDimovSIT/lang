@@ -449,6 +449,8 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::select(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdRandom:
         return InterpreterCalculator::randomize(leftOfOperator, hadError, errorReporter);
+    case TokenIdSine:
+        return InterpreterCalculator::sine(leftOfOperator, hadError, errorReporter);
     case TokenIdMakeSet:
         return InterpreterCalculator::makeSet(leftOfOperator, hadError, errorReporter);
     case TokenIdCeil:

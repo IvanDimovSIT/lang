@@ -34,7 +34,7 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
         
         return std::move(result);
     }
-    
+
     const int maxSize = leftSize > rightSize ? leftSize : rightSize;
 
     for(int i=0; i<maxSize; i++){
@@ -252,6 +252,21 @@ std::unique_ptr<Value> InterpreterCalculator::power(
             return res;
         })
     );
+}
+
+std::unique_ptr<Value> InterpreterCalculator::sine(
+    const Value& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<Value>();
+    if(!validateInput(left, reporter, hadError))
+        return std::move(result);
+
+    for(const auto& i: left)
+        result->push_back(sin(i));
+    
+    return std::move(result);
 }
 
 std::unique_ptr<Value> InterpreterCalculator::iterate(

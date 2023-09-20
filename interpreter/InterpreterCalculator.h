@@ -126,6 +126,11 @@ public:
         bool& hadError,
         IRuntimeErrorReporter* reporter);
 
+    static std::unique_ptr<Value> sine(
+        const Value& left,
+        bool& hadError,
+        IRuntimeErrorReporter* reporter);
+
     static std::unique_ptr<Value> findCeil(
         const Value& left,
         bool& hadError,

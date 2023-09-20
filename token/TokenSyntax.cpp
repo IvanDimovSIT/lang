@@ -8,6 +8,7 @@ std::unordered_map<std::string, TokenId> TokenSyntax::tokenMap = {
     {"/", TokenIdDivide},
     {"%", TokenIdMod},
     {"**",TokenIdPower},
+    {"s", TokenIdSine},
     {"<", TokenIdLessThan},
     {">", TokenIdGreaterThan},
     {"<=",TokenIdLessThanOrEquals},
@@ -78,6 +79,7 @@ switch (token)
     case 'w':
     case 'g':
     case 't':
+    case 's':
     case '{':
     case '}':
     case '(':

@@ -10,6 +10,7 @@ enum TokenId{
     TokenIdDivide,              // /
     TokenIdMod,                 // %
     TokenIdPower,               // **
+    TokenIdSine,                // s
     TokenIdLessThan,            // <
     TokenIdGreaterThan,         // >
     TokenIdLessThanOrEquals,    // <=

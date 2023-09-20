@@ -17,6 +17,7 @@ bool OperatorArguments::getArgs(TokenId id, bool& hasLeft, bool& hasRight)
     case TokenIdReverse:
     case TokenIdApplyToEach:
     case TokenIdMakeSet:
+    case TokenIdSine:
         hasLeft = true;
         hasRight = false;
         return true;
