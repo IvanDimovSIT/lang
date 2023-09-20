@@ -194,7 +194,7 @@ void Scanner::determineFunctionPrameters(Function& function)
     }
 }
 
-bool Scanner::extractFunctions(std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions)
+bool Scanner::extractFunctions(const std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions)
 {
     const int size = tokens.size();
     Function function;
@@ -357,7 +357,7 @@ bool Scanner::validateParenthesis(const std::string& source, const int sourceLen
     return !hadError;
 }
 
-bool Scanner::validateOperatorModifier(std::vector<Token>& tokens)
+bool Scanner::validateOperatorModifier(const std::vector<Token>& tokens)
 {
     const int size = tokens.size();
     if(size < 2)

@@ -1,9 +1,6 @@
 #include "InterpreterIO.h"
 #include <iostream>
 
-#define CHARS_START '\t'
-#define CHARS_END '~'
-
 std::unique_ptr<Value> InterpreterIO::read()
 {
     std::string input, cur="";
@@ -36,7 +33,7 @@ std::unique_ptr<Value> InterpreterIO::read()
     return std::move(result);
 }
     
-void InterpreterIO::write(Value& value)
+void InterpreterIO::write(const Value& value)
 {
     const int size = value.size();
     for(int i=0; i<size-1; i++){
@@ -66,7 +63,7 @@ std::unique_ptr<Value> InterpreterIO::readText()
     return std::move(result);
 }
     
-void InterpreterIO::writeText(Value& value)
+void InterpreterIO::writeText(const Value& value)
 {
     for(const auto& i: value){
         if(i<CHARS_START || i>CHARS_END)

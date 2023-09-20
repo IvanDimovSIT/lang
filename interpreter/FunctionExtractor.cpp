@@ -1,13 +1,13 @@
 #include "FunctionExtractor.h"
 #include "../util/TokenSubArrayFinder.h"
 
-bool FunctionExtractor::extractFunctions(std::vector<Token> &tokens, std::vector<Token*> &dest)
+bool FunctionExtractor::extractFunctions(const std::vector<Token> &tokens, std::vector<Token*> &dest)
 {
     dest.clear();
     const int size = tokens.size();
     for(int i=0; i<size; i++){
         if(tokens[i].id != TokenIdFunctionDeclaration){
-            dest.push_back(&tokens[i]);
+            dest.push_back((Token*)&tokens[i]);
         }else{
             while(tokens[i].id != TokenIdOpenCurly && i<size)
                 i++;

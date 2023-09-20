@@ -4,5 +4,5 @@
 
 class FunctionExtractor{
 public:
-    static bool extractFunctions(std::vector<Token> &tokens, std::vector<Token*> &dest);
+    static bool extractFunctions(const std::vector<Token> &tokens, std::vector<Token*> &dest);
 };

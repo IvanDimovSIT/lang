@@ -4,9 +4,9 @@
 #include <unordered_set>
 #include <algorithm>
 
-bool InterpreterCalculator::validateInput(Value& val, IRuntimeErrorReporter* reporter, bool& hadError)
+bool InterpreterCalculator::validateInput(const Value& input, IRuntimeErrorReporter* reporter, bool& hadError)
 {
-    if(val.size() == 0){
+    if(input.size() == 0){
         hadError = true;
         if(reporter)
             reporter->report(RuntimeErrorTypeEmptyData);
@@ -17,8 +17,8 @@ bool InterpreterCalculator::validateInput(Value& val, IRuntimeErrorReporter* rep
 }
 
 std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
-        Value& left,
-        Value& right,
+        const Value& left,
+        const Value& right,
         bool& hadError,
         IRuntimeErrorReporter* reporter,
         DyadicFunctionLambda lambda
@@ -42,8 +42,8 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::add(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -58,8 +58,8 @@ std::unique_ptr<Value> InterpreterCalculator::add(
 
 
 std::unique_ptr<Value> InterpreterCalculator::subtract(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -74,8 +74,8 @@ std::unique_ptr<Value> InterpreterCalculator::subtract(
 
 
 std::unique_ptr<Value> InterpreterCalculator::multiply(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -89,8 +89,8 @@ std::unique_ptr<Value> InterpreterCalculator::multiply(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::divide(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -110,8 +110,8 @@ std::unique_ptr<Value> InterpreterCalculator::divide(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::mod(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -133,8 +133,8 @@ std::unique_ptr<Value> InterpreterCalculator::mod(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::lessThan(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -148,8 +148,8 @@ std::unique_ptr<Value> InterpreterCalculator::lessThan(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::greaterThan(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -163,8 +163,8 @@ std::unique_ptr<Value> InterpreterCalculator::greaterThan(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::lessThanOrEquals(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -179,8 +179,8 @@ std::unique_ptr<Value> InterpreterCalculator::lessThanOrEquals(
 
 
 std::unique_ptr<Value> InterpreterCalculator::greaterThanOrEquals(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -194,8 +194,8 @@ std::unique_ptr<Value> InterpreterCalculator::greaterThanOrEquals(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::equals(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -209,8 +209,8 @@ std::unique_ptr<Value> InterpreterCalculator::equals(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::notEquals(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -224,8 +224,8 @@ std::unique_ptr<Value> InterpreterCalculator::notEquals(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::power(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -252,7 +252,7 @@ std::unique_ptr<Value> InterpreterCalculator::power(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::iterate(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -276,7 +276,7 @@ std::unique_ptr<Value> InterpreterCalculator::iterate(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::logicalNot(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -291,7 +291,7 @@ std::unique_ptr<Value> InterpreterCalculator::logicalNot(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::count(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -310,7 +310,7 @@ std::unique_ptr<Value> InterpreterCalculator::count(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::sumAll(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -328,7 +328,7 @@ std::unique_ptr<Value> InterpreterCalculator::sumAll(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::multiplyAll(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -346,8 +346,8 @@ std::unique_ptr<Value> InterpreterCalculator::multiplyAll(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::findUnion(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -363,8 +363,8 @@ std::unique_ptr<Value> InterpreterCalculator::findUnion(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::select(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -389,7 +389,7 @@ std::unique_ptr<Value> InterpreterCalculator::select(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::randomize(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -404,7 +404,7 @@ std::unique_ptr<Value> InterpreterCalculator::randomize(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::findCeil(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -418,8 +418,8 @@ std::unique_ptr<Value> InterpreterCalculator::findCeil(
     return std::move(result);
 }
 
-    std::unique_ptr<Value> InterpreterCalculator::findFloor(
-    Value& left,
+std::unique_ptr<Value> InterpreterCalculator::findFloor(
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -433,8 +433,8 @@ std::unique_ptr<Value> InterpreterCalculator::findCeil(
     return std::move(result);
 }
 
-    std::unique_ptr<Value> InterpreterCalculator::findRound(
-    Value& left,
+std::unique_ptr<Value> InterpreterCalculator::findRound(
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -449,7 +449,7 @@ std::unique_ptr<Value> InterpreterCalculator::findCeil(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::sortArray(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -465,7 +465,7 @@ std::unique_ptr<Value> InterpreterCalculator::sortArray(
 
 
 std::unique_ptr<Value> InterpreterCalculator::reverseArray(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -480,7 +480,7 @@ std::unique_ptr<Value> InterpreterCalculator::reverseArray(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::makeSet(
-    Value& left,
+    const Value& left,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -518,8 +518,8 @@ void InterpreterCalculator::rotateToLeft(const Value& src, Value& dest, long lon
 }
 
 std::unique_ptr<Value> InterpreterCalculator::leftRotate(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -533,8 +533,8 @@ std::unique_ptr<Value> InterpreterCalculator::leftRotate(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::rightRotate(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -548,8 +548,8 @@ std::unique_ptr<Value> InterpreterCalculator::rightRotate(
 }
 
 std::unique_ptr<Value> InterpreterCalculator::remove(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
@@ -573,8 +573,8 @@ std::unique_ptr<Value> InterpreterCalculator::remove(
 }
 
  std::unique_ptr<Value> InterpreterCalculator::remain(
-    Value& left,
-    Value& right,
+    const Value& left,
+    const Value& right,
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {

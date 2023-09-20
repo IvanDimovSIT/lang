@@ -4,7 +4,15 @@
 class InterpreterIO : public IInterpreterIO{
 public:
     std::unique_ptr<Value> read() override;
-    void write(Value& value) override;
+    
+    void write(const Value& value) override;
+    
     std::unique_ptr<Value> readText() override;
-    void writeText(Value& value) override;
+    
+    void writeText(const Value& value) override;
+
+private:
+    static const char CHARS_START = '\t';
+    
+    static const char CHARS_END = '~';
 };

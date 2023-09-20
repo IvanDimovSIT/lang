@@ -19,90 +19,90 @@ class IInterpreterIO{
 public:
     virtual std::unique_ptr<Value> read() = 0;
     
-    virtual void write(Value& value) = 0;
+    virtual void write(const Value& value) = 0;
     
     virtual std::unique_ptr<Value> readText() = 0;
     
-    virtual void writeText(Value& value) = 0;
+    virtual void writeText(const Value& value) = 0;
 };
 
 class Interpreter{
 public:
     Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
 
-    bool execute(std::vector<Token*> &tokens, std::unordered_map<std::string, Function>& functions, Value& result);
+    bool execute(const std::vector<Token*> &tokens, const std::unordered_map<std::string, Function>& functions, Value& result);
 
-    bool execute(std::vector<Token*> &tokens, ProgramState& programState, Value& result);
+    bool execute(const std::vector<Token*> &tokens, ProgramState& programState, Value& result);
 
 private:
     bool execute(
-        std::vector<Token*> &tokens,
+        const std::vector<Token*> &tokens,
         ProgramState& programState,
-        Value& argumentA,
-        Value& argumentB,
+        const Value& argumentA,
+        const Value& argumentB,
         Value& result);
 
     void executeOnThread(
-        std::vector<Token*> tokens,
+        const std::vector<Token*> tokens,
         ProgramState& programState,
-        Value argumentA,
-        Value argumentB);
+        const Value argumentA,
+        const Value argumentB);
 
     inline bool checkForCalculation(
-        std::vector<Token*> &tokens,
+        const std::vector<Token*> &tokens,
         int& position,
         ProgramState& programState,
-        Value& argumentA,
-        Value& argumentB,
+        const Value& argumentA,
+        const Value& argumentB,
         Token*& operation,
         std::unique_ptr<Value>& leftParameter,
         std::unique_ptr<Value>& rightParameter);
 
     inline bool getArgumentsAndOperation(
         int& position,
-        std::vector<Token*> &tokens,
+        const std::vector<Token*> &tokens,
         ProgramState& programState,
         std::unique_ptr<Value>& leftParameter,
         std::unique_ptr<Value>& rightParameter,
-        Value& argumentA,
-        Value& argumentB,
+        const Value& argumentA,
+        const Value& argumentB,
         Token*& operation);
 
     std::unique_ptr<Value> getNextArgument(
         int& position,
-        std::vector<Token*> &tokens,
+        const std::vector<Token*> &tokens,
         ProgramState& programState,
-        Value& argumentA,
-        Value& argumentB,
+        const Value& argumentA,
+        const Value& argumentB,
         bool& hadError);
 
     // returns false if not an operation
     bool getOperatorOrFunctionParamerters(Token& operation, bool& hasLeftParam, bool& hasRightParam, ProgramState& programState);
 
     std::unique_ptr<Value> executeOperationOrFunction(
-        Value& leftOfOperator,
-        Value& rightOfOperator,
-        Token& operation,
-        Value& argumentA,
-        Value& argumentB,
+        const Value& leftOfOperator,
+        const Value& rightOfOperator,
+        const Token& operation,
+        const Value& argumentA,
+        const Value& argumentB,
         ProgramState& programState,
         bool& hadError);
 
     bool isFunctionWithoutParameters(Token& function, ProgramState& programState);
 
     bool executeAsync(
-        std::vector<Token*> &tokens,
+        const std::vector<Token*> &tokens,
         int& position,
         ProgramState& programState,
-        Value& argumentA,
-        Value& argumentB);
+        const Value& argumentA,
+        const Value& argumentB);
 
     inline std::unique_ptr<Value> executeModifier(
         Value& leftParameter,
-        std::vector<Token*> &tokens,
+        const std::vector<Token*> &tokens,
         ProgramState& programState,
-        Value& argumentA,
-        Value& argumentB,
+        const Value& argumentA,
+        const Value& argumentB,
         int position,
         bool& hadError);
 
@@ -110,13 +110,13 @@ private:
     
     inline void getVariable(Value& value, const std::string& variableName, ProgramState& programState);
 
-    void initVariables(std::vector<Token*> &tokens, ProgramState& programState);
+    void initVariables(const std::vector<Token*> &tokens, ProgramState& programState);
 
     void joinThreads(ProgramState& programState);
     
     void report(RuntimeErrorType errorType);
 
-    void report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
+    void report(const std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
 
     inline void endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter);
 

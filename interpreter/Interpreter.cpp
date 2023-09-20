@@ -17,7 +17,7 @@ Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* i
     this->interpreterIO = interpreterIO;
 }
 
-bool Interpreter::execute(std::vector<Token*> &tokens, std::unordered_map<std::string, Function>& functions, Value& result)
+bool Interpreter::execute(const std::vector<Token*> &tokens, const std::unordered_map<std::string, Function>& functions, Value& result)
 {
     ProgramState programState = {functions,{}, {}};
     initVariables(tokens, programState);
@@ -28,7 +28,7 @@ bool Interpreter::execute(std::vector<Token*> &tokens, std::unordered_map<std::s
     return successfulExecution;
 }
 
- bool Interpreter::execute(std::vector<Token*> &tokens, ProgramState& programState, Value& result)
+ bool Interpreter::execute(const std::vector<Token*> &tokens, ProgramState& programState, Value& result)
  {
     Value empty;
     bool successfulExecution = execute(tokens, programState,  empty, empty, result);
@@ -37,7 +37,7 @@ bool Interpreter::execute(std::vector<Token*> &tokens, std::unordered_map<std::s
     return successfulExecution;
  }
 
-void Interpreter::initVariables(std::vector<Token*> &tokens, ProgramState& programState)
+void Interpreter::initVariables(const std::vector<Token*> &tokens, ProgramState& programState)
 {
     for(const auto& i: tokens){
         if(i->id != TokenIdVariable)
@@ -69,10 +69,10 @@ void Interpreter::executeOnThread(
 }
 
 bool Interpreter::execute(
-    std::vector<Token*> &tokens,
+    const std::vector<Token*> &tokens,
     ProgramState& programState,
-    Value& argumentA,
-    Value& argumentB,
+    const Value& argumentA,
+    const Value& argumentB,
     Value& result)
 {
     const int size = tokens.size();
@@ -234,11 +234,11 @@ bool Interpreter::execute(
 }
 
 bool Interpreter::checkForCalculation(
-    std::vector<Token*> &tokens,
+    const std::vector<Token*> &tokens,
     int& position,
     ProgramState& programState,
-    Value& argumentA,
-    Value& argumentB,
+    const Value& argumentA,
+    const Value& argumentB,
     Token*& operation,
     std::unique_ptr<Value>& leftParameter,
     std::unique_ptr<Value>& rightParameter)
@@ -282,12 +282,12 @@ bool Interpreter::checkForCalculation(
 
 inline bool Interpreter::getArgumentsAndOperation(
     int& position,
-    std::vector<Token*> &tokens,
+    const std::vector<Token*> &tokens,
     ProgramState& programState,
     std::unique_ptr<Value>& leftParameter,
     std::unique_ptr<Value>& rightParameter,
-    Value& argumentA,
-    Value& argumentB,
+    const Value& argumentA,
+    const Value& argumentB,
     Token*& operation)
 {
     bool hadError = false;
@@ -306,10 +306,10 @@ inline bool Interpreter::getArgumentsAndOperation(
     
 std::unique_ptr<Value> Interpreter::getNextArgument(
     int& position,
-    std::vector<Token*> &tokens,
+    const std::vector<Token*> &tokens,
     ProgramState& programState,
-    Value& argumentA,
-    Value& argumentB,
+    const Value& argumentA,
+    const Value& argumentB,
     bool& hadError)
 {
     std::unique_ptr<Value> result;
@@ -393,11 +393,11 @@ bool Interpreter::getOperatorOrFunctionParamerters(Token& operation,  bool& hasL
 }
 
 std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
-    Value& leftOfOperator,
-    Value& rightOfOperator,
-    Token& operation,
-    Value& argumentA,
-    Value& argumentB,
+    const Value& leftOfOperator,
+    const Value& rightOfOperator,
+    const Token& operation,
+    const Value& argumentA,
+    const Value& argumentB,
     ProgramState& programState,
     bool& hadError)
 {
@@ -503,10 +503,10 @@ inline void Interpreter::getVariable(Value& value, const std::string& variableNa
 
 std::unique_ptr<Value> Interpreter::executeModifier(
     Value& leftParameter,
-    std::vector<Token*> &tokens,
+    const std::vector<Token*> &tokens,
     ProgramState& programState,
-    Value& argumentA,
-    Value& argumentB,
+    const Value& argumentA,
+    const Value& argumentB,
     int position,
     bool& hadError)
 {
@@ -552,11 +552,11 @@ std::unique_ptr<Value> Interpreter::executeModifier(
 }
 
 bool Interpreter::executeAsync(
-    std::vector<Token*> &tokens,
+    const std::vector<Token*> &tokens,
     int& position,
     ProgramState& programState,
-    Value& argumentA,
-    Value& argumentB)
+    const Value& argumentA,
+    const Value& argumentB)
 {
     std::vector<Token*> toExecute;
     int endPosition = TokenSubArrayFinder::findFirstTokenId(tokens, position, TokenIdAsyncEnd);
@@ -622,7 +622,7 @@ void Interpreter::report(RuntimeErrorType errorType)
         errorReporter->report(errorType);
 }
 
-void Interpreter::report(std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
+void Interpreter::report(const std::vector<Token*> &tokens, int position, RuntimeErrorType errorType)
 {
     if(errorReporter != nullptr && tokens.size() > 0)
         errorReporter->report(tokens, position, errorType);

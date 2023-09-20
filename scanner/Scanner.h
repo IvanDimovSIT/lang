@@ -28,7 +28,7 @@ public:
 private:
     static bool findFunctionNames(const std::string& source, std::unordered_set<std::string>& functionNames, IScannerErrorReporter* errorReporter);
 
-    static bool extractFunctions(std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions);
+    static bool extractFunctions(const std::vector<Token>& tokens, std::unordered_map<std::string, Function>& functions);
     
     static void addNextToken(
         const std::string& tokenString,
@@ -48,7 +48,7 @@ private:
 
     static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
 
-    static bool validateOperatorModifier(std::vector<Token>& tokens);
+    static bool validateOperatorModifier(const std::vector<Token>& tokens);
 
     static void report(IScannerErrorReporter* errorReporter, const std::string& line, ScannerErrorType error);
 };
