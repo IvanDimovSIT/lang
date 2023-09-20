@@ -44,9 +44,21 @@ private:
         std::unordered_set<std::string>& functionNames,
         std::unordered_set<std::string>& previousFunctions);
 
+    static inline void earlyTokenMatch(
+        int& position,
+        const std::string& source,
+        std::string& currentToken,
+        std::vector<Token>& tokens,
+        std::unordered_set<std::string>& functionNames,
+        std::unordered_set<std::string>& previousFunctions,
+        bool& hadError,
+        IScannerErrorReporter* errorReporter);
+
     static void determineFunctionPrameters(Function& function);
 
     static bool validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter);
+
+    static bool isIdentifierNextToSymbol(const std::string& source, int position);
 
     static bool validateOperatorModifier(const std::vector<Token>& tokens);
 

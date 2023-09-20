@@ -57,7 +57,7 @@ void testStringUtil(){
 
 
 
-void testScanner(){
+void testScanner1(){
     std::string source = "f FUNC { a + 1,2,3 }\nA = 2,1 FUNC ";
     std::vector<Token> tokens;
     std::unordered_map<std::string, Function> functions;
@@ -95,6 +95,30 @@ void testScanner(){
     assert(result[1] == 3);
     assert(result[2] == 5);
 
+}
+
+void testScanner2(){
+    std::string source = "A = 1,2; B = 2,1; C=A+B\n";
+    std::vector<Token> tokens;
+    std::unordered_map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    assert(functions.size() == 0);
+
+    assert(tokens[0].id == TokenIdVariable);
+    assert(tokens[1].id == TokenIdEquals);
+    assert(tokens[2].id == TokenIdLiteral);
+    assert(tokens[3].id == TokenIdEndLine);
+    assert(tokens[4].id == TokenIdVariable);
+    assert(tokens[5].id == TokenIdEquals);
+    assert(tokens[6].id == TokenIdLiteral);
+    assert(tokens[7].id == TokenIdEndLine);
+    assert(tokens[8].id == TokenIdVariable);
+    assert(tokens[9].id == TokenIdEquals);
+    assert(tokens[10].id == TokenIdVariable);
+    assert(tokens[11].id == TokenIdAdd);
+    assert(tokens[12].id == TokenIdVariable);
+    assert(tokens[13].id == TokenIdEndLine);
 }
 
 void testInterpreter1()
@@ -404,7 +428,8 @@ void testInterpreter13()
 int main(){
     testLiteralParser();
     testStringUtil();
-    testScanner();
+    testScanner1();
+    testScanner2();
     testInterpreter1();
     testInterpreter2();
     testInterpreter3();

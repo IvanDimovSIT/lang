@@ -84,12 +84,7 @@ bool Scanner::scan(
 
         }else{ // Add character
             curr += source[i];
-            if((i+1<sourceLen) &&
-                TokenSyntax::isValidToken(curr+source[i+1]) &&
-                matchToken(curr+source[i+1], tokens, functionNames, previousFunctions)){
-                i++;
-                curr = "";
-            }
+            earlyTokenMatch(i, source, curr, tokens, functionNames, previousFunctions, hadError, errorReporter);
         }
     }
 
@@ -282,6 +277,39 @@ void Scanner::addNextToken(
         hadError = true;
         report(errorReporter, tokenString, ScannerErrorTypeUnrecognisedToken);
     }
+}
+
+inline void Scanner::earlyTokenMatch(
+    int& position,
+    const std::string& source,
+    std::string& currentToken,
+    std::vector<Token>& tokens,
+    std::unordered_set<std::string>& functionNames,
+    std::unordered_set<std::string>& previousFunctions,
+    bool& hadError,
+    IScannerErrorReporter* errorReporter)
+{
+    const int sourceLen = source.size();
+    if((position+1<sourceLen) &&
+        TokenSyntax::isValidToken(currentToken+source[position+1]) &&
+        matchToken(currentToken+source[position+1], tokens, functionNames, previousFunctions)){
+        position++;
+        currentToken = "";
+    }else if(isIdentifierNextToSymbol(source, position)){
+        addNextToken(currentToken, tokens, functionNames, previousFunctions, hadError, errorReporter);
+        currentToken = "";
+    }
+}
+
+bool Scanner::isIdentifierNextToSymbol(const std::string& source, int position)
+{
+    const int size = source.size();
+    return 
+        (position+1<size) &&
+        (
+            (std::isupper(source[position]) && ((!std::isupper(source[position+1])) && (!std::isdigit(source[position+1])))) ||
+            (std::isupper(source[position+1]) && ((!std::isupper(source[position])) && (!std::isdigit(source[position]))))
+        );
 }
 
 bool Scanner::validateParenthesis(const std::string& source, const int sourceLen, IScannerErrorReporter* errorReporter)
