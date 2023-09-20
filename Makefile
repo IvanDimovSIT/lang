@@ -13,19 +13,19 @@ SRC := \
 	scanner/Scanner.cpp \
 	token/OperatorArguments.cpp \
 	token/TokenSyntax.cpp \
-	interpreter/InterpreterCalculator.cpp \
 	util/FileReader.cpp \
 	util/LiteralParser.cpp \
 	util/StringUtil.cpp \
 	util/TokenSubArrayFinder.cpp \
+	util/RandomGenerator.cpp \
 	debug/DebugPrinter.cpp \
-	debug/ErrorPrinter.cpp \
-	debug/BasePreprocessorErrorPrinter.cpp \
-	debug/REPLPreprocessorErrorPrinter.cpp \
+	reporting/ErrorPrinter.cpp \
+	reporting/BasePreprocessorErrorPrinter.cpp \
+	reporting/REPLPreprocessorErrorPrinter.cpp \
 	interpreter/FunctionExtractor.cpp \
 	interpreter/Interpreter.cpp \
 	interpreter/InterpreterIO.cpp \
-	util/RandomGenerator.cpp \
+	interpreter/InterpreterCalculator.cpp \
 	main/REPL.cpp
 
 LANG_SRC := main/main.cpp $(SRC)

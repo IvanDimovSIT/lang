@@ -5,7 +5,7 @@
 #include "../util/StringUtil.h"
 #include "../util/TokenSubArrayFinder.h"
 #include "../debug/DebugPrinter.h"
-#include "../debug/ErrorPrinter.h"
+#include "../reporting/ErrorPrinter.h"
 #include "../interpreter/Interpreter.h"
 #include "../interpreter/FunctionExtractor.h"
 #include "../interpreter/InterpreterIO.h"

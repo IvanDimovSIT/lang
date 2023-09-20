@@ -1,7 +1,7 @@
 #pragma once
 #include "../interpreter/Interpreter.h"
 #include "../scanner/Scanner.h"
-#include "../debug/ErrorPrinter.h"
+#include "../reporting/ErrorPrinter.h"
 #include "../interpreter/InterpreterIO.h"
 #include "../interpreter/FunctionExtractor.h"
 

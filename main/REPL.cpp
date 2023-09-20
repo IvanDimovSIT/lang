@@ -1,5 +1,5 @@
 #include "REPL.h"
-#include "../debug/REPLPreprocessorErrorPrinter.h"
+#include "../reporting/REPLPreprocessorErrorPrinter.h"
 #include "../scanner/Preprocessor.h"
 #include <iostream>
 
