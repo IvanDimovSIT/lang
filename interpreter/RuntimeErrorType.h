@@ -16,5 +16,6 @@ enum RuntimeErrorType{
     RuntimeErrorTypeNoOperatorToModify,
     RuntimeErrorTypeThreadHadError,
     RuntimeErrorTypeOperatorError,
-    RuntimeErrorTypeMissingParameter
+    RuntimeErrorTypeMissingParameter,
+    RuntimeErrorTypeUseOfUninitialisedVariable
 };

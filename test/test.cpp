@@ -424,6 +424,27 @@ void testInterpreter13()
     assert(result[0] == '\\');
 }
 
+void testInterpreter14()
+{
+    std::string source = 
+        "A = 1 + \"\\0\""; 
+
+    assert(Preprocessor::process(source, source, "", nullptr));
+    std::vector<Token> tokens;
+    std::unordered_map<std::string, Function> functions;
+    assert(Scanner::scan(source, tokens, functions, &errorPrinter));
+
+    std::vector<Token*> exec;
+    assert(FunctionExtractor::extractFunctions(tokens, exec));
+
+    Value result;
+    Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
+    assert(interpreter.execute(exec, functions, result));
+
+    assert(result.size() == 1);
+    assert(result[0] == 1);
+}
+
 
 int main(){
     testLiteralParser();
@@ -443,6 +464,7 @@ int main(){
     testInterpreter11();
     testInterpreter12();
     testInterpreter13();
+    testInterpreter14();
 
     std::cout << "ALL TESTS PASSED!" << std::endl;
     return 0;

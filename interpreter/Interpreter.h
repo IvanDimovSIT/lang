@@ -110,8 +110,6 @@ private:
     
     inline void getVariable(Value& value, const std::string& variableName, ProgramState& programState);
 
-    void initVariables(const std::vector<Token*> &tokens, ProgramState& programState);
-
     void joinThreads(ProgramState& programState);
     
     void report(RuntimeErrorType errorType);

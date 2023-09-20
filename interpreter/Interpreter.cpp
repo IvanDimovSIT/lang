@@ -20,7 +20,6 @@ Interpreter::Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* i
 bool Interpreter::execute(const std::vector<Token*> &tokens, const std::unordered_map<std::string, Function>& functions, Value& result)
 {
     ProgramState programState = {functions,{}, {}};
-    initVariables(tokens, programState);
     Value empty;
     bool successfulExecution = execute(tokens, programState,  empty, empty, result);
     joinThreads(programState);
@@ -35,25 +34,6 @@ bool Interpreter::execute(const std::vector<Token*> &tokens, const std::unordere
     joinThreads(programState);
 
     return successfulExecution;
- }
-
-void Interpreter::initVariables(const std::vector<Token*> &tokens, ProgramState& programState)
-{
-    for(const auto& i: tokens){
-        if(i->id != TokenIdVariable)
-            continue;
-        
-        programState.variables[i->str].value = {0.0};
-    }
-
-    for(const auto& i: programState.functions){
-        for(const auto& j: i.second.body){
-            if(j->id != TokenIdVariable)
-            continue;
-        
-        programState.variables[j->str].value = {0.0};
-        }
-    }
 }
 
 void Interpreter::executeOnThread(
@@ -497,9 +477,15 @@ inline void Interpreter::setVariable(const Value& value, const std::string& vari
     
 inline void Interpreter::getVariable(Value& value, const std::string& variableName, ProgramState& programState)
 {
-    programState.variables[variableName].mut.lock();
-    value = programState.variables[variableName].value;
-    programState.variables[variableName].mut.unlock();
+    const auto variable = programState.variables.find(variableName);
+    if(variable == programState.variables.end()){
+        value = {0.0};
+        return;
+    }
+
+    variable->second.mut.lock();
+    value = variable->second.value;
+    variable->second.mut.unlock();
 }
 
 

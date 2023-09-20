@@ -295,7 +295,7 @@ inline void Scanner::earlyTokenMatch(
         matchToken(currentToken+source[position+1], tokens, functionNames, previousFunctions)){
         position++;
         currentToken = "";
-    }else if(isIdentifierNextToSymbol(source, position)){
+    }else if(source[position] != '"' && isIdentifierNextToSymbol(source, position)){
         addNextToken(currentToken, tokens, functionNames, previousFunctions, hadError, errorReporter);
         currentToken = "";
     }
