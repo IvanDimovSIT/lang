@@ -27,11 +27,14 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
     auto result = std::make_unique<Value>();
     const int leftSize = left.size();
     const int rightSize = right.size();
-    if(leftSize == 0 || rightSize == 0){
+    if((!validateInput(left, reporter, hadError)) || (!validateInput(right, reporter, hadError))){
         hadError = true;
         if(reporter)
             reporter->report(RuntimeErrorTypeEmptyData);
+        
+        return std::move(result);
     }
+    
     const int maxSize = leftSize > rightSize ? leftSize : rightSize;
 
     for(int i=0; i<maxSize; i++){

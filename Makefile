@@ -38,6 +38,9 @@ all: $(LANG_EXE)
 
 buildtest: $(TEST_EXE)
 
+scan: $(LANG_SRC)
+	scan-build $(CXX) $(CXXFLAGS) -o $(LANG_EXE) $(LANG_SRC)
+
 $(LANG_EXE): $(LANG_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $(LANG_SRC)
 
