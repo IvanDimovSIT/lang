@@ -45,7 +45,7 @@ void ErrorPrinter::report(RuntimeErrorType errorType)
     std::cout << "RuntimeError:" << (runtimeErrors.count(errorType)?runtimeErrors[errorType]:std::to_string(errorType)) << std::endl;
 }
 
-void ErrorPrinter::report(const std::vector<Token*>& tokens, int errorPosition, RuntimeErrorType errorType)
+void ErrorPrinter::report(const std::vector<const Token*>& tokens, int errorPosition, RuntimeErrorType errorType)
 {
     static const std::string runtimeError = "RuntimeError in: ";
     static const int runtimeErrorSize = runtimeError.size();
@@ -148,7 +148,7 @@ bool ErrorPrinter::hasSeenError(const std::string& line, ScannerErrorType errorT
     return false;
 }
 
-std::string ErrorPrinter::generateErrorLine(const std::vector<Token*>& tokens, int errorPosition, int& tokenPositionInLine)
+std::string ErrorPrinter::generateErrorLine(const std::vector<const Token*>& tokens, int errorPosition, int& tokenPositionInLine)
 {
     const int size = tokens.size();
     tokenPositionInLine = 0;

@@ -7,7 +7,7 @@ class ErrorPrinter : public IScannerErrorReporter, public IRuntimeErrorReporter,
 public:
     void report(RuntimeErrorType errorType) override;
 
-    void report(const std::vector<Token*>& tokens, int errorPosition, RuntimeErrorType errorType) override;
+    void report(const std::vector<const Token*>& tokens, int errorPosition, RuntimeErrorType errorType) override;
 
     void report(const std::string& source, int position, ScannerErrorType errorType) override;
 
@@ -24,7 +24,7 @@ private:
 
     bool hasSeenError(const std::string& line, ScannerErrorType errorType, bool& lineNotSeen);
 
-    std::string generateErrorLine(const std::vector<Token*>& tokens, int errorPosition, int& tokenPositionInLine);
+    std::string generateErrorLine(const std::vector<const Token*>& tokens, int errorPosition, int& tokenPositionInLine);
 
     std::unordered_map<std::string, std::unordered_set<ScannerErrorType>> seenScannerErrors;
     std::unordered_map<std::string, std::unordered_set<RuntimeErrorType>> seenRuntimeErrors;

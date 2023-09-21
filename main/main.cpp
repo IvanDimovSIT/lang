@@ -63,15 +63,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::vector<Token*> exec;
-    if(!FunctionExtractor::extractFunctions(tokens, exec)){
+    std::vector<const Token*> executable;
+    if(!FunctionExtractor::extractFunctions(tokens, executable)){
         std::cout << "Error finding functions" << std::endl;
         return 1;
     }
     Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
     
-    if(!interpreter.execute(exec, functions, result)){
+    if(!interpreter.execute(executable, functions, result)){
         return 1;
     }
 

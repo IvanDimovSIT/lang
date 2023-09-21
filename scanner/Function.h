@@ -3,7 +3,7 @@
 #include "../token/Token.h"
 
 struct Function{
-    std::vector<Token*> body;
+    std::vector<const Token*> body;
     bool hasLeft;
     bool hasRight;
 };

@@ -10,7 +10,7 @@ void REPL::run()
     InterpreterIO io;
     Interpreter interpreter(&errorPrinter, &io);
     std::vector<Token> tokens;
-    std::vector<Token*> tokensRef;
+    std::vector<const Token*> tokensRef;
     std::unordered_map<std::string, Function> functions = {};
     std::unordered_set<std::string> functionNames;
     ProgramState programState;

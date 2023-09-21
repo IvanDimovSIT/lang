@@ -83,7 +83,7 @@ void testScanner1(){
     assert(tokens[10].val.size() == 2);
     assert(tokens[11].id == TokenIdFunction);
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     assert(exec.size() == 5);
 
@@ -138,7 +138,7 @@ void testInterpreter1()
     std::vector<Token> tokens;
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
@@ -153,7 +153,7 @@ void testInterpreter2()
     std::vector<Token> tokens;
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
@@ -179,7 +179,7 @@ void testInterpreter3()
     std::vector<Token> tokens;
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
     Value result;
     Interpreter interpreter((IRuntimeErrorReporter*)&errorPrinter, (IInterpreterIO*)&io);
@@ -205,7 +205,7 @@ void testInterpreter4()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -230,7 +230,7 @@ void testInterpreter5()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -251,7 +251,7 @@ void testInterpreter6()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -274,7 +274,7 @@ void testInterpreter7()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -296,7 +296,7 @@ void testInterpreter8()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -322,7 +322,7 @@ void testInterpreter9()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -350,7 +350,7 @@ void testInterpreter10()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -370,7 +370,7 @@ void testInterpreter11()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -391,7 +391,7 @@ void testInterpreter12()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -413,7 +413,7 @@ void testInterpreter13()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;
@@ -434,7 +434,7 @@ void testInterpreter14()
     std::unordered_map<std::string, Function> functions;
     assert(Scanner::scan(source, tokens, functions, &errorPrinter));
 
-    std::vector<Token*> exec;
+    std::vector<const Token*> exec;
     assert(FunctionExtractor::extractFunctions(tokens, exec));
 
     Value result;

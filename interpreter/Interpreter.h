@@ -10,7 +10,7 @@
 
 class IRuntimeErrorReporter{
 public:
-    virtual void report(const std::vector<Token*>& tokens, int errorPosition, RuntimeErrorType errorType) = 0;
+    virtual void report(const std::vector<const Token*>& tokens, int errorPosition, RuntimeErrorType errorType) = 0;
 
     virtual void report(RuntimeErrorType errorType) = 0;
 };
@@ -30,54 +30,54 @@ class Interpreter{
 public:
     Interpreter(IRuntimeErrorReporter* errorReporter, IInterpreterIO* interpreterIO);
 
-    bool execute(const std::vector<Token*> &tokens, const std::unordered_map<std::string, Function>& functions, Value& result);
+    bool execute(const std::vector<const Token*> &tokens, const std::unordered_map<std::string, Function>& functions, Value& result);
 
-    bool execute(const std::vector<Token*> &tokens, ProgramState& programState, Value& result);
+    bool execute(const std::vector<const Token*> &tokens, ProgramState& programState, Value& result);
 
 private:
     bool execute(
-        const std::vector<Token*> &tokens,
+        const std::vector<const Token*> &tokens,
         ProgramState& programState,
         const Value& argumentA,
         const Value& argumentB,
         Value& result);
 
     void executeOnThread(
-        const std::vector<Token*> tokens,
+        const std::vector<const Token*> tokens,
         ProgramState& programState,
         const Value argumentA,
         const Value argumentB);
 
     inline bool checkForCalculation(
-        const std::vector<Token*> &tokens,
+        const std::vector<const Token*> &tokens,
         int& position,
         ProgramState& programState,
         const Value& argumentA,
         const Value& argumentB,
-        Token*& operation,
+        const Token*& operation,
         std::unique_ptr<Value>& leftParameter,
         std::unique_ptr<Value>& rightParameter);
 
     inline bool getArgumentsAndOperation(
         int& position,
-        const std::vector<Token*> &tokens,
+        const std::vector<const Token*> &tokens,
         ProgramState& programState,
         std::unique_ptr<Value>& leftParameter,
         std::unique_ptr<Value>& rightParameter,
         const Value& argumentA,
         const Value& argumentB,
-        Token*& operation);
+        const Token*& operation);
 
     std::unique_ptr<Value> getNextArgument(
         int& position,
-        const std::vector<Token*> &tokens,
+        const std::vector<const Token*> &tokens,
         ProgramState& programState,
         const Value& argumentA,
         const Value& argumentB,
         bool& hadError);
 
     // returns false if not an operation
-    bool getOperatorOrFunctionParamerters(Token& operation, bool& hasLeftParam, bool& hasRightParam, ProgramState& programState);
+    bool getOperatorOrFunctionParamerters(const Token& operation, bool& hasLeftParam, bool& hasRightParam, ProgramState& programState);
 
     std::unique_ptr<Value> executeOperationOrFunction(
         const Value& leftOfOperator,
@@ -88,10 +88,10 @@ private:
         ProgramState& programState,
         bool& hadError);
 
-    bool isFunctionWithoutParameters(Token& function, ProgramState& programState);
+    bool isFunctionWithoutParameters(const Token& function, ProgramState& programState);
 
     bool executeAsync(
-        const std::vector<Token*> &tokens,
+        const std::vector<const Token*> &tokens,
         int& position,
         ProgramState& programState,
         const Value& argumentA,
@@ -99,7 +99,7 @@ private:
 
     inline std::unique_ptr<Value> executeModifier(
         Value& leftParameter,
-        const std::vector<Token*> &tokens,
+        const std::vector<const Token*> &tokens,
         ProgramState& programState,
         const Value& argumentA,
         const Value& argumentB,
@@ -114,7 +114,7 @@ private:
     
     void report(RuntimeErrorType errorType);
 
-    void report(const std::vector<Token*> &tokens, int position, RuntimeErrorType errorType);
+    void report(const std::vector<const Token*> &tokens, int position, RuntimeErrorType errorType);
 
     inline void endStatement(std::unique_ptr<Value>& lastResult, std::unique_ptr<Value>& leftParameter, std::unique_ptr<Value>& rightParameter);
 
