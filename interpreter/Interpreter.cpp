@@ -186,11 +186,18 @@ bool Interpreter::execute(
                 if(hadError)
                     return false;
             
+                if(leftParameter->size() == 0){
+                    report(tokens, i, RuntimeErrorTypeEmptyData);
+                    return false;
+                }
                 lastResult = std::move(leftParameter);
                 leftParameter = std::make_unique<Value>();
                 setVariable(*lastResult, tokens[i - 1]->str, programState);
                 i = statementEnd;
                 continue;
+            }else{
+                report(tokens, i, RuntimeErrorTypeOperatorError);
+                return false;
             }
             break;
             default:break;
