@@ -18,5 +18,12 @@ public:
 
     static void convertValueToString(const Value& value, std::string& dest);
 
+private:
+    static inline bool isWithnLimit(double value);
+
+public:
     static const int STRING_END_NOT_FOUND = -1;
+
+private:
+    static constexpr double CONVERT_LIMIT = 1000000.0;
 };

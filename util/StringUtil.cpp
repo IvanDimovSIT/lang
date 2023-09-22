@@ -1,5 +1,6 @@
 #include "StringUtil.h"
 #include <sstream>
+#include <cmath>
 
 bool StringUtil::isValidIdentifierName(const std::string& name){
     const int strLen = name.size();
@@ -69,6 +70,11 @@ std::string StringUtil::getLine(const std::string& str, int position)
     return line;
 }
 
+inline bool StringUtil::isWithnLimit(double value)
+{
+    return fabs(value) < CONVERT_LIMIT;
+}
+
 void StringUtil::convertValueToString(const Value& value, std::string& dest)
 {
     const int size = value.size();
@@ -76,10 +82,10 @@ void StringUtil::convertValueToString(const Value& value, std::string& dest)
     dest = "";
 
     for(int i=0; i<size-1; i++){
-        stream << value[i];
+        stream << (isWithnLimit(value[i])?std::defaultfloat: std::fixed) << value[i];
         stream << ", ";
     }
-    stream << value[size-1];
+    stream <<(isWithnLimit(value[size-1])?std::defaultfloat: std::fixed) << value[size-1];
 
     dest = stream.str();
 }
