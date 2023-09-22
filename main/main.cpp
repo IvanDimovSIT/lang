@@ -7,16 +7,18 @@
 #include "../reporting/ErrorPrinter.h"
 #include "../interpreter/InterpreterIO.h"
 #include "../interpreter/FunctionExtractor.h"
+#include "../util/StringUtil.h"
 #include "REPL.h"
 
 void printResult(const Value& result)
 {
-    std::cout << "Result: [";
-    const int size = result.size();
-    for(int i=0; i<size-1; i++){
-        std::cout << result[i] <<", ";
+    if(result.size() == 0){
+        std::cout << "No result" << std::endl;
+        return;
     }
-    std::cout << result[size-1] << "]" << std::endl;
+    std::string resultString = "";
+    StringUtil::convertValueToString(result, resultString);
+    std::cout << "Result: [" << resultString << ']' << std::endl;
 }
 
 bool enterFilepath(std::string& filepath)
@@ -74,12 +76,8 @@ int main(int argc, char** argv)
     if(!interpreter.execute(executable, functions, result)){
         return 1;
     }
-
-    if(result.size() > 0){
-        printResult(result);
-    }else{
-        std::cout << "No result" << std::endl;
-    }
+    
+    printResult(result);
 
     return 0;
 }

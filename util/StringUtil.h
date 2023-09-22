@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../token/Token.h"
 
 class StringUtil{
 public:
@@ -14,6 +15,8 @@ public:
     static std::string getLine(const std::string& str, int position, int& substringStartPosition);
 
     static std::string getLine(const std::string& str, int position);
+
+    static void convertValueToString(const Value& value, std::string& dest);
 
     static const int STRING_END_NOT_FOUND = -1;
 };

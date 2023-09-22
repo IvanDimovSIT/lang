@@ -1,5 +1,6 @@
 #include "InterpreterCalculator.h"
 #include "../util/RandomGenerator.h"
+#include "../util/StringUtil.h"
 #include <cmath>
 #include <unordered_set>
 #include <algorithm>
@@ -265,6 +266,23 @@ std::unique_ptr<Value> InterpreterCalculator::sine(
 
     for(const auto& i: left)
         result->push_back(sin(i));
+    
+    return std::move(result);
+}
+
+std::unique_ptr<Value> InterpreterCalculator::convert(
+    const Value& left,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<Value>();
+    if(!validateInput(left, reporter, hadError))
+        return std::move(result);
+
+    std::string converted;
+    StringUtil::convertValueToString(left, converted);
+    for(const auto& i: converted)
+        result->push_back((char)i);
     
     return std::move(result);
 }

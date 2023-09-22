@@ -1,7 +1,9 @@
 #include "REPL.h"
 #include "../reporting/REPLPreprocessorErrorPrinter.h"
 #include "../scanner/Preprocessor.h"
+#include "../util/StringUtil.h"
 #include <iostream>
+
 
 void REPL::run()
 {
@@ -109,21 +111,20 @@ void REPL::deleteProgramState(ProgramState& programState)
     }
 }
 
-void REPL::printValue(Value& v)
+void REPL::printValue(Value& value)
 {
-    const int size = v.size();
-    if(size == 1){
-        std::cout << v[0] << std::endl;
-        return;
-    }else if(size == 0){
+    if(value.size() == 0){
         return;
     }
 
-    std::cout << "[";
-    for(int i=0; i<size-1; i++){
-        std::cout << v[i] <<", ";
-    }
-    std::cout << v[size-1] << "]" << std::endl;
+    std::string valueString = "";
+    StringUtil::convertValueToString(value, valueString);
+   
+   if(value.size() == 1){
+        std::cout << valueString << std::endl;
+   }else{
+        std::cout << '[' << valueString << ']' << std::endl;
+   }
 }
 
 bool REPL::isStringExit(const std::string& line)

@@ -20,7 +20,7 @@ private:
 
     static void deleteProgramState(ProgramState& programState);
 
-    static void printValue(Value& v);
+    static void printValue(Value& value);
 
     static bool isStringExit(const std::string& line);
 

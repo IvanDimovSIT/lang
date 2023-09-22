@@ -1,22 +1,9 @@
 FIZZBUZZUPTO = 100          // maximum number to apply fizzbuzz to
 
-// generate fizzbuzz string from number or 0 if not divisable by 3 or 5
-f FIZZBUZZSTR {
-    ( a % 3 == 0 ) * "Fizz" | (( a % 5 == 0 ) * "Buzz") -> 0
-}
-
-// fizzbuzz output for single number
+// generate fizzbuzz string from number
 f FIZZBUZZ {
-    STR = a FIZZBUZZSTR     // get string for input
-    
-    if STR == 0 {           // if string is 0 then output the number
-        w a
-    }
-
-    if STR != 0 {           // if there is a string then output it
-        t STR
-    }
+    ( a % 3 == 0 ) * "Fizz" | (( a % 5 == 0 ) * "Buzz") | ((( a % 5 != 0 ) * ( a % 3 != 0 ))*(a c)) -> 0 | "\n"
 }
 
-FIZZBUZZUPTO i \FIZZBUZZ    // apply fizzbuzz to all numbers from 1 to FIZZBUZZUPTO
+t FIZZBUZZUPTO i \FIZZBUZZ  // apply fizzbuzz to all numbers from 1 to FIZZBUZZUPTO and output the result
 0                           // return 0

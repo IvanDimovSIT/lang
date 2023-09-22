@@ -1,4 +1,5 @@
 #include "StringUtil.h"
+#include <sstream>
 
 bool StringUtil::isValidIdentifierName(const std::string& name){
     const int strLen = name.size();
@@ -67,3 +68,19 @@ std::string StringUtil::getLine(const std::string& str, int position)
 
     return line;
 }
+
+void StringUtil::convertValueToString(const Value& value, std::string& dest)
+{
+    const int size = value.size();
+    std::ostringstream stream;
+    dest = "";
+
+    for(int i=0; i<size-1; i++){
+        stream << value[i];
+        stream << ", ";
+    }
+    stream << value[size-1];
+
+    dest = stream.str();
+}
+

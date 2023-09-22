@@ -46,6 +46,7 @@ enum TokenId{
     TokenIdWrite,               // w
     TokenIdReadText,            // g
     TokenIdWriteText,           // t
+    TokenIdConvert,             // c
     TokenIdApplyToEach,         // '\'
     TokenIdLeftRotate,          // <<
     TokenIdRightRotate,         // >>

@@ -1,5 +1,6 @@
 #include "InterpreterIO.h"
-#include <iostream>
+#include <iostream> 
+#include "../util/StringUtil.h"
 
 std::unique_ptr<Value> InterpreterIO::read()
 {
@@ -35,11 +36,9 @@ std::unique_ptr<Value> InterpreterIO::read()
     
 void InterpreterIO::write(const Value& value)
 {
-    const int size = value.size();
-    for(int i=0; i<size-1; i++){
-        std::cout << value[i] << ", ";
-    }
-    std::cout << value[size-1] << std::endl;
+    std::string converted = "";
+    StringUtil::convertValueToString(value, converted);
+    std::cout << converted << std::endl;
 }
 
 std::unique_ptr<Value> InterpreterIO::readText()

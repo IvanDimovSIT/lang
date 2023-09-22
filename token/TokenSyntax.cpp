@@ -45,6 +45,7 @@ std::unordered_map<std::string, TokenId> TokenSyntax::tokenMap = {
     {"w", TokenIdWrite},
     {"g", TokenIdReadText},
     {"t", TokenIdWriteText},
+    {"c", TokenIdConvert},
     {"\\",TokenIdApplyToEach},
     {"<<",TokenIdLeftRotate},
     {">>",TokenIdRightRotate},
@@ -80,6 +81,7 @@ switch (token)
     case 'g':
     case 't':
     case 's':
+    case 'c':
     case '{':
     case '}':
     case '(':
