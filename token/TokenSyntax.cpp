@@ -56,6 +56,11 @@ std::unordered_map<std::string, TokenId> TokenSyntax::tokenMap = {
     {"!!", TokenIdAsyncJoin}
 };
 
+std::unordered_set<char> TokenSyntax::singleCharTokens = {
+    'i', 'f', 'a', 'b', 'r', 'w', 'g', 't', 's', 'c', '{', '}', '(', ')', '\n',
+    ';', '@', '?', '|', '&', ':', '_', '$', '~', '^', '\\', '[', ']'
+};
+
 bool TokenSyntax::isValidToken(const std::string& tokenString)
 {
     return tokenMap.find(tokenString) != tokenMap.end();
@@ -70,39 +75,5 @@ TokenId TokenSyntax::getToken(const std::string& tokenString)
 
 bool TokenSyntax::isSingleCharToken(char token)
 {
-switch (token)
-    {
-    case 'i':
-    case 'f':
-    case 'a':
-    case 'b':
-    case 'r':
-    case 'w':
-    case 'g':
-    case 't':
-    case 's':
-    case 'c':
-    case '{':
-    case '}':
-    case '(':
-    case ')':
-    case '\n':
-    case ';':
-    case '@':
-    case '?':
-    case '|':
-    case '&':
-    case ':':
-    case '_':
-    case '$':
-    case '~':
-    case '^':
-    case '\\':
-    case '[':
-    case ']':
-        return true;
-    default:
-        return false;
-    }
+    return singleCharTokens.find(token) != singleCharTokens.end();
 }
-

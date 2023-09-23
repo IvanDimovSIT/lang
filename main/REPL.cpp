@@ -134,11 +134,9 @@ bool REPL::isStringExit(const std::string& line)
         if(line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
             continue;
         
-        if(line[i] == 'e'){
-            return line[i+1] == 'x' && line[i+2] == 'i' && line[i+3] == 't';
-        }else{
-            return false;
-        }
+        std::string exitString = line.substr(i, 4);
+
+        return exitString == "exit" || exitString == "quit"; 
     }
 
     return false;

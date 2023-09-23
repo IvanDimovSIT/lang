@@ -64,5 +64,5 @@ private:
 
     static bool validateOperatorModifier(const std::vector<Token>& tokens);
 
-    static void report(IScannerErrorReporter* errorReporter, const std::string& source, int position, ScannerErrorType error);
+    static void report(IScannerErrorReporter* errorReporter, bool& hadError, const std::string& source, int position, ScannerErrorType error);
 };
