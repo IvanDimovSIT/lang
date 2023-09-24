@@ -76,6 +76,16 @@ private:
         const Value& argumentB,
         bool& hadError);
 
+    //returns statement end position
+    int executeStatement(
+        const std::vector<const Token*> &tokens,
+        int position,
+        ProgramState& programState,
+        const Value& argumentA,
+        const Value& argumentB,
+        Value& result,
+        bool& hadError);
+
     // returns false if not an operation
     bool getOperatorOrFunctionParamerters(const Token& operation, bool& hasLeftParam, bool& hasRightParam, ProgramState& programState);
 

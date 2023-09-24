@@ -148,48 +148,26 @@ bool Interpreter::execute(
             case TokenIdWrite:
             case TokenIdWriteText:
             {
-                const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
                 Value output;
-                std::vector<const Token*> statement;
-                TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
-                hadError = !execute(
-                    statement,
-                    programState,
-                    argumentA,
-                    argumentB,
-                    output);
+                const int statementEnd = executeStatement(tokens, i, programState, argumentA, argumentB, output, hadError);
                 if(hadError)
                     return false;
             
-                if(output.size() >= 1){
-                    if(tokens[i]->id == TokenIdWrite)
-                        writeNumbers(programState, output);
-                    else
-                        writeText(programState, output);
-                    *lastResult = output;
-                }
+                if(tokens[i]->id == TokenIdWrite)
+                    writeNumbers(programState, output);
+                else
+                    writeText(programState, output);
+                *lastResult = output;
+
                 i = statementEnd;
                 continue;
             }
             case TokenIdEquals:
             if(i-1>=0 && tokens[i-1]->id == TokenIdVariable){
-                const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, i);
-                std::vector<const Token*> statement;
-                TokenSubArrayFinder::findSubArray(tokens, statement, i+1, statementEnd);
-
-                hadError = !execute(
-                    statement,
-                    programState,
-                    argumentA,
-                    argumentB,
-                    *leftParameter);
+                const int statementEnd = executeStatement(tokens, i, programState, argumentA, argumentB, *leftParameter, hadError);
                 if(hadError)
                     return false;
-            
-                if(leftParameter->size() == 0){
-                    report(tokens, i, RuntimeErrorTypeEmptyData);
-                    return false;
-                }
+
                 lastResult = std::move(leftParameter);
                 leftParameter = std::make_unique<Value>();
                 setVariable(*lastResult, tokens[i - 1]->str, programState);
@@ -218,6 +196,37 @@ bool Interpreter::execute(
         lastResult = std::move(leftParameter);
     result = *lastResult;
     return true;
+}
+
+int Interpreter::executeStatement(
+    const std::vector<const Token*> &tokens,
+    int position,
+    ProgramState& programState,
+    const Value& argumentA,
+    const Value& argumentB,
+    Value& result,
+    bool& hadError)
+{
+    const int statementEnd = TokenSubArrayFinder::findStatementEnd(tokens, position);
+    std::vector<const Token*> statement;
+    TokenSubArrayFinder::findSubArray(tokens, statement, position+1, statementEnd);
+
+    if(!execute(
+        statement,
+        programState,
+        argumentA,
+        argumentB,
+        result)){
+        hadError = true;
+        return statementEnd;
+    }
+            
+    if(result.size() == 0){
+        report(tokens, position, RuntimeErrorTypeEmptyData);
+        hadError = true;
+    }
+
+    return statementEnd;
 }
 
 bool Interpreter::checkForCalculation(
@@ -565,6 +574,7 @@ bool Interpreter::executeAsync(
     int endPosition = TokenSubArrayFinder::findFirstTokenId(tokens, position, TokenIdAsyncEnd);
     if(endPosition == TokenSubArrayFinder::TOKEN_INDEX_NOT_FOUND)
         return false;
+
     TokenSubArrayFinder::findSubArray(tokens, toExecute, position+1, endPosition-1);
     programState.threads.push_back(std::thread(&Interpreter::executeOnThread, this, toExecute, std::ref(programState), argumentA, argumentB));
     position = endPosition;

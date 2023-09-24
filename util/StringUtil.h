@@ -8,6 +8,7 @@ public:
     
     static int findStringLiteralEndIndex(const std::string& source, int start); 
 
+    // returns string position index
     static int findNextEndline(const std::string& str, int start);
 
     static bool isSeparator(char c);
