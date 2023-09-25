@@ -2,8 +2,10 @@
 #include "../reporting/REPLPreprocessorErrorPrinter.h"
 #include "../scanner/Preprocessor.h"
 #include "../util/StringUtil.h"
+#include "../token/OperatorsHelp.h"
+#include "../token/TokenSyntax.h"
 #include <iostream>
-
+#include <cctype>
 
 void REPL::run()
 {
@@ -19,15 +21,19 @@ void REPL::run()
 
     std::string source;
     do{
+        bool isHelp = false, isExit = false;
         errorPrinter.resetErrors();
         functions = programState.functions;
         tokens.clear();
         tokensRef.clear();
 
-        source = readInput();
-        if(isStringExit(source)){
+        source = readInput(isHelp, isExit);
+        if(isExit){
             deleteProgramState(programState);
             return;
+        }
+        if(isHelp){
+            continue;
         }
         if(!Preprocessor::process(source, source, "", &preprocessorErrorPrinter)){
             continue;
@@ -51,7 +57,7 @@ void REPL::run()
 
 void REPL::countOpen(const std::string& line, int& openCurly, int& openSquare)
 {
-    for(const auto& i: line){
+    for(const auto& i: Preprocessor::removeComments(line)){
         switch (i)
         {
         case '{': openCurly++; break;
@@ -63,7 +69,7 @@ void REPL::countOpen(const std::string& line, int& openCurly, int& openSquare)
     }
 }
 
-std::string REPL::readInput()
+std::string REPL::readInput(bool& isHelp, bool& isExit)
 {
     std::string read, source = "";
     int openCurly = 0, openSquare = 0;
@@ -73,6 +79,14 @@ std::string REPL::readInput()
         else
             std::cout << ">>> ";
         getline(std::cin, read);
+        if(openCurly == 0 && openSquare == 0 && isStringExit(read)){
+            isExit = true;
+            return "";
+        }
+        if(openCurly == 0 && openSquare == 0 && displayHelp(read)){
+            isHelp = true;
+            return "";
+        }
         source += read;
         source += '\n';
         countOpen(read, openCurly, openSquare);
@@ -131,7 +145,7 @@ bool REPL::isStringExit(const std::string& line)
 {
     const int size = line.size();
     for(int i=0; i<size-3; i++){
-        if(line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
+        if(std::isspace(line[i]))
             continue;
         
         std::string exitString = line.substr(i, 4);
@@ -140,6 +154,62 @@ bool REPL::isStringExit(const std::string& line)
     }
 
     return false;
+}
+
+bool REPL::displayHelp(const std::string& line)
+{
+    const int size = line.size();
+    for(int i=0; i<size-3; i++){
+        if(std::isspace(line[i]))
+            continue;
+        
+        std::string helpString = line.substr(i, 4);
+        if(helpString == "help"){
+            std::string toCheck = line.substr(i+4);
+            displayHelpFor(toCheck);
+            return true;
+        }else
+            return false;
+    }
+
+    return false;
+}
+
+void REPL::displayHelpFor(const std::string& operatorString)
+{
+    const int size = operatorString.size();
+    std::string token = "";
+    for(int i = 0; i<size; i++){
+        if(std::isspace(operatorString[i]) && token.size() > 0)
+            break;
+        else if(std::isspace(operatorString[i]))
+            continue;
+        
+        token += operatorString[i];
+    }
+
+    displayDescription(token);
+}
+
+void REPL::displayDescription(const std::string& token)
+{
+    if(token == ""){
+        std::cout << "No operator entered (eg. use \"help +\" to display help about the \"+\" operator)" << std::endl;
+        return;
+    }
+
+    if(!TokenSyntax::isValidToken(token)){
+        std::cout << '"' << token << '"' << " is not a recognised operator" << std::endl;
+        return;
+    }
+
+    const auto description = OperatorsHelp::descriptions.find(TokenSyntax::getToken(token));
+    if(description == OperatorsHelp::descriptions.end()){
+        std::cout << '"' << token << '"' << " is not a recognised operator" << std::endl;
+        return;
+    }
+
+    std::cout << description->second << std::endl;
 }
 
 void REPL::addFunctionNames(std::unordered_set<std::string>& functionNames, std::unordered_map<std::string, Function>& functions){

@@ -42,7 +42,9 @@ int main(int argc, char** argv)
     }
 
     if(filepath == "REPL"){
-        std::cout << "*Entered REPL mode*\nType \"exit\" to quit the program" << std::endl;
+        std::cout << "*Entered REPL mode*" << std::endl;
+        std::cout << "Type \"exit\" to quit the program" << std::endl;
+        std::cout << "Type \"help\" + operator to view a description of the operator" << std::endl;
         REPL::run();
         return 0;
     }

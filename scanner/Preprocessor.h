@@ -14,6 +14,8 @@ class Preprocessor{
 public:
     static bool process(std::string source, std::string& dest, const std::string& sourceFilepath, IPreprocessorErrorReporter* errorReporter);
 
+    static std::string removeComments(const std::string& source);
+    
 private:
     static bool process(
         int recursionLimit,
@@ -29,8 +31,6 @@ private:
         std::string& dest,
         const std::string& sourceFilepath,
         IPreprocessorErrorReporter* errorReporter);
-
-    static std::string removeComments(const std::string& source);
 
     static std::string getDirectoryPath(const std::string& filepath);
 

@@ -13,6 +13,7 @@ SRC := \
 	scanner/Scanner.cpp \
 	token/OperatorArguments.cpp \
 	token/TokenSyntax.cpp \
+	token/OperatorsHelp.cpp \
 	util/FileReader.cpp \
 	util/LiteralParser.cpp \
 	util/StringUtil.cpp \
