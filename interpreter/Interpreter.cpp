@@ -475,6 +475,8 @@ std::unique_ptr<Value> Interpreter::executeOperationOrFunction(
         return InterpreterCalculator::remove(leftOfOperator, rightOfOperator, hadError, errorReporter);
     case TokenIdRemain:
         return InterpreterCalculator::remain(leftOfOperator, rightOfOperator, hadError, errorReporter);
+    case TokenIdCountEach:
+        return InterpreterCalculator::countEach(leftOfOperator, rightOfOperator, hadError, errorReporter);
     default:
         hadError = true;
         report(RuntimeErrorTypeNotAnOperation);

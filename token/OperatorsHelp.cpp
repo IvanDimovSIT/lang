@@ -16,6 +16,7 @@ const std::map<TokenId, std::string> OperatorsHelp::descriptions = {
     {TokenIdNotEquals, "NotEquals - Checks if the two values are not equal, if so returns 1"},
     {TokenIdLogicalNot, "LogicalNot - Performs logical NOT operation"},
     {TokenIdCount, "Count - Returns the count of numbers in the value to the left"},
+    {TokenIdCountEach, "CountEach - Returns the count of numbers in the value to the left that mach each number in the right (duplicate values ignored)"},
     {TokenIdSumAll, "SumAll - Sums all numbers in the value to the left"},
     {TokenIdMultiplyAll, "MultiplyAll - Multiplies all numbers in the value to the left"},
     {TokenIdMakeSet, "MakeSet - Returns all unique numbers in the value to the left"},

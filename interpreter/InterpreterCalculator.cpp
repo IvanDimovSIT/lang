@@ -632,3 +632,35 @@ std::unique_ptr<Value> InterpreterCalculator::remove(
 
     return std::move(result);
 }
+
+std::unique_ptr<Value> InterpreterCalculator::countEach(
+    const Value& left,
+    const Value& right,
+    bool& hadError,
+    IRuntimeErrorReporter* reporter)
+{
+    auto result = std::make_unique<Value>();
+    if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
+        return std::move(result);
+
+    std::unordered_map<double, int> numberCounts;
+    for(const auto& i: left){
+        auto count = numberCounts.find(i);
+        if(count == numberCounts.end()){
+            numberCounts[i] = 1;
+        }else{
+            count->second++;
+        }
+    }
+
+    for(const auto& i: right){
+        auto count = numberCounts.find(i);
+        if(count == numberCounts.end()){
+            result->push_back(0.0);
+        }else{
+            result->push_back((double)count->second);
+        }
+    }
+
+    return std::move(result);
+}

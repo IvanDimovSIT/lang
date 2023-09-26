@@ -27,6 +27,7 @@ std::unordered_map<std::string, TokenId> TokenSyntax::tokenMap = {
     {"@", TokenIdReverse},
     {"&", TokenIdMakeSet},
     {"#", TokenIdCount},
+    {"##",TokenIdCountEach},
     {"#+",TokenIdSumAll},
     {"#*",TokenIdMultiplyAll},
     {"f", TokenIdFunctionDeclaration},
