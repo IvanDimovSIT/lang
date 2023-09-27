@@ -194,7 +194,14 @@ void REPL::displayHelpFor(const std::string& operatorString)
 void REPL::displayDescription(const std::string& token)
 {
     if(token == ""){
-        std::cout << "No operator entered (eg. use \"help +\" to display help about the \"+\" operator)" << std::endl;
+        std::cout << "No operator entered (eg. use \"help +\" to display help about the \"+\" operator, or \"help all\" to display all operators)" << std::endl;
+        return;
+    }
+
+    if(token == "all"){
+        for(const auto& i: OperatorsHelp::descriptions){
+            std::cout << i.second.description << std::endl;
+        }
         return;
     }
 
@@ -209,7 +216,10 @@ void REPL::displayDescription(const std::string& token)
         return;
     }
 
-    std::cout << description->second << std::endl;
+    std::cout << description->second.description << "\nExamples:" << std::endl;
+    for(const auto& i: description->second.examples){
+        std::cout << i << std::endl;
+    }
 }
 
 void REPL::addFunctionNames(std::unordered_set<std::string>& functionNames, std::unordered_map<std::string, Function>& functions){
