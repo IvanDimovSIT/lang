@@ -26,7 +26,7 @@ const std::map<TokenId, OperatorsInformation> OperatorsHelp::descriptions = {
         "/ Divides two values, causes an error if any number in the second value is zero",
         {
             "6 / 3 -> 2",
-            "-3 / 2 -> -1.5"
+            "-3 / 2 -> -1.5",
             "1 / 0 -> ERROR"
         }
     }},
@@ -39,7 +39,8 @@ const std::map<TokenId, OperatorsInformation> OperatorsHelp::descriptions = {
     {TokenIdPower,{
         "** Raises the first value to the power of the second value",
         {
-            "2 ** 3 -> 8"
+            "2 ** 3 -> 8",
+            "4 ** 0.5 -> 2"
         }
     }},
     {TokenIdSine,{
@@ -51,13 +52,17 @@ const std::map<TokenId, OperatorsInformation> OperatorsHelp::descriptions = {
     {TokenIdLessThan,{
         "< Checks if the first value is less than the second value, if so returns 1",
         {
-            "1 < 5 -> 1"
+            "1 < 5 -> 1",
+            "5 < 5 -> 0",
+            "6 < 5 -> 0"
         }
     }},
     {TokenIdGreaterThan,{
         "> Checks if the first value is greater than the second value, if so returns 1",
         {
-            "1 > 5 -> 0"
+            "1 > 5 -> 0",
+            "5 > 5 -> 0",
+            "6 > 5 -> 1"
         }
     }},
     {TokenIdLessThanOrEquals,{
@@ -246,25 +251,31 @@ const std::map<TokenId, OperatorsInformation> OperatorsHelp::descriptions = {
     {TokenIdLeftRotate,{
         "<< Rotates numbers in the left value to the left based on the value passed from the right parameter",
         {
-            "1,2,3 << 1 -> 2,3,1"
+            "1,2,3 << 1 -> 2,3,1",
+            "1,2,3 << 3 -> 1,2,3",
+            "1,2,3 << -1 -> 3,2,1"
         }
     }},
     {TokenIdRightRotate,{
         ">> Rotates numbers in the left value to the right based on the value passed from the right parameter",
         {
-            "1,2,3 >> 1 -> 3,1,2"
+            "1,2,3 >> 1 -> 3,1,2",
+            "1,2,3 >> 3 -> 1,2,3",
+            "1,2,3 >> -1 -> 2,3,1"
         }
     }},
     {TokenIdRemove,{
         "-> Removes numbers from the left value that are contained in the right value (if none remain returns 0)",
         {
-            "1,2,3 -> 1,3 -> 2"
+            "1,2,3 -> 1,3 -> 2",
+            "1,2 -> 1,2 -> 0"
         }
     }},
     {TokenIdRemain,{
         "<- Removes numbers from the left value that are not contained in the right value (if none remain returns 0)",
         {
-            "1,2,3 <- 1,3 -> 1,3"
+            "1,2,3 <- 1,3 -> 1,3",
+            "1,2,3 <- 4 -> 0"
         }
     }},
     {TokenIdAsyncStart,{
