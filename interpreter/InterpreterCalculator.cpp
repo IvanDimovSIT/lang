@@ -37,6 +37,7 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
     }
 
     const int maxSize = leftSize > rightSize ? leftSize : rightSize;
+    result->reserve(maxSize);
 
     for(int i=0; i<maxSize; i++){
         result->push_back(lambda(left[i%leftSize],right[i%rightSize], hadError, reporter));
@@ -264,6 +265,7 @@ std::unique_ptr<Value> InterpreterCalculator::sine(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     for(const auto& i: left)
         result->push_back(sin(i));
     
@@ -320,6 +322,7 @@ std::unique_ptr<Value> InterpreterCalculator::logicalNot(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
     
+    result->reserve(left.size());
     for(const auto& i:left)
         result->push_back(i == 0.0 ? 1.0 : 0.0);
 
@@ -387,11 +390,11 @@ std::unique_ptr<Value> InterpreterCalculator::findUnion(
     bool& hadError,
     IRuntimeErrorReporter* reporter)
 {
-    auto result = std::make_unique<Value>();
     if((!validateInput(left, reporter, hadError)) || (!validateInput(right, reporter, hadError)))
-        return std::move(result);
+        return std::move(std::make_unique<Value>());
 
-    *result = left;
+    auto result = std::make_unique<Value>(left);
+    result->reserve(left.size() + right.size());
     for(const auto& i: right)
         result->push_back(i);
 
@@ -412,6 +415,7 @@ std::unique_ptr<Value> InterpreterCalculator::select(
             reporter->report(RuntimeErrorTypeEmptyData);
         return std::move(result);
     }
+    result->reserve(right.size());
 
     for(const auto& i: right){
         int index = floor(i)-1;
@@ -433,6 +437,7 @@ std::unique_ptr<Value> InterpreterCalculator::randomize(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     for(const auto& i: left)
         result->push_back(i*RandomGenerator::generateRandom());
 
@@ -448,6 +453,7 @@ std::unique_ptr<Value> InterpreterCalculator::findCeil(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     for(const auto& i: left)
         result->push_back(ceil(i));
 
@@ -463,6 +469,7 @@ std::unique_ptr<Value> InterpreterCalculator::findFloor(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     for(const auto& i: left)
         result->push_back(floor(i));
 
@@ -478,6 +485,7 @@ std::unique_ptr<Value> InterpreterCalculator::findRound(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     for(const auto& i: left)
         result->push_back(round(i));
 
@@ -563,6 +571,7 @@ std::unique_ptr<Value> InterpreterCalculator::leftRotate(
     if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     rotateToLeft(left, *result, (long long)right[0]);
     
     return std::move(result);
@@ -578,6 +587,7 @@ std::unique_ptr<Value> InterpreterCalculator::rightRotate(
     if(!validateInput(left, reporter, hadError) || !validateInput(right, reporter, hadError))
         return std::move(result);
 
+    result->reserve(left.size());
     rotateToLeft(left, *result, -((long long)right[0]));
     
     return std::move(result);
