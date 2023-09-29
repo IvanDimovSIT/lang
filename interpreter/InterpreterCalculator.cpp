@@ -36,7 +36,7 @@ std::unique_ptr<Value> InterpreterCalculator::dyadicFunction(
         return std::move(result);
     }
 
-    const int maxSize = leftSize > rightSize ? leftSize : rightSize;
+    const int maxSize = std::max(leftSize, rightSize);
     result->reserve(maxSize);
 
     for(int i=0; i<maxSize; i++){
@@ -298,6 +298,7 @@ std::unique_ptr<Value> InterpreterCalculator::iterate(
     if(!validateInput(left, reporter, hadError))
         return std::move(result);
 
+    result->reserve((size_t)std::max(left[0], 1.0)); // assume only one element
     for(const auto& i: left){
         int val = floor(i);
         if(val <= 0)
